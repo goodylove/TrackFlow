@@ -21,7 +21,6 @@ export interface IUser {
 
 export type UserDocument = HydratedDocument<IUser>;
 
-
 const UserSchema = new Schema<IUser>(
   {
     name: {
@@ -39,12 +38,10 @@ const UserSchema = new Schema<IUser>(
       trim: true,
       lowercase: true,
       maxlength: 255,
-
     },
     passwordHash: {
       type: String,
       required: true,
-
       select: false,
     },
     avatarUrl: {
@@ -97,7 +94,5 @@ const UserSchema = new Schema<IUser>(
     },
   },
 );
-
-
 
 export const User = model<IUser>("User", UserSchema);

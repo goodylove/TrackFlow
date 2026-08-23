@@ -14,11 +14,13 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 app.get("/", (req, res) => {
-    res.status(StatusCodes.OK).json({ message: "Welcome to the TrackFlow API", status: "success" });
+  res
+    .status(StatusCodes.OK)
+    .json({ message: "Welcome to the TrackFlow API", status: "success" });
 });
 app.get("/api/v1/health", (req, res) => {
-    res.set("Cache-Control", "no-store");
-    res.status(StatusCodes.OK).json({ message: "API is healthy", status: "success" });
+  res.set("Cache-Control", "no-store");
+  res.status(StatusCodes.OK).json({ message: "API is healthy", status: "success" });
 });
 
 // user
