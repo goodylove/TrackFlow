@@ -6,6 +6,7 @@ import { NotFound } from "./middleware/notfound.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { StatusCodes } from "http-status-codes";
 import userRouter from "./modules/user/user.routes.js";
+import workspaceRouter from "./modules/workspace/workspace.routes.js";
 
 const app = express();
 app.use(cors());
@@ -26,6 +27,10 @@ app.get("/api/v1/health", (req, res) => {
 // user
 
 app.use("/api/v1/users", userRouter);
+
+// workspace
+
+app.use("/api/v1/workspaces", workspaceRouter);
 
 // Handle unknown routes
 app.use(NotFound);
