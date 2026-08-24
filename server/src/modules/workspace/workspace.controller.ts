@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import { createWorkspaceSchema } from "./workspace.schema.js";
 import { StatusCodes } from "http-status-codes";
 import { createWorkSpace, getWorkspacesByUserId, } from "./workspace.service.js";
