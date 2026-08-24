@@ -8,3 +8,4 @@ export class AuthenticationError extends Error {
         this.name = "AuthenticationError";
     }
 }
+
