@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 
 import { User } from "./user.model.js";
 import type { LoginUserInput, RegisterUserInput } from "./user.schema.js";
+import { WorkspaceMember } from "../workspace/workspace-member.model.js";
+import { Workspace } from "../workspace/workspace.model.js";
 
 const SALT_ROUNDS = 12;
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -80,6 +82,17 @@ export const loginUser = async (input: LoginUserInput) => {
     isEmailVerified: user.isEmailVerified,
     createdAt: user.createdAt,
     lastLoginAt: user.lastLoginAt,
-
   };
+};
+
+export const deleteUser = async (userId: string) => {
+  const user = await User.findByIdAndDelete(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  await WorkspaceMember.deleteMany({ user: userId });
+  await Workspace.deleteMany({ createdBy: userId });
+  return;
 };

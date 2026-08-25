@@ -1,8 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import type { Error } from "mongoose";
-import { WorkspaceAlreadyExistsError } from "../errors/workspace.error.js";
-import { AuthenticationError } from "../errors/authentication.error.js";
+import {
+  ExistingMemberError,
+  WorkspaceAlreadyExistsError,
+} from "../errors/workspace.error.js";
+import {
+  AuthenticationError,
+  UserNotFoundError,
+} from "../errors/authentication.error.js";
 import { EmailAlreadyExistsError } from "../modules/user/user.service.js";
 
 export const errorHandler = (
@@ -11,9 +17,6 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction,
 ) => {
-
-
-
   if (err instanceof AuthenticationError) {
     res.status(StatusCodes.UNAUTHORIZED).json({
       success: false,
@@ -31,6 +34,24 @@ export const errorHandler = (
     });
 
     return;
+  }
+
+  if (err instanceof UserNotFoundError) {
+    res.status(StatusCodes.NOT_FOUND).json({
+      success: false,
+      status: "error",
+      message: err.message,
+    });
+
+    return;
+  }
+
+  if (err instanceof ExistingMemberError) {
+    res.status(StatusCodes.CONFLICT).json({
+      success: false,
+      status: "error",
+      message: err.message,
+    });
   }
 
   if (err instanceof WorkspaceAlreadyExistsError) {
