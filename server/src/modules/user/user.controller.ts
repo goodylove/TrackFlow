@@ -64,9 +64,11 @@ export const loginUserController = async (
   });
 };
 
-
-
-export const currentUserController = async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
+export const currentUserController = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+): Promise<void> => {
   res.status(StatusCodes.OK).json({
     success: true,
     message: "Current user retrieved successfully",
@@ -74,4 +76,4 @@ export const currentUserController = async (req: Request, res: Response, _next: 
       user: req.user,
     },
   });
-}
+};

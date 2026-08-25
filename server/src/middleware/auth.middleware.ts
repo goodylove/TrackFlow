@@ -4,110 +4,108 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import { User } from "../modules/user/user.model.js";
 import { StatusCodes } from "http-status-codes";
 
-
-
 export const authenticate = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
+  req: Request,
+  res: Response,
+  next: NextFunction,
 ): Promise<void> => {
-    // 1. Read the Authorization header
-    const authorizationHeader = req.headers.authorization;
+  // 1. Read the Authorization header
+  const authorizationHeader = req.headers.authorization;
 
-    if (!authorizationHeader) {
-        res.status(StatusCodes.UNAUTHORIZED).json({
-            success: false,
-            message: "Authentication token is required",
-        });
+  if (!authorizationHeader) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      success: false,
+      message: "Authentication token is required",
+    });
 
-        return;
+    return;
+  }
+
+  // 2. Separate "Bearer" from the token
+  const [scheme, token] = authorizationHeader.split(" ");
+
+  if (scheme !== "Bearer" || !token) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      success: false,
+      message: "Use the format: Bearer <token>",
+    });
+
+    return;
+  }
+
+  // 3. Make sure the JWT secret exists
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+
+  let payload: JwtPayload;
+
+  // 4. Verify the JWT
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+
+    if (typeof decoded === "string") {
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        success: false,
+        message: "Invalid authentication token",
+      });
+
+      return;
     }
 
-    // 2. Separate "Bearer" from the token
-    const [scheme, token] = authorizationHeader.split(" ");
+    payload = decoded;
+  } catch {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      success: false,
+      message: "Authentication token is invalid or expired",
+    });
 
-    if (scheme !== "Bearer" || !token) {
-        res.status(StatusCodes.UNAUTHORIZED).json({
-            success: false,
-            message: "Use the format: Bearer <token>",
-        });
+    return;
+  }
 
-        return;
-    }
+  // 5. Read the user ID from the token
+  const userId = payload.sub;
 
-    // 3. Make sure the JWT secret exists
-    const jwtSecret = process.env.JWT_SECRET;
+  if (!userId) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      success: false,
+      message: "Invalid authentication token",
+    });
 
-    if (!jwtSecret) {
-        throw new Error("JWT_SECRET is not defined");
-    }
+    return;
+  }
 
-    let payload: JwtPayload;
+  // 6. Confirm that the user still exists
+  const user = await User.findById(userId);
 
-    // 4. Verify the JWT
-    try {
-        const decoded = jwt.verify(token, jwtSecret);
+  if (!user) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      success: false,
+      message: "User no longer exists",
+    });
 
-        if (typeof decoded === "string") {
-            res.status(StatusCodes.UNAUTHORIZED).json({
-                success: false,
-                message: "Invalid authentication token",
-            });
+    return;
+  }
 
-            return;
-        }
+  // 7. Prevent suspended users from continuing
+  if (user.status !== "active") {
+    res.status(StatusCodes.FORBIDDEN).json({
+      success: false,
+      message: "This account is not active",
+    });
 
-        payload = decoded;
-    } catch {
-        res.status(StatusCodes.UNAUTHORIZED).json({
-            success: false,
-            message: "Authentication token is invalid or expired",
-        });
+    return;
+  }
 
-        return;
-    }
+  // 8. Attach the authenticated user to the request
+  req.user = {
+    id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+  };
 
-    // 5. Read the user ID from the token
-    const userId = payload.sub
-
-    if (!userId) {
-        res.status(StatusCodes.UNAUTHORIZED).json({
-            success: false,
-            message: "Invalid authentication token",
-        });
-
-        return;
-    }
-
-    // 6. Confirm that the user still exists
-    const user = await User.findById(userId);
-
-    if (!user) {
-        res.status(StatusCodes.UNAUTHORIZED).json({
-            success: false,
-            message: "User no longer exists",
-        });
-
-        return;
-    }
-
-    // 7. Prevent suspended users from continuing
-    if (user.status !== "active") {
-        res.status(StatusCodes.FORBIDDEN).json({
-            success: false,
-            message: "This account is not active",
-        });
-
-        return;
-    }
-
-    // 8. Attach the authenticated user to the request
-    req.user = {
-        id: user._id.toString(),
-        name: user.name,
-        email: user.email,
-    };
-
-    // 9. Continue to the controller
-    next();
+  // 9. Continue to the controller
+  next();
 };
