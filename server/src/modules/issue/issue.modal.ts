@@ -1,23 +1,12 @@
 import { model, Schema, Types } from "mongoose";
 
-export const ISSUE_STATUSES = [
-  "todo",
-  "in_progress",
-  "done",
-] as const;
+export const ISSUE_STATUSES = ["todo", "in_progress", "done"] as const;
 
-export type IssueStatus =
-  (typeof ISSUE_STATUSES)[number];
+export type IssueStatus = (typeof ISSUE_STATUSES)[number];
 
-export const ISSUE_PRIORITIES = [
-  "low",
-  "medium",
-  "high",
-  "urgent",
-] as const;
+export const ISSUE_PRIORITIES = ["low", "medium", "high", "urgent"] as const;
 
-export type IssuePriority =
-  (typeof ISSUE_PRIORITIES)[number];
+export type IssuePriority = (typeof ISSUE_PRIORITIES)[number];
 
 export interface IIssue {
   workspace: Types.ObjectId;
@@ -26,7 +15,7 @@ export interface IIssue {
   status: IssueStatus;
   priority: IssuePriority;
   reporter: Types.ObjectId;
-  assignee?: Types.ObjectId;
+  assignee: Types.ObjectId | null;
   dueDate?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -80,7 +69,7 @@ const issueSchema = new Schema<IIssue>(
     assignee: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      default: undefined,
+      default: null,
       index: true,
     },
 
@@ -100,7 +89,9 @@ issueSchema.index({
   createdAt: -1,
 });
 
-export const Issue = model<IIssue>(
-  "Issue",
-  issueSchema,
-);
+issueSchema.index({
+  workspace: 1,
+  title: 1,
+});
+
+export const Issue = model<IIssue>("Issue", issueSchema);
