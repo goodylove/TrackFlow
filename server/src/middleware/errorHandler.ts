@@ -63,6 +63,7 @@ export const errorHandler = (
 
     return;
   }
+  console.log(err);
   res
     .status(StatusCodes.INTERNAL_SERVER_ERROR)
     .json({ message: "Internal server error", status: "error", success: false });
