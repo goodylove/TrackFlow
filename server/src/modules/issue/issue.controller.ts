@@ -1,11 +1,18 @@
 import { StatusCodes } from "http-status-codes";
-import { createIssueSchema, setIssueAssigneeSchema } from "./issue.schema.js";
+import {
+  createIssueSchema,
+  getIssuesSchema,
+  setIssueAssigneeSchema,
+  updateIssueSchema,
+} from "./issue.schema.js";
 import type { Request, Response } from "express";
 import {
   createIssue,
+  deleteIssue,
   getIssueById,
   getIssuesByWorkspaceId,
   setIssueAssignee,
+  updateIssueDetails,
 } from "./issue.service.js";
 
 export const createIssueController = async (
@@ -63,6 +70,19 @@ export const getIssuesByWorkspaceIdController = async (
 ): Promise<void> => {
   const workspaceId = req.workspaceMembership?.workspaceId;
 
+  const result = getIssuesSchema.safeParse({
+    query: req.query,
+  });
+
+  if (!result.success) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid filters",
+      errors: result.error.flatten().fieldErrors,
+    });
+
+    return;
+  }
   if (!workspaceId) {
     res.status(StatusCodes.BAD_REQUEST).json({
       success: false,
@@ -72,7 +92,7 @@ export const getIssuesByWorkspaceIdController = async (
     return;
   }
 
-  const issues = await getIssuesByWorkspaceId(workspaceId);
+  const issues = await getIssuesByWorkspaceId(workspaceId, result.data.query);
 
   res.status(StatusCodes.OK).json({
     success: true,
@@ -153,5 +173,70 @@ export const setIssueAssigneeController = async (
     success: true,
     message: "assignee updated successfully",
     data: issue,
+  });
+};
+
+export const updateIssueDetailsController = async (
+  req: Request<{ workspaceId: string; issueId: string }>,
+  res: Response,
+): Promise<void> => {
+  const membership = req.workspaceMembership;
+
+  if (!membership) {
+    res.status(StatusCodes.FORBIDDEN).json({
+      success: false,
+      message: "Workspace membership has not been verified",
+    });
+
+    return;
+  }
+
+  const result = updateIssueSchema.safeParse({
+    body: req.body,
+  });
+  if (!result.success) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      message: "Validation failed",
+      errors: result.error.flatten().fieldErrors,
+    });
+    return;
+  }
+
+  const issue = await updateIssueDetails(
+    membership.workspaceId,
+    result.data.body,
+    req.params.issueId,
+  );
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "issue updated successfully",
+    data: {
+      issue,
+    },
+  });
+};
+
+export const deleteIssueController = async (
+  req: Request<{ workspaceId: string; issueId: string }>,
+  res: Response,
+): Promise<void> => {
+  const membership = req.workspaceMembership;
+
+  if (!membership) {
+    res.status(StatusCodes.FORBIDDEN).json({
+      success: false,
+      message: "Workspace membership has not been verified",
+    });
+
+    return;
+  }
+
+  await deleteIssue(membership.workspaceId, req.params.issueId);
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Issue deleted successfully",
   });
 };
