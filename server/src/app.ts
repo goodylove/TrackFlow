@@ -9,6 +9,7 @@ import userRouter from "./modules/user/user.routes.js";
 import workspaceRouter from "./modules/workspace/workspace.routes.js";
 import issueRouter from "./modules/issue/issue.routes.js";
 import commentRoute from "./modules/comment/comment.routes.js";
+import dashboardRouter from "./modules/dashboard/dashboard.routes.js";
 
 const app = express();
 app.use(cors());
@@ -26,18 +27,21 @@ app.get("/api/v1/health", (req, res) => {
   res.status(StatusCodes.OK).json({ message: "API is healthy", status: "success" });
 });
 
-// user
+// User
 
 app.use("/api/v1/users", userRouter);
 
-// workspace
+// Workspace
 
 app.use("/api/v1/workspaces", workspaceRouter);
-// issues
+// Issues
 app.use("/api/v1/workspaces", issueRouter);
 
-// comment
+// Comment
 app.use("/api/v1/workspaces", commentRoute);
+
+// Dashboard
+app.use("/api/v1/workspaces", dashboardRouter);
 
 // Handle unknown routes
 app.use(NotFound);
