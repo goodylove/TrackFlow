@@ -1,19 +1,19 @@
 import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import type { Error } from "mongoose";
 import {
   ExistingMemberError,
   WorkspaceAlreadyExistsError,
 } from "../errors/workspace.error.js";
 import {
   AuthenticationError,
+  InvalidCredentialsError,
   UserNotFoundError,
 } from "../errors/authentication.error.js";
 import { EmailAlreadyExistsError } from "../modules/user/user.service.js";
 
 export const errorHandler = (
-  err: Error,
-  req: Request,
+  err: unknown,
+  _req: Request,
   res: Response,
   _next: NextFunction,
 ) => {
@@ -26,6 +26,17 @@ export const errorHandler = (
 
     return;
   }
+
+  if (err instanceof InvalidCredentialsError) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      success: false,
+      status: "error",
+      message: err.message,
+    });
+
+    return;
+  }
+
   if (err instanceof EmailAlreadyExistsError) {
     res.status(StatusCodes.CONFLICT).json({
       success: false,
@@ -52,6 +63,8 @@ export const errorHandler = (
       status: "error",
       message: err.message,
     });
+
+    return;
   }
 
   if (err instanceof WorkspaceAlreadyExistsError) {
