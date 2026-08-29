@@ -1,16 +1,15 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+import { env } from "../../config/env.js";
+import { InvalidCredentialsError } from "../../errors/authentication.error.js";
 import { User } from "./user.model.js";
 import type { LoginUserInput, RegisterUserInput } from "./user.schema.js";
 import { WorkspaceMember } from "../workspace/workspace-member.model.js";
 import { Workspace } from "../workspace/workspace.model.js";
 
 const SALT_ROUNDS = 12;
-const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_SECRET = env.JWT_SECRET;
 
 export class EmailAlreadyExistsError extends Error {
   constructor() {
@@ -52,13 +51,13 @@ export const loginUser = async (input: LoginUserInput) => {
   const user = await User.findOne({ email }).select("+passwordHash");
 
   if (!user) {
-    throw new Error("Invalid email");
+    throw new InvalidCredentialsError();
   }
 
   const isPasswordValid = await bcrypt.compare(input.password, user.passwordHash);
 
   if (!isPasswordValid) {
-    throw new Error("Incorrect password");
+    throw new InvalidCredentialsError();
   }
 
   const token = jwt.sign(

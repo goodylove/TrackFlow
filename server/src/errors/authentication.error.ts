@@ -9,6 +9,15 @@ export class AuthenticationError extends Error {
   }
 }
 
+export class InvalidCredentialsError extends Error {
+  public readonly statusCode = StatusCodes.UNAUTHORIZED;
+
+  constructor(message = "Invalid email or password") {
+    super(message);
+    this.name = "InvalidCredentialsError";
+  }
+}
+
 export class UserNotFoundError extends Error {
   public readonly statusCode = StatusCodes.NOT_FOUND;
 

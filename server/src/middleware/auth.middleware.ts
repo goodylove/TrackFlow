@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 
+import { env } from "../config/env.js";
 import { User } from "../modules/user/user.model.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -33,18 +34,11 @@ export const authenticate = async (
     return;
   }
 
-  // 3. Make sure the JWT secret exists
-  const jwtSecret = process.env.JWT_SECRET;
-
-  if (!jwtSecret) {
-    throw new Error("JWT_SECRET is not defined");
-  }
-
   let payload: JwtPayload;
 
   // 4. Verify the JWT
   try {
-    const decoded = jwt.verify(token, jwtSecret);
+    const decoded = jwt.verify(token, env.JWT_SECRET);
 
     if (typeof decoded === "string") {
       res.status(StatusCodes.UNAUTHORIZED).json({

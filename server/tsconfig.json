@@ -45,6 +45,7 @@
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
+  "types": ["node", "vitest/globals"],
 
   // , "test/**/*.ts"
   "exclude": ["node_modules", "dist"]
