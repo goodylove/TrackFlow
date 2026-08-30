@@ -44,7 +44,12 @@ export const createIssue = async (
     ...(input.assigneeId !== undefined && {
       assignee: input.assigneeId,
     }),
-
+    ...(input.status !== undefined && {
+      status: input.status,
+    }),
+    ...(input.priority !== undefined && {
+      priority: input.priority,
+    }),
     reporter: userId,
   });
 
@@ -91,41 +96,40 @@ export const getIssuesByWorkspaceId = async (
 
   // return issues;
 
-    const [issues, totalIssues] = await Promise.all([
-      Issue.find(query)
-        .populate({
-          path: "reporter",
-          select: "name email avatarUrl status",
-        })
-        .populate({
-          path: "assignee",
-          select: "name email avatarUrl status",
-        })
-        .sort({
-          createdAt: -1,
-          _id: -1,
-        })
-        .skip(skip)
-        .limit(filters.limit),
+  const [issues, totalIssues] = await Promise.all([
+    Issue.find(query)
+      .populate({
+        path: "reporter",
+        select: "name email avatarUrl status",
+      })
+      .populate({
+        path: "assignee",
+        select: "name email avatarUrl status",
+      })
+      .sort({
+        createdAt: -1,
+        _id: -1,
+      })
+      .skip(skip)
+      .limit(filters.limit),
 
-      Issue.countDocuments(query),
-    ]);
+    Issue.countDocuments(query),
+  ]);
 
-    const totalPages = Math.ceil(totalIssues / filters.limit);
+  const totalPages = Math.ceil(totalIssues / filters.limit);
 
-     return {
+  return {
     issues,
     pagination: {
-      page:filters.page,
-      limit:filters.limit,
+      page: filters.page,
+      limit: filters.limit,
       totalIssues,
       totalPages,
       hasNextPage: filters.page < totalPages,
       hasPreviousPage: filters.page > 1,
     },
-}
-}
-
+  };
+};
 
 export const getIssueById = async (workspaceId: string, issueId: string) => {
   const issue = await Issue.findOne({
