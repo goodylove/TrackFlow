@@ -2,17 +2,11 @@ import { describe, expect, it } from "vitest";
 import request from "supertest";
 import app from "../../app.js";
 import { User } from "./user.model.js";
-// import type { registerUserSchema } from "./user.schema.js";
+import { login, UserData } from "../../test/auth.helper.js";
 
 describe("Register flows works as expected", () => {
-  const data = {
-    name: "Goodness",
-    email: "goodyc@gmail.com",
-    password: "wghejhfjjghfjw",
-  };
-
   it("Successful registration", async () => {
-    const response = await request(app).post("/api/v1/users/register").send(data);
+    const response = await request(app).post("/api/v1/users/register").send(UserData);
 
     expect(response.status).toBe(201);
     expect(response.body).toMatchObject({
@@ -25,8 +19,8 @@ describe("Register flows works as expected", () => {
   });
 
   it("Duplicate email", async () => {
-    await request(app).post("/api/v1/users/register").send(data);
-    const response = await request(app).post("/api/v1/users/register").send(data);
+    await request(app).post("/api/v1/users/register").send(UserData);
+    const response = await request(app).post("/api/v1/users/register").send(UserData);
 
     expect(response.status).toBe(409);
     expect(response.body).toMatchObject({
@@ -104,5 +98,53 @@ describe("Login flows works as expected", () => {
     });
 
     expect(response.body).not.toHaveProperty("data");
+  });
+});
+
+describe("Protected Routes", () => {
+  it("Unauthenticated user is not allowed to have access to workspace routes", async () => {
+    const token = null;
+
+    const response = await request(app)
+      .get("/api/v1/workspaces")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Authentication token is invalid or expired",
+    });
+  });
+
+  it("No authorization header → 401", async () => {
+    await request(app).post("/api/v1/users/register").send(UserData);
+    await request(app).post("/api/v1/users/login").send(login);
+
+    const response = await request(app).get("/api/v1/workspaces");
+
+    expect(response.status).toBe(401);
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Authentication token is required",
+    });
+  });
+
+  it("authenticated user is allowed to have access to workspace routes with Valid JWT ", async () => {
+    await request(app).post("/api/v1/users/register").send(UserData);
+    const loginResponseB = await request(app).post("/api/v1/users/login").send(login);
+
+    const token = loginResponseB.body.data.user.token;
+
+    const response = await request(app)
+      .get("/api/v1/workspaces")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Workspaces retrieved successfully",
+    });
+
+    expect(Array.isArray(response.body.data)).toBe(true);
   });
 });
