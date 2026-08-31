@@ -25,3 +25,5 @@ npm-debug.log*
 .vscode/
 .DS_Store
 Thumbs.db
+
+# $ npm install react-router-dom axios @tanstack/react-query react-hook-form zod @hookform/resol
