@@ -1,7 +1,9 @@
 import { ArrowRight } from "@phosphor-icons/react"
+import { Link } from "react-router-dom"
 
 import { Container } from "@/components/shared/container"
-import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 import { ProductPreview } from "./product-preview"
 
@@ -21,7 +23,7 @@ export function Hero() {
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-[18%] top-[3%] h-[39rem] rounded-[9999px] bg-white/90 blur-[74px] sm:inset-x-[22%] sm:h-[50rem]"
+              className="pointer-events-none absolute -inset-x-12 top-[3%] h-[49rem] rounded-[9999px] bg-white/90 blur-[45px] sm:inset-x-[22%] sm:h-[50rem] sm:blur-[74px]"
             />
 
 
@@ -44,10 +46,10 @@ export function Hero() {
                 </p>
               </div>
               <div className="mt-6 flex items-center justify-center">
-                <Button className="min-w-40 shadow-[0_18px_36px_-20px_rgba(23,63,43,0.38)]" size="lg" type="button">
+                <Link className={cn(buttonVariants({ size: "lg" }), "min-w-40 shadow-[0_18px_36px_-20px_rgba(23,63,43,0.38)]")} to="/signup">
                   Get started
                   <ArrowRight className="size-4" />
-                </Button>
+                </Link>
               </div>
             </div>
 

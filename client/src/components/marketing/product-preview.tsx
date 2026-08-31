@@ -1,3 +1,5 @@
+
+
 import {
   CalendarBlank,
   ChatsCircle,
@@ -5,30 +7,78 @@ import {
   DotsThree,
   Kanban,
   MagnifyingGlass,
-  ShareNetwork,
-} from "@phosphor-icons/react"
+  Plus,
+} from "@phosphor-icons/react";
 
 const boardColumns = [
-  { name: "To do", count: 12, accent: "bg-slate-300" },
-  { name: "In progress", count: 8, accent: "bg-amber-300" },
-  { name: "In review", count: 5, accent: "bg-orange-200" },
-  { name: "Complete", count: 21, accent: "bg-emerald-400" },
-]
+  {
+    name: "To do",
+    count: 9,
+    accent: "bg-slate-300",
+  },
+  {
+    name: "In progress",
+    count: 8,
+    accent: "bg-amber-300",
+  },
+  {
+    name: "Done",
+    count: 7,
+    accent: "bg-emerald-400",
+  },
+];
 
 const boardCards = [
-  { title: "Refine issue activity timeline", label: "Low", due: "Jun 27" },
-  { title: "Close auth edge case on invite flow", label: "Medium", due: "Jun 30" },
-  { title: "Ship billing audit export filters", label: "High", due: "Jul 13" },
-  { title: "Tighten dashboard empty states", label: "Urgent", due: "Jul 19" },
-]
+  {
+    title: "Fix login redirect after authentication",
+    priority: "High",
+    dueDate: "Sep 4",
+    comments: 6,
+  },
+  {
+    title: "Improve dashboard empty states",
+    priority: "Medium",
+    dueDate: "Sep 8",
+    comments: 4,
+  },
+  {
+    title: "Add pagination to issue comments",
+    priority: "Low",
+    dueDate: "Sep 12",
+    comments: 8,
+  },
+];
+
+const workspaces = [
+  "TrackFlow Development",
+  "Website Redesign",
+  "Mobile Application",
+  "Documentation",
+];
 
 const featureTags = [
-  "Issue Management",
-  "Collaboration Tools",
-  "Tasks & To Do's",
-  "Project Management",
-  "Goals & Strategy",
-]
+  "Workspace Management",
+  "Issue Tracking",
+  "Clear Ownership",
+  "Team Comments",
+  "Dashboard Insights",
+];
+
+function getPriorityClass(priority: string) {
+  switch (priority) {
+    case "Low":
+      return "text-slate-500";
+
+    case "Medium":
+      return "text-amber-600";
+
+    case "High":
+      return "text-red-600";
+
+    default:
+      return "text-red-800";
+  }
+}
 
 export function ProductPreview() {
   return (
@@ -36,37 +86,41 @@ export function ProductPreview() {
       <div className="absolute inset-x-[10%] top-10 h-16 rounded-full bg-[var(--marketing-side-glow-soft)] blur-3xl" />
 
       <div className="mx-auto max-w-[var(--preview-width)]">
-        <div className="overflow-hidden rounded-[1.75rem] border border-[var(--marketing-preview-border)] bg-[var(--marketing-elevated)] shadow-[0_30px_90px_-45px_rgba(22,32,25,0.18)]">
+        <div className="overflow-hidden rounded-[1.70rem] border border-[var(--marketing-preview-border)] bg-[var(--marketing-elevated)] shadow-[0_30px_90px_-45px_rgba(22,32,25,0.18)]">
           <div className="flex items-center gap-3 border-b border-[var(--marketing-border)] px-4 py-3 sm:px-5">
             <div className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-[#ff5f57]" />
               <span className="size-2 rounded-full bg-[#febc2e]" />
               <span className="size-2 rounded-full bg-[#28c840]" />
             </div>
+
             <div className="flex flex-1 justify-center">
-              <div className="flex min-w-[12rem] max-w-[24rem] items-center justify-center rounded-[var(--radius-pill)] border border-[var(--marketing-border)] bg-[var(--marketing-page)] px-4 py-1.5 text-[0.72rem] text-[var(--marketing-muted-foreground)]">
-                trackflow.app/projects
+              <div className="flex  w-full  max-w-[26rem] items-center justify-center truncate rounded-[var(--radius-pill)] border border-[var(--marketing-border)] bg-[var(--marketing-page)] px-4 py-1.5 text-[0.72rem] text-[var(--marketing-muted-foreground)]">
+                trackflow.app/workspaces/trackflow-development/issues
               </div>
             </div>
+
             <div className="hidden items-center gap-3 text-[var(--marketing-muted-foreground)] sm:flex">
-              <ShareNetwork className="size-4" />
+              <MagnifyingGlass className="size-4" />
               <DotsThree className="size-4" weight="bold" />
             </div>
           </div>
 
-          <div className="grid gap-0 lg:grid-cols-[11rem_minmax(0,1fr)]">
+          <div className="grid gap-0 lg:grid-cols-[15rem_minmax(0,1fr)]">
             <aside className="border-b border-[var(--marketing-border)] bg-[var(--marketing-preview-sidebar)] px-3 py-4 lg:border-r lg:border-b-0">
               <div className="space-y-4">
                 <div className="flex items-center gap-3 px-2">
                   <div className="flex size-8 items-center justify-center rounded-[0.9rem] bg-[var(--foreground)] text-white">
                     <Kanban className="size-4" weight="fill" />
                   </div>
+
                   <div>
                     <p className="text-sm font-semibold text-[var(--foreground)]">
-                      All Projects
+                      Workspaces
                     </p>
+
                     <p className="text-xs text-[var(--marketing-muted-foreground)]">
-                      Product + platform
+                      Your team workspaces
                     </p>
                   </div>
                 </div>
@@ -74,21 +128,25 @@ export function ProductPreview() {
                 <div className="rounded-[1rem] border border-[var(--marketing-border)] bg-white px-3 py-2.5 text-sm text-[var(--marketing-muted-foreground)]">
                   <div className="flex items-center gap-2">
                     <MagnifyingGlass className="size-4" />
-                    <span>Search</span>
+                    <span>Search workspaces</span>
                   </div>
                 </div>
 
                 <div className="rounded-[1rem] border border-[var(--marketing-border)] bg-white p-3 shadow-sm">
                   <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--marketing-muted-foreground)]">
-                    Projects
+                    Your workspaces
                   </p>
+
                   <div className="mt-3 space-y-2">
-                    {["Website rebuild", "Q3 launch", "Billing fixes", "Docs refresh"].map((item, index) => (
+                    {workspaces.map((workspace, index) => (
                       <div
-                        key={item}
-                        className={`rounded-[0.9rem] px-2 py-2 text-sm ${index === 0 ? "bg-[var(--marketing-track)] font-medium text-[var(--foreground)]" : "text-[var(--marketing-muted-foreground)]"}`}
+                        key={workspace}
+                        className={`rounded-[0.9rem] px-2 py-2 text-sm ${index === 0
+                          ? "bg-[var(--marketing-track)] font-medium text-[var(--foreground)]"
+                          : "text-[var(--marketing-muted-foreground)]"
+                          }`}
                       >
-                        {item}
+                        {workspace}
                       </div>
                     ))}
                   </div>
@@ -99,17 +157,20 @@ export function ProductPreview() {
             <div className="bg-white">
               <div className="border-b border-[var(--marketing-border)] px-4 py-4 sm:px-6">
                 <p className="text-[0.7rem] text-[var(--marketing-muted-foreground)]">
-                  Projects / Timmy / SaaS Website
+                  Workspaces / TrackFlow Development / Issues
                 </p>
+
                 <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   <div>
                     <h2 className="text-2xl font-semibold tracking-tight text-[var(--foreground)] sm:text-[2rem]">
-                      TrackFlow Product Launch
+                      TrackFlow Development
                     </h2>
+
                     <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-[var(--marketing-muted-foreground)] sm:text-sm">
-                      <span>Created on Jan 8, 2026</span>
+                      <span>24 issues · 5 members</span>
+
                       <div className="flex -space-x-2">
-                        {["A", "T", "M", "K"].map((letter) => (
+                        {["G", "A", "T", "M"].map((letter) => (
                           <span
                             key={letter}
                             className="flex size-7 items-center justify-center rounded-full border-2 border-white bg-[var(--marketing-track)] text-[0.7rem] font-semibold text-[var(--foreground)]"
@@ -118,6 +179,7 @@ export function ProductPreview() {
                           </span>
                         ))}
                       </div>
+
                       <button
                         className="rounded-[var(--radius-pill)] border border-[var(--marketing-border)] px-3 py-1.5 font-medium text-[var(--foreground)]"
                         type="button"
@@ -127,21 +189,17 @@ export function ProductPreview() {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      className="rounded-[var(--radius-pill)] border border-[var(--marketing-border)] px-3 py-2 text-sm text-[var(--foreground)]"
-                      type="button"
-                    >
-                      Private
-                    </button>
+                  <div className="flex items-center gap-2">
                     <button
                       className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-[var(--primary)] px-4 py-2 text-sm font-medium text-[var(--primary-foreground)]"
                       type="button"
                     >
-                      <ShareNetwork className="size-4" />
-                      Share
+                      <Plus className="size-4" />
+                      New issue
                     </button>
+
                     <button
+                      aria-label="More workspace actions"
                       className="rounded-[var(--radius-pill)] border border-[var(--marketing-border)] p-2 text-[var(--foreground)]"
                       type="button"
                     >
@@ -154,74 +212,91 @@ export function ProductPreview() {
               <div className="border-b border-[var(--marketing-border)] px-4 py-3 sm:px-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-5 text-sm">
-                    <span className="font-semibold text-[var(--foreground)]">Board</span>
-                    <span className="text-[var(--marketing-muted-foreground)]">Timeline</span>
-                    <span className="text-[var(--marketing-muted-foreground)]">Calendar</span>
-                    <span className="text-[var(--marketing-muted-foreground)]">List</span>
+                    <span className="text-[var(--marketing-muted-foreground)]">
+                      Overview
+                    </span>
+
+                    <span className="font-semibold text-[var(--foreground)]">
+                      Issues
+                    </span>
+
+                    <span className="text-[var(--marketing-muted-foreground)]">
+                      Members
+                    </span>
                   </div>
+
                   <div className="flex items-center gap-4 text-sm text-[var(--marketing-muted-foreground)]">
-                    <span>Sort</span>
-                    <span>Filter</span>
+                    <span>Search</span>
+                    <span>Status</span>
+                    <span>Priority</span>
                   </div>
                 </div>
               </div>
 
-              <div className="grid gap-3 p-3 sm:grid-cols-2 sm:p-4 xl:grid-cols-4">
-                {boardColumns.map((column, index) => (
-                  <div
-                    key={column.name}
-                    className="rounded-[1.1rem] border border-[var(--marketing-border)] bg-[var(--marketing-preview-column)] p-3"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-[var(--foreground)]">
-                          {column.name}
-                        </span>
-                        <span className="rounded-full bg-white px-2 py-0.5 text-[0.7rem] text-[var(--marketing-muted-foreground)]">
-                          {column.count}
-                        </span>
-                      </div>
-                      <DotsThree className="size-4 text-[var(--marketing-muted-foreground)]" weight="bold" />
-                    </div>
+              <div className="grid gap-3 p-3 sm:grid-cols-3 sm:p-4">
+                {boardColumns.map((column, index) => {
+                  const issue = boardCards[index];
 
-                    <div className="mt-3 rounded-[0.95rem] border border-dashed border-[var(--marketing-border)] bg-white/90 px-3 py-2 text-center text-sm text-[var(--marketing-muted-foreground)]">
-                      +
-                    </div>
+                  return (
+                    <div
+                      key={column.name}
+                      className="rounded-[1.1rem] border border-[var(--marketing-border)] bg-[var(--marketing-preview-column)] p-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-[var(--foreground)]">
+                            {column.name}
+                          </span>
 
-                    <article className="mt-3 rounded-[1rem] border border-[var(--marketing-border)] bg-white p-3 shadow-sm">
-                      <div className={`h-1 rounded-full ${column.accent}`} />
-                      <div className="mt-3 flex items-center justify-between text-[0.68rem] text-[var(--marketing-muted-foreground)]">
-                        <span
-                          className={
-                            boardCards[index].label === "Low"
-                              ? "text-slate-500"
-                              : boardCards[index].label === "Medium"
-                                ? "text-amber-600"
-                                : boardCards[index].label === "High"
-                                  ? "text-red-600"
-                                  : "text-red-800"
-                          }
-                        >
-                          {boardCards[index].label}
-                        </span>
-                        <span>{boardCards[index].due}</span>
-                      </div>
-                      <h3 className="mt-3 text-sm font-medium leading-6 text-[var(--foreground)]">
-                        {boardCards[index].title}
-                      </h3>
-                      <div className="mt-4 flex items-center justify-between text-[var(--marketing-muted-foreground)]">
-                        <div className="flex items-center gap-2 text-xs">
-                          <ChatsCircle className="size-4" />
-                          <span>12</span>
+                          <span className="rounded-full bg-white px-2 py-0.5 text-[0.7rem] text-[var(--marketing-muted-foreground)]">
+                            {column.count}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs">
-                          <CalendarBlank className="size-4" />
-                          <span>{boardCards[index].due}</span>
-                        </div>
+
+                        <DotsThree
+                          className="size-4 text-[var(--marketing-muted-foreground)]"
+                          weight="bold"
+                        />
                       </div>
-                    </article>
-                  </div>
-                ))}
+
+                      <div className="mt-3 rounded-[0.95rem] border border-dashed border-[var(--marketing-border)] bg-white/90 px-3 py-2 text-center text-sm text-[var(--marketing-muted-foreground)]">
+                        Add issue
+                      </div>
+
+                      <article className="mt-3 rounded-[1rem] border border-[var(--marketing-border)] bg-white p-3 shadow-sm">
+                        <div
+                          className={`h-1 rounded-full ${column.accent}`}
+                        />
+
+                        <div className="mt-3 flex items-center justify-between text-[0.68rem] text-[var(--marketing-muted-foreground)]">
+                          <span
+                            className={getPriorityClass(issue.priority)}
+                          >
+                            {issue.priority}
+                          </span>
+
+                          <span>{issue.dueDate}</span>
+                        </div>
+
+                        <h3 className="mt-3 text-sm leading-6 font-medium text-[var(--foreground)]">
+                          {issue.title}
+                        </h3>
+
+                        <div className="mt-4 flex items-center justify-between text-[var(--marketing-muted-foreground)]">
+                          <div className="flex items-center gap-2 text-xs">
+                            <ChatsCircle className="size-4" />
+                            <span>{issue.comments}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-xs">
+                            <CalendarBlank className="size-4" />
+                            <span>{issue.dueDate}</span>
+                          </div>
+                        </div>
+                      </article>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -233,12 +308,16 @@ export function ProductPreview() {
               key={tag}
               className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--marketing-border)] bg-white/92 px-4 py-2.5 text-sm text-[var(--foreground)] shadow-sm"
             >
-              <CheckCircle className="size-4 text-[var(--primary)]" weight="duotone" />
+              <CheckCircle
+                className="size-4 text-[var(--primary)]"
+                weight="duotone"
+              />
+
               <span>{tag}</span>
             </div>
           ))}
         </div>
       </div>
     </div>
-  )
+  );
 }
