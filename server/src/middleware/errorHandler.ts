@@ -11,6 +11,21 @@ import {
 } from "../errors/authentication.error.js";
 import { EmailAlreadyExistsError } from "../modules/user/user.service.js";
 
+// const isHttpError = (
+//   err: unknown,
+// ): err is {
+//   status: number;
+//   message: string;
+// } => {
+//   if (typeof err !== "object" || err === null) {
+//     return false;
+//   }
+
+//   const candidate = err as { status?: unknown; message?: unknown };
+
+//   return typeof candidate.status === "number" && typeof candidate.message === "string";
+// };
+
 export const errorHandler = (
   err: unknown,
   _req: Request,
@@ -76,6 +91,17 @@ export const errorHandler = (
 
     return;
   }
+
+  // if (isHttpError(err)) {
+  //   res.status(err.status).json({
+  //     success: false,
+  //     status: "error",
+  //     message: err.message,
+  //   });
+
+  //   return;
+  // }
+
   console.log(err);
   res
     .status(StatusCodes.INTERNAL_SERVER_ERROR)
