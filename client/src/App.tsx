@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom"
 
-import { AuthPage } from "@/components/auth/auth-page"
+import { AuthPage } from "@/pages/auth/auth-page"
 import { Hero } from "@/components/marketing/hero"
 import { LandingSections } from "@/components/marketing/landing-sections"
 import { Navbar } from "@/components/marketing/navbar"

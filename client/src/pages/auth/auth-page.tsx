@@ -10,14 +10,22 @@ import {
   SpinnerGap,
 } from "@phosphor-icons/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm, type SubmitHandler, type UseFormRegisterReturn } from "react-hook-form"
+import { useForm, type ControllerRenderProps, type SubmitHandler } from "react-hook-form"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 
-import { authFormSchema, type AuthFormValues } from "@/components/auth/auth-schema"
+import { authFormSchema, type AuthFormValues } from "@/feature/auth/auth-schema"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Alert } from "@/components/ui/alert"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { AuthApiError, loginUser, registerUser } from "@/lib/auth-api"
 import { cn } from "@/lib/utils"
 
@@ -60,12 +68,12 @@ function BrandLockup({ inverse = false }: { inverse?: boolean }) {
 function PasswordField({
   id,
   autoComplete,
-  registration,
+  field,
   hasError,
 }: {
   id: string
   autoComplete: "current-password" | "new-password"
-  registration: UseFormRegisterReturn<"password">
+  field: ControllerRenderProps<AuthFormValues, "password">
   hasError: boolean
 }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -83,7 +91,7 @@ function PasswordField({
         id={id}
         placeholder="Enter your password"
         type={isVisible ? "text" : "password"}
-        {...registration}
+        {...field}
       />
       <Button
         aria-label={isVisible ? "Hide password" : "Show password"}
@@ -108,14 +116,7 @@ export function AuthPage({ mode }: AuthPageProps) {
       ? "Your account is ready. Sign in to continue."
       : ""
   )
-  const {
-    clearErrors,
-    control,
-    formState: { errors, isSubmitting },
-    handleSubmit,
-    register,
-    setError,
-  } = useForm<AuthFormValues>({
+  const form = useForm<AuthFormValues>({
     defaultValues: {
       email: "",
       mode,
@@ -123,8 +124,17 @@ export function AuthPage({ mode }: AuthPageProps) {
       password: "",
       remember: false,
     },
+    mode: "onBlur",
+    reValidateMode: "onChange",
     resolver: zodResolver(authFormSchema),
   })
+  const {
+    clearErrors,
+    control,
+    formState: { errors, isSubmitting },
+    handleSubmit,
+    setError,
+  } = form
 
   const title = isSignup ? "Create your account" : "Welcome back"
   const description = isSignup
@@ -156,6 +166,19 @@ export function AuthPage({ mode }: AuthPageProps) {
       )
       navigate("/", { replace: true })
     } catch (submissionError) {
+      if (submissionError instanceof AuthApiError && submissionError.fieldErrors) {
+        const fieldErrors = submissionError.fieldErrors
+        ;(["name", "email", "password"] as const).forEach((field) => {
+          if (fieldErrors[field]) {
+            setError(field, { type: "server", message: fieldErrors[field] })
+          }
+        })
+
+        if (Object.keys(fieldErrors).length > 0) {
+          return
+        }
+      }
+
       setError("root", {
         message:
           submissionError instanceof AuthApiError
@@ -232,72 +255,67 @@ export function AuthPage({ mode }: AuthPageProps) {
             </div>
 
             {notice ? (
-              <p
-                className="mt-5 flex items-start gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm leading-5 text-emerald-800"
-                role="status"
-              >
+              <Alert className="mt-5 flex items-start gap-2" role="status" variant="success">
                 <CheckCircle className="mt-0.5 size-4 shrink-0" weight="fill" />
                 {notice}
-              </p>
+              </Alert>
             ) : null}
 
             {errors.root?.message ? (
-              <p
-                className="mt-5 rounded-md border border-red-200 bg-red-50 px-3 py-2.5 text-sm leading-5 text-red-700"
-                role="alert"
-              >
+              <Alert className="mt-5" variant="destructive">
                 {errors.root.message}
-              </p>
+              </Alert>
             ) : null}
 
+            <Form {...form}>
             <form className="mt-7 space-y-4" noValidate onSubmit={handleSubmit(onSubmit)}>
               {isSignup ? (
-                <Label className="block" htmlFor={`${mode}-name`}>
-                  <span className="mb-1.5 block text-sm font-semibold text-[var(--foreground)]">
-                    Full name
-                  </span>
-                  <Input
-                    autoComplete="name"
-                    className={cn(
-                      "h-11 w-full rounded-md border bg-white px-3 text-sm text-[var(--foreground)] outline-none transition placeholder:text-[var(--marketing-muted-foreground)] focus:ring-4 focus:ring-[var(--primary)]/10",
-                      errors.name
-                        ? "border-red-400 focus:border-red-500"
-                        : "border-[var(--marketing-border)] focus:border-[var(--primary)]"
-                    )}
-                    id={`${mode}-name`}
-                    placeholder="Enter your full name"
-                    {...register("name")}
-                  />
-                  {errors.name ? (
-                    <span className="mt-1.5 block text-xs text-red-600">{errors.name.message}</span>
-                  ) : null}
-                </Label>
+                <FormField
+                  control={control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-semibold text-[var(--foreground)]">Full name</FormLabel>
+                      <FormControl>
+                        <Input
+                          autoComplete="name"
+                          className="h-11 w-full rounded-md border-[var(--marketing-border)] bg-white px-3 text-sm text-[var(--foreground)] outline-none transition placeholder:text-[var(--marketing-muted-foreground)] focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--primary)]/10 aria-invalid:border-red-400 aria-invalid:focus:border-red-500"
+                          placeholder="Enter your full name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               ) : null}
 
-              <Label className="block" htmlFor={`${mode}-email`}>
-                <span className="mb-1.5 block text-sm font-semibold text-[var(--foreground)]">
-                  Email address
-                </span>
-                <Input
-                  autoComplete="email"
-                  className={cn(
-                    "h-11 w-full rounded-md border bg-white px-3 text-sm text-[var(--foreground)] outline-none transition placeholder:text-[var(--marketing-muted-foreground)] focus:ring-4 focus:ring-[var(--primary)]/10",
-                    errors.email
-                      ? "border-red-400 focus:border-red-500"
-                      : "border-[var(--marketing-border)] focus:border-[var(--primary)]"
-                  )}
-                  id={`${mode}-email`}
-                  placeholder="Enter your email"
-                  type="email"
-                  {...register("email")}
-                />
-                {errors.email ? (
-                  <span className="mt-1.5 block text-xs text-red-600">{errors.email.message}</span>
-                ) : null}
-              </Label>
+              <FormField
+                control={control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-semibold text-[var(--foreground)]">Email address</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="email"
+                        className="h-11 w-full rounded-md border-[var(--marketing-border)] bg-white px-3 text-sm text-[var(--foreground)] outline-none transition placeholder:text-[var(--marketing-muted-foreground)] focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--primary)]/10 aria-invalid:border-red-400 aria-invalid:focus:border-red-500"
+                        placeholder="Enter your email"
+                        type="email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <Label className="block" htmlFor={`${mode}-password`}>
-                <span className="mb-1.5 flex items-center justify-between gap-3 text-sm font-semibold text-[var(--foreground)]">
+              <FormField
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center justify-between gap-3 text-sm font-semibold text-[var(--foreground)]">
                   Password
                   {!isSignup ? (
                     <Button
@@ -310,24 +328,24 @@ export function AuthPage({ mode }: AuthPageProps) {
                       Forgot password?
                     </Button>
                   ) : null}
-                </span>
-                <PasswordField
-                  autoComplete={isSignup ? "new-password" : "current-password"}
-                  hasError={Boolean(errors.password)}
-                  id={`${mode}-password`}
-                  registration={register("password")}
-                />
-                {errors.password ? (
-                  <span className="mt-1.5 block text-xs text-red-600">{errors.password.message}</span>
-                ) : null}
-              </Label>
+                    </FormLabel>
+                    <PasswordField
+                      autoComplete={isSignup ? "new-password" : "current-password"}
+                      field={field}
+                      hasError={Boolean(errors.password)}
+                      id={`${mode}-password`}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {!isSignup ? (
-                <Label className="flex cursor-pointer items-center gap-2 pt-0.5 text-xs text-[var(--marketing-muted-foreground)]">
-                  <Controller
-                    control={control}
-                    name="remember"
-                    render={({ field }) => (
+                <FormField
+                  control={control}
+                  name="remember"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center gap-2 space-y-0 pt-0.5">
                       <Checkbox
                         checked={field.value}
                         name={field.name}
@@ -335,10 +353,12 @@ export function AuthPage({ mode }: AuthPageProps) {
                         onCheckedChange={field.onChange}
                         ref={field.ref}
                       />
-                    )}
-                  />
-                  Remember me for 30 days
-                </Label>
+                      <FormLabel className="cursor-pointer text-xs font-normal text-[var(--marketing-muted-foreground)]">
+                        Remember me for 30 days
+                      </FormLabel>
+                    </FormItem>
+                  )}
+                />
               ) : null}
 
               <Button
@@ -351,6 +371,7 @@ export function AuthPage({ mode }: AuthPageProps) {
                 {isSubmitting ? "Please wait" : isSignup ? "Create account" : "Sign in"}
               </Button>
             </form>
+            </Form>
 
             <div className="my-6 flex items-center gap-3 text-xs text-[var(--marketing-muted-foreground)] before:h-px before:flex-1 before:bg-[var(--marketing-border)] after:h-px after:flex-1 after:bg-[var(--marketing-border)]">
               Or continue with
