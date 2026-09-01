@@ -1,0 +1,10 @@
+@import url("../assets/fonts/satoshi/Fonts/WEB/css/satoshi.css");
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/jetbrains-mono";
+@import "./variables.css";
+@custom-variant dark (&: is(.dark *));
+
+
