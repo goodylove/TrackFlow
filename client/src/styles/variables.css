@@ -70,35 +70,39 @@
   --radius-shell: 1.5rem;
   --radius-hero: 2rem;
   --radius-pill: 999px;
-  --container-width: 88rem;
+  /* --landing-canvas-width: 74rem; */
+  --container-width: 60rem;
   --hero-copy-width: 46rem;
-  --preview-width: 64rem;
-  --marketing-page: #f7f8f5;
-  --marketing-bg: #f7f8f5;
+  --preview-width: 34rem;
+  --marketing-page: #dddde5;
+  --marketing-bg: #f6f6f8;
   --marketing-surface: rgba(255, 255, 255, 0.9);
   --marketing-elevated: #ffffff;
-  --marketing-sidebar: #eef1ec;
-  --marketing-hero-base: #f9faf7;
-  --marketing-hero-start: #fbfcfa;
-  --marketing-hero-end: #f4f6f1;
+  --marketing-sidebar: #f2f3f7;
+  --marketing-hero-base: #ffffff;
+  --marketing-hero-start: #ffffff;
+  --marketing-hero-end: #f7f8fb;
   --marketing-hero-glow: rgba(183, 243, 107, 0.22);
-  --marketing-side-glow-soft: rgba(195, 231, 207, 0.65);
-  --marketing-side-glow-strong: rgba(174, 220, 190, 0.78);
-  --marketing-border: #dce3dd;
-  --marketing-border-strong: #cdd6cf;
-  --marketing-muted-foreground: #68746c;
-  --marketing-accent: #b7f36b;
-  --marketing-accent-strong: #a7e45f;
-  --marketing-accent-soft: rgba(183, 243, 107, 0.2);
+  --marketing-side-glow-soft: rgba(69, 67, 255, 0.16);
+  --marketing-side-glow-strong: rgba(51, 43, 212, 0.22);
+  --marketing-border: #e5e6ee;
+  --marketing-border-strong: #cfd1dc;
+  --marketing-muted-foreground: #6d7080;
+  --marketing-action: #2f37f4;
+  --marketing-action-strong: #252bd0;
+  --marketing-action-soft: #eef0ff;
+  --marketing-accent: #342dce;
+  --marketing-accent-strong: #251f9f;
+  --marketing-accent-soft: rgba(47, 55, 244, 0.12);
   --marketing-accent-foreground: #162019;
-  --marketing-accent-shadow: rgba(183, 243, 107, 0.34);
+  --marketing-accent-shadow: rgba(47, 55, 244, 0.24);
   --marketing-primary-strong: #123320;
-  --marketing-track: #eef1ec;
-  --marketing-table-header: #f6f8f4;
-  --marketing-preview-border: #dce3dd;
-  --marketing-preview-sidebar: #f8f9f6;
-  --marketing-preview-column: #f8f9f6;
-  --marketing-glow: rgba(183, 243, 107, 0.14);
+  --marketing-track: #f1f2f7;
+  --marketing-table-header: #f7f7fa;
+  --marketing-preview-border: #e0e1ea;
+  --marketing-preview-sidebar: #f7f7fb;
+  --marketing-preview-column: #f6f7fb;
+  --marketing-glow: rgba(47, 55, 244, 0.14);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -178,11 +182,15 @@ body {
 }
 
 .landing-reveal-visible {
-  animation: landing-reveal 720ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms) both;
+  animation: landing-reveal 720ms cubic-bezier(0.22, 1, 0.36, 1)
+    var(--reveal-delay, 0ms) both;
 }
 
 .landing-card {
-  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 360ms ease, border-color 360ms ease;
+  transition:
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 360ms ease,
+    border-color 360ms ease;
 }
 
 .landing-card:hover {

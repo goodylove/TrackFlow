@@ -35,6 +35,13 @@ export const boardCards = [
     dueDate: "Sep 12",
     comments: 8,
   },
+
+  {
+    title: "Fix overflow issue on mobile view",
+    priority: "Low",
+    dueDate: "Sep 12",
+    comments: 8,
+  },
 ];
 
 export const workspaces = [

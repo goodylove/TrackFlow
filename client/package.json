@@ -24,6 +24,8 @@
 
       "@base-ui/react": "^1.7.0",
 
+      "@dr.pogodin/react-helmet": "^3.2.3",
+
       "@fontsource-variable/jetbrains-mono": "^5.3.0",
 
       "@hookform/resolvers": "^5.9.1",
@@ -41,6 +43,8 @@
       "class-variance-authority": "^0.7.1",
 
       "clsx": "^2.1.1",
+
+      "framer-motion": "^13.1.1",
 
       "react": "^19.2.8",
 

@@ -1,4 +1,4 @@
-import { ArrowRight } from "@phosphor-icons/react"
+import { ArrowRight, PlayCircle, Sparkle } from "@phosphor-icons/react"
 import { Link } from "react-router-dom"
 
 import { Container } from "@/components/shared/container"
@@ -6,56 +6,83 @@ import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 import { ProductPreview } from "./product-preview"
+import { LoadReveal } from "./landing/motion"
 
 export function Hero() {
   return (
-    <section className="pb-20 pt-4 sm:pb-24 sm:pt-6 lg:pb-28">
-      <Container className="">
-        <div className="bg-white px-1 py-1 border border-[var(--marketing-border)] rounded-[var(--radius-hero)]">
-          <div className="relative overflow-hidden  rounded-[var(--radius-hero)] border  border-[var(--marketing-border)] bg-[var(--marketing-hero-base)] px-4 py-10 shadow-[0_28px_80px_-44px_rgba(22,32,25,0.16)] sm:px-8 sm:py-14 lg:px-12 lg:py-16">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 left-0 w-[34%] bg-[radial-gradient(circle_at_18%_18%,var(--marketing-side-glow-soft)_0,transparent_42%),radial-gradient(circle_at_54%_38%,var(--marketing-side-glow-strong)_0,transparent_58%),radial-gradient(circle_at_22%_82%,var(--marketing-side-glow-soft)_0,transparent_38%)]"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 right-0 w-[34%] bg-[radial-gradient(circle_at_82%_18%,var(--marketing-side-glow-soft)_0,transparent_42%),radial-gradient(circle_at_46%_38%,var(--marketing-side-glow-strong)_0,transparent_58%),radial-gradient(circle_at_78%_82%,var(--marketing-side-glow-soft)_0,transparent_38%)]"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -inset-x-12 top-[3%] h-[49rem] rounded-[9999px] bg-white/90 blur-[45px] sm:inset-x-[22%] sm:h-[50rem] sm:blur-[74px]"
-            />
-
-
-
-            <div className=" mx-auto w-full flex justify-center items-center  relative z-10 flex-col ">
-
-
-              <div className="inline-flex items-center rounded-[var(--radius-pill)] border border-[var(--marketing-border)] bg-white/95 px-4 py-2 text-sm font-medium text-[var(--primary)] shadow-sm">
+    <section className="pt-12 sm:pt-16 lg:pt-20">
+      <Container>
+        <div className="grid items-center gap-10 lg:grid-cols-[0.92fr_1.08fr]">
+          <div className="max-w-[29rem]">
+            <LoadReveal distance={24}>
+              <div className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-[#f5f5f9] px-3 py-1.5 text-[0.76rem] font-semibold text-[#55586a]">
+                <Sparkle className="size-3.5 text-[var(--marketing-action)]" weight="fill" />
                 Issue tracking for focused teams
               </div>
-              <div className="mx-auto mt-4 flex max-w-4xl flex-col items-center text-center">
-                <h1 className="text-4xl  font-semibold leading-[0.98] text-[#162019] sm:text-5xl lg:text-6xl">
-                  Keep every issue
-                  <span className="block">moving forward</span>
-                </h1>
+            </LoadReveal>
 
-                <p className="mt-6 max-w-2xl text-base leading-7 text-[#68746c] sm:text-lg">
-                  TrackFlow gives your team one place to organize incoming work, assign clear
-                  ownership, discuss updates, and resolve issues without losing momentum.
-                </p>
-              </div>
-              <div className="mt-6 flex items-center justify-center">
-                <Link className={cn(buttonVariants({ size: "lg" }), "min-w-40 shadow-[0_18px_36px_-20px_rgba(23,63,43,0.38)]")} to="/signup">
-                  Get started
-                  <ArrowRight className="size-4" />
-                </Link>
-              </div>
-            </div>
+            <LoadReveal delay={90} distance={32}>
+              <h1 className="mt-5 max-w-[27rem] text-[2.65rem] font-black leading-[1.02] tracking-normal text-[#171722] sm:text-[3.45rem] lg:text-[3.8rem]">
+                Keep every issue moving forward
+              </h1>
+            </LoadReveal>
 
-            <ProductPreview />
+            <LoadReveal delay={180} distance={32}>
+              <p className="mt-5 max-w-[26rem] text-[0.98rem] leading-7 text-[var(--marketing-muted-foreground)]">
+                TrackFlow gives your team one place to organize incoming work, assign clear
+                ownership, discuss updates, and resolve issues without losing momentum.
+              </p>
+            </LoadReveal>
+
+            <LoadReveal delay={270} distance={32}>
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "h-11 rounded-[var(--radius-pill)] bg-[var(--marketing-action)] px-6 text-[0.82rem] hover:bg-[var(--marketing-action-strong)]"
+                )}
+                to="/signup"
+              >
+                Get started
+                <ArrowRight className="size-4" />
+              </Link>
+
+              <a
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "h-11 rounded-[var(--radius-pill)] border-transparent bg-white px-5 text-[0.82rem] shadow-[0_12px_30px_-24px_rgba(17,16,28,0.45)]"
+                )}
+                href="#how-it-works"
+              >
+                <PlayCircle className="size-4 text-[var(--marketing-action)]" weight="fill" />
+                See workflow
+              </a>
+              </div>
+            </LoadReveal>
           </div>
+
+          <LoadReveal className="min-w-0 overflow-hidden py-2 lg:overflow-visible" delay={180} direction="right" distance={36}>
+            <ProductPreview />
+          </LoadReveal>
         </div>
+
+        {/* <div className="mt-14 border-t border-[var(--marketing-border)] pt-6">
+          <p className="text-center text-[0.72rem] font-bold text-[#55586a]">
+            Built around the work teams repeat every day
+          </p>
+
+          <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3 lg:grid-cols-5">
+            {featureTags.map((tag) => (
+              <div
+                key={tag}
+                className="flex items-center justify-center gap-2 text-center text-[0.82rem] font-bold text-[#9a9daa]"
+              >
+                <span className="size-2 rounded-full bg-[var(--marketing-action)]" />
+                {tag}
+              </div>
+            ))}
+          </div>
+        </div> */}
       </Container>
     </section>
   )
