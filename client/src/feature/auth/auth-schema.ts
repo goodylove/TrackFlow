@@ -8,7 +8,9 @@ export const authFormSchema = z
       .string()
       .trim()
       .min(1, "Email is required")
-      .email("Enter a valid email address"),
+      .email("Enter a valid email address")
+      .max(255, "Email cannot exceed 255 characters")
+      .transform((email) => email.toLowerCase()),
     password: z
       .string()
       .min(8, "Password must contain at least 8 characters")

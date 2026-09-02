@@ -9,12 +9,21 @@ type ApiResponse<T> = {
   success: boolean
   message: string
   data?: T
+  errors?: Partial<Record<"name" | "email" | "password", string[]>>
 }
 
 export class AuthApiError extends Error {
-  constructor(message: string) {
+  fieldErrors?: Partial<Record<"name" | "email" | "password", string>>
+
+  constructor(
+    message: string,
+    options?: {
+      fieldErrors?: Partial<Record<"name" | "email" | "password", string>>
+    }
+  ) {
     super(message)
     this.name = "AuthApiError"
+    this.fieldErrors = options?.fieldErrors
   }
 }
 
@@ -36,7 +45,19 @@ async function request<T>(path: string, body: Record<string, string>) {
   const payload = (await response.json().catch(() => null)) as ApiResponse<T> | null
 
   if (!response.ok || !payload?.success || !payload.data) {
-    throw new AuthApiError(payload?.message ?? "Something went wrong. Please try again.")
+    const fieldErrors = Object.fromEntries(
+      Object.entries(payload?.errors ?? {}).flatMap(([field, messages]) =>
+        messages?.[0] ? [[field, messages[0]]] : []
+      )
+    ) as Partial<Record<"name" | "email" | "password", string>>
+
+    if (response.status === 409 && !fieldErrors.email) {
+      fieldErrors.email = payload?.message ?? "An account with this email already exists"
+    }
+
+    throw new AuthApiError(payload?.message ?? "Something went wrong. Please try again.", {
+      fieldErrors,
+    })
   }
 
   return payload.data
