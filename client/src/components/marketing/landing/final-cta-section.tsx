@@ -1,4 +1,3 @@
-import { ClockCountdown } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 
 import { Container } from "@/components/shared/container";

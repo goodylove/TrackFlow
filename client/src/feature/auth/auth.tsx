@@ -14,6 +14,10 @@ import { useForm, type ControllerRenderProps, type SubmitHandler } from "react-h
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 
 import { authFormSchema, type AuthFormValues } from "@/feature/auth/auth-schema"
+import {
+    useAuthLoginService,
+    useAuthRegisterService,
+} from "@/feature/auth/services/auth-service"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Alert } from "@/components/ui/alert"
@@ -27,8 +31,9 @@ import {
     useFormField,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { AuthApiError, loginUser, registerUser } from "@/lib/auth-api"
+import { ApiError } from "@/lib/api/api-error"
 import { cn } from "@/lib/utils"
+import { useAuthStore } from "@/stores/auth-store"
 import type { AuthPageProps } from "./types"
 import { testimonial } from "./dummy"
 
@@ -103,6 +108,9 @@ function PasswordField({
 export function Auth({ mode }: AuthPageProps) {
     const isSignup = mode === "signup"
     const navigate = useNavigate()
+    const setSession = useAuthStore((state) => state.setSession)
+    const loginMutation = useAuthLoginService()
+    const registerMutation = useAuthRegisterService()
     const [searchParams] = useSearchParams()
     const [notice, setNotice] = useState(
         !isSignup && searchParams.get("registered") === "1"
@@ -140,26 +148,32 @@ export function Auth({ mode }: AuthPageProps) {
 
         try {
             if (isSignup) {
-                await registerUser({ name: values.name, email: values.email, password: values.password })
+                await registerMutation.mutateAsync({
+                    name: values.name,
+                    email: values.email,
+                    password: values.password,
+                })
                 navigate("/login?registered=1", { replace: true })
                 return
             }
 
-            const { user } = await loginUser({ email: values.email, password: values.password })
+            const { user } = await loginMutation.mutateAsync({
+                email: values.email,
+                password: values.password,
+            })
 
             if (!user.token) {
-                throw new AuthApiError("TrackFlow did not return a session. Please try again.")
+                throw new ApiError("TrackFlow did not return a session. Please try again.")
             }
 
-            const storage = values.remember ? localStorage : sessionStorage
-            storage.setItem("trackflow.auth.token", user.token)
-            storage.setItem(
-                "trackflow.auth.user",
-                JSON.stringify({ id: user.id, name: user.name, email: user.email })
+            setSession(
+                user.token,
+                { id: user.id, name: user.name, email: user.email },
+                values.remember
             )
             navigate("/", { replace: true })
         } catch (submissionError) {
-            if (submissionError instanceof AuthApiError && submissionError.fieldErrors) {
+            if (submissionError instanceof ApiError && submissionError.fieldErrors) {
                 const fieldErrors = submissionError.fieldErrors
                     ; (["name", "email", "password"] as const).forEach((field) => {
                         if (fieldErrors[field]) {
@@ -174,7 +188,7 @@ export function Auth({ mode }: AuthPageProps) {
 
             setError("root", {
                 message:
-                    submissionError instanceof AuthApiError
+                    submissionError instanceof ApiError
                         ? submissionError.message
                         : "Something went wrong. Please try again.",
             })
