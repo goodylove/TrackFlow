@@ -4,11 +4,15 @@ import { BuildingsIcon, PlusIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 
 type DashboardEmptyStateProps = {
+  description?: string;
   onAddWorkspace?: () => void;
+  title?: string;
 };
 
 export function DashboardEmptyState({
+  description = "Bring your team, issues, and priorities into one focused place to start moving work forward.",
   onAddWorkspace,
+  title = "Create your first workspace",
 }: DashboardEmptyStateProps) {
   return (
     <section
@@ -27,11 +31,10 @@ export function DashboardEmptyState({
           className="text-2xl font-black tracking-[-0.035em] text-foreground sm:text-3xl"
           id="workspace-empty-state-title"
         >
-          Create your first workspace
+          {title}
         </h1>
         <p className="mt-3 max-w-sm text-sm leading-6 text-muted-foreground">
-          Bring your team, issues, and priorities into one focused place to
-          start moving work forward.
+          {description}
         </p>
         <Button
           className="mt-7  cursor-pointer rounded-lg bg-[var(--marketing-action)] px-5 hover:bg-[var(--marketing-action)]/90"

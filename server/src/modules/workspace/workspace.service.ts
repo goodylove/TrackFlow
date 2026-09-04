@@ -1,13 +1,21 @@
 import { StatusCodes } from "http-status-codes";
+import { Types } from "mongoose";
 import { WorkspaceMember, type WorkspaceRole } from "./workspace-member.model.js";
 import { Workspace } from "./workspace.model.js";
 import type {
   AddWorkspaceMemberInput,
   createWorkSpaceInput,
 } from "./workspace.schema.js";
-import { WorkspaceAlreadyExistsError } from "../../errors/workspace.error.js";
+import {
+  ExistingMemberError,
+  InvalidWorkspaceMemberIdError,
+  WorkspaceAlreadyExistsError,
+  WorkspaceMemberNotFoundError,
+  WorkspaceRolePermissionError,
+} from "../../errors/workspace.error.js";
 import { User } from "../user/user.model.js";
 import { UserNotFoundError } from "../../errors/authentication.error.js";
+import { Issue } from "../issue/issue.modal.js";
 
 type AssignableWorkspaceRole = "admin" | "member";
 
@@ -40,11 +48,21 @@ export const createWorkSpace = async (input: createWorkSpaceInput, userId: strin
 
 export const getWorkspacesByUserId = async (userId: string) => {
   const membership = await WorkspaceMember.find({ user: userId })
-    .populate({
+    .populate<{
+      workspace: {
+        _id: Types.ObjectId;
+        name: string;
+        description?: string;
+        createdBy: Types.ObjectId;
+        createdAt: Date;
+        updatedAt: Date;
+      } | null;
+    }>({
       path: "workspace",
       select: "name description createdBy createdAt updatedAt",
     })
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .lean();
 
   if (!membership) {
     throw {
@@ -52,7 +70,46 @@ export const getWorkspacesByUserId = async (userId: string) => {
       message: "No workspaces found for the user",
     };
   }
-  return membership;
+
+  const workspaceIds = membership.flatMap(({ workspace }) =>
+    workspace ? [workspace._id] : [],
+  );
+  const [memberCounts, openIssueCounts] = await Promise.all([
+    WorkspaceMember.aggregate<{ _id: Types.ObjectId; count: number }>([
+      { $match: { workspace: { $in: workspaceIds } } },
+      { $group: { _id: "$workspace", count: { $sum: 1 } } },
+    ]),
+    Issue.aggregate<{ _id: Types.ObjectId; count: number }>([
+      {
+        $match: {
+          workspace: { $in: workspaceIds },
+          status: { $ne: "done" },
+        },
+      },
+      { $group: { _id: "$workspace", count: { $sum: 1 } } },
+    ]),
+  ]);
+  const memberCountByWorkspace = new Map(
+    memberCounts.map(({ _id, count }) => [_id.toString(), count]),
+  );
+  const openIssueCountByWorkspace = new Map(
+    openIssueCounts.map(({ _id, count }) => [_id.toString(), count]),
+  );
+
+  return membership.map((item) => {
+    if (!item.workspace) return item;
+
+    const workspaceId = item.workspace._id.toString();
+
+    return {
+      ...item,
+      workspace: {
+        ...item.workspace,
+        memberCount: memberCountByWorkspace.get(workspaceId) ?? 0,
+        openIssueCount: openIssueCountByWorkspace.get(workspaceId) ?? 0,
+      },
+    };
+  });
 };
 
 export const getWorkspaceById = async (workspaceId: string) => {
@@ -101,7 +158,6 @@ export const addWorkspaceMember = async (
   role: WorkspaceRole,
 ) => {
   const user = await User.findOne({ email: input.email });
-  console.log("user", user, input.email);
 
   if (!user) {
     throw new UserNotFoundError();
@@ -113,17 +169,13 @@ export const addWorkspaceMember = async (
   });
 
   if (existingMember) {
-    throw {
-      status: StatusCodes.CONFLICT,
-      message: "This user is already a workspace member",
-    };
+    throw new ExistingMemberError();
   }
 
   if (role === "admin" && input.role === "admin") {
-    throw {
-      status: StatusCodes.FORBIDDEN,
-      message: "Only the workspace owner can add an admin",
-    };
+    throw new WorkspaceRolePermissionError(
+      "Only the workspace owner can add an admin",
+    );
   }
 
   const membership = await WorkspaceMember.create({
@@ -145,23 +197,23 @@ export const changeWorkspaceMemberRole = async (
   memberId: string,
   inputRole: AssignableWorkspaceRole,
 ) => {
+  if (!Types.ObjectId.isValid(memberId)) {
+    throw new InvalidWorkspaceMemberIdError();
+  }
+
   const workspaceMember = await WorkspaceMember.findOne({
     workspace: workspaceId,
     _id: memberId,
   });
 
   if (!workspaceMember) {
-    throw {
-      status: StatusCodes.NOT_FOUND,
-      message: "Workspace member not found",
-    };
+    throw new WorkspaceMemberNotFoundError();
   }
 
   if (workspaceMember.role === "owner") {
-    throw {
-      status: StatusCodes.FORBIDDEN,
-      message: "The workspace owner's role cannot be changed",
-    };
+    throw new WorkspaceRolePermissionError(
+      "The workspace owner's role cannot be changed",
+    );
   }
 
   workspaceMember.role = inputRole;
@@ -175,34 +227,32 @@ export const removeWorkspaceMember = async (
   workspaceMemberId: string,
   actorRole: WorkspaceRole,
 ) => {
+  if (!Types.ObjectId.isValid(workspaceMemberId)) {
+    throw new InvalidWorkspaceMemberIdError();
+  }
+
   const workspaceMember = await WorkspaceMember.findOne({
     _id: workspaceMemberId,
     workspace: workspaceId,
   });
 
   if (!workspaceMember) {
-    throw {
-      status: StatusCodes.NOT_FOUND,
-      message: "Workspace member not found",
-    };
+    throw new WorkspaceMemberNotFoundError();
   }
 
-  if (workspaceMember.role == "owner") {
-    throw {
-      status: StatusCodes.FORBIDDEN,
-      message: "The workspace owner cannot be removed",
-    };
+  if (workspaceMember.role === "owner") {
+    throw new WorkspaceRolePermissionError(
+      "The workspace owner cannot be removed",
+    );
   }
 
-
-  if (actorRole === "admin" && workspaceMember?.role === "admin") {
-     throw {
-       status: StatusCodes.FORBIDDEN,
-       message: "An admin cannot remove another admin",
-     };
-
+  if (actorRole === "admin" && workspaceMember.role === "admin") {
+    throw new WorkspaceRolePermissionError(
+      "An admin cannot remove another admin",
+    );
   }
-  await workspaceMember.deleteOne()
-  
+
+  await workspaceMember.deleteOne();
+
   return workspaceMember;
 };

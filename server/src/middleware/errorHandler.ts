@@ -2,7 +2,10 @@ import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import {
   ExistingMemberError,
+  InvalidWorkspaceMemberIdError,
   WorkspaceAlreadyExistsError,
+  WorkspaceMemberNotFoundError,
+  WorkspaceRolePermissionError,
 } from "../errors/workspace.error.js";
 import {
   AuthenticationError,
@@ -74,6 +77,36 @@ export const errorHandler = (
 
   if (err instanceof ExistingMemberError) {
     res.status(StatusCodes.CONFLICT).json({
+      success: false,
+      status: "error",
+      message: err.message,
+    });
+
+    return;
+  }
+
+  if (err instanceof WorkspaceRolePermissionError) {
+    res.status(StatusCodes.FORBIDDEN).json({
+      success: false,
+      status: "error",
+      message: err.message,
+    });
+
+    return;
+  }
+
+  if (err instanceof InvalidWorkspaceMemberIdError) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      status: "error",
+      message: err.message,
+    });
+
+    return;
+  }
+
+  if (err instanceof WorkspaceMemberNotFoundError) {
+    res.status(StatusCodes.NOT_FOUND).json({
       success: false,
       status: "error",
       message: err.message,

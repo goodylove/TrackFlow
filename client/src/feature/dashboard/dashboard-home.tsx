@@ -13,6 +13,7 @@ import { RecentIssuesTable } from "@/feature/dashboard/components/recent-issues-
 import { StatsCard } from "@/feature/dashboard/components/stats-card";
 import { StatusOverview } from "@/feature/dashboard/components/status-overview";
 import type { DashboardIssue, DashboardUser } from "@/feature/dashboard/types";
+import { getGreeting } from "@/lib/helper";
 
 type DashboardHomeProps = {
   issues: DashboardIssue[];
@@ -50,7 +51,7 @@ export function DashboardHome({
             Workspace overview
           </p>
           <h1 className="mt-1 text-3xl font-black tracking-[-0.04em] sm:text-4xl">
-            Good morning, {currentUser.name.split(" ")[0]}
+            {getGreeting()}, {currentUser.name.split(" ")[0]}
           </h1>
         </div>
         {/* <p className="max-w-sm text-sm leading-6 text-muted-foreground">

@@ -10,6 +10,11 @@ import { ProtectedRoute, PublicOnlyRoute } from "@/feature/auth/auth-route-guard
 import AuthPage from "./pages/auth/auth.page"
 
 const DashboardPage = lazy(() => import("./pages/dashboard/dashboard.page"))
+const DashboardLayout = lazy(() => import("./pages/dashboard/dashboard-layout"))
+const IssuesPage = lazy(() => import("./pages/issues/issues.page"))
+const WorkspaceMembersPage = lazy(() => import("./pages/members/workspace-members.page"))
+const WorkspaceSettingsPage = lazy(() => import("./pages/settings/workspace-settings.page"))
+const WorkspacesPage = lazy(() => import("./pages/workspace/workspaces.page"))
 
 function LandingPage() {
   return (
@@ -62,17 +67,18 @@ function App() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <Seo
-              description="Review workspace issue activity, priorities, ownership, and recent updates in TrackFlow."
-              noIndex
-              title="Dashboard"
-            />
             <Suspense fallback={<div className="grid min-h-screen place-items-center bg-background text-sm font-bold text-muted-foreground">Loading dashboard...</div>}>
-              <DashboardPage />
+              <DashboardLayout />
             </Suspense>
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<DashboardPage />} />
+        <Route path="issues" element={<IssuesPage />} />
+        <Route path="members" element={<WorkspaceMembersPage />} />
+        <Route path="settings" element={<WorkspaceSettingsPage />} />
+        <Route path="workspace" element={<WorkspacesPage />} />
+      </Route>
       <Route path="*" element={<Navigate replace to="/" />} />
     </Routes>
   )

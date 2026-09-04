@@ -13,6 +13,11 @@ export type DashboardWorkspace = {
   _id: string
   name: string
   slug: string
+  description?: string
+  role: "owner" | "admin" | "member"
+  memberCount: number
+  openIssueCount: number
+  createdAt: string
 }
 
 export type DashboardIssue = {
