@@ -8,7 +8,7 @@ import {
   UsersThreeIcon,
   type Icon,
 } from "@phosphor-icons/react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,12 +23,12 @@ import { resetClientState } from "@/stores/reset-client-state";
 import { useUiStore } from "@/stores/ui-store";
 import { BrandMark } from "../shared/brandMark";
 
-type NavItem = { label: string; icon: Icon };
+type NavItem = { label: string; icon: Icon; to?: string };
 const navItems: NavItem[] = [
-  { label: "Overview", icon: HouseIcon },
-  { label: "Issues", icon: ListChecksIcon },
-  { label: "Members", icon: UsersThreeIcon },
-  { label: "Settings", icon: GearIcon },
+  { label: "Overview", icon: HouseIcon, to: "/dashboard" },
+  { label: "Issues", icon: ListChecksIcon, to: "/dashboard/issues" },
+  { label: "Members", icon: UsersThreeIcon, to: "/dashboard/members" },
+  { label: "Settings", icon: GearIcon, to: "/dashboard/settings" },
 ];
 
 type DashboardSidebarProps = {
@@ -48,6 +48,7 @@ export function DashboardSidebar({
   const toggleSidebar = useUiStore((state) => state.toggleSidebar);
   const collapsed = mobile ? false : storedCollapsed;
   const navigate = useNavigate();
+  const location = useLocation();
 
   function logout() {
     resetClientState();
@@ -68,16 +69,15 @@ export function DashboardSidebar({
           collapsed ? "justify-center px-3" : "justify-between px-5",
         )}
       >
-        <Link
-          aria-label="TrackFlow home"
-          to="/"
+        <div
+
           className="flex items-center gap-2 text-[0.98rem] font-bold tracking-tight text-[var(--marketing-action)]"
         >
           <span className="flex size-8 items-center justify-center rounded-[0.6rem] bg-[var(--marketing-action)]/95 text-white">
             <BrandMark />
           </span>
           {!collapsed ? <span>TrackFlow</span> : null}
-        </Link>
+        </div>
 
 
 
@@ -99,35 +99,56 @@ export function DashboardSidebar({
         aria-label="Dashboard navigation"
         className={cn("flex-1 space-y-1", collapsed ? "px-3" : "px-4")}
       >
-        {navItems.map(({ label, icon: NavIcon }, index) => {
-          const button = (
-            <button
-              aria-current={index === 0 ? "page" : undefined}
-              className={cn(
-                "flex h-11 w-full items-center rounded-lg text-sm font-bold transition-colors cursor-pointer",
-                collapsed ? "justify-center" : "gap-3 px-3",
-                index === 0
-                  ? "bg-[var(--marketing-action)]/95 text-white shadow-[0_12px_24px_-16px_var(--marketing-accent-shadow)]"
-                  : "text-[var(--marketing-muted-foreground)] hover:bg-[var(--marketing-action-soft)] hover:text-[var(--marketing-action)]",
-              )}
-              onClick={onNavigate}
-              type="button"
-            >
+        {navItems.map(({ label, icon: NavIcon, to }) => {
+          const isActive = to
+            ? to === "/dashboard"
+              ? location.pathname === to
+              : location.pathname.startsWith(to)
+            : false;
+          const className = cn(
+            "flex h-11 w-full items-center rounded-lg text-sm font-bold transition-colors",
+            collapsed ? "justify-center" : "gap-3 px-3",
+            isActive
+              ? "bg-[var(--marketing-action)]/95 text-white shadow-[0_12px_24px_-16px_var(--marketing-accent-shadow)]"
+              : "text-[var(--marketing-muted-foreground)] hover:bg-[var(--marketing-action-soft)] hover:text-[var(--marketing-action)]",
+          );
+          const content = (
+            <>
               <NavIcon
                 aria-hidden="true"
                 size={19}
-                weight={index === 0 ? "fill" : "regular"}
+                weight={isActive ? "fill" : "regular"}
               />
               {!collapsed ? <span>{label}</span> : null}
+            </>
+          );
+          const control = to ? (
+            <Link
+              aria-current={isActive ? "page" : undefined}
+              aria-label={collapsed ? label : undefined}
+              className={className}
+              onClick={onNavigate}
+              to={to}
+            >
+              {content}
+            </Link>
+          ) : (
+            <button
+              aria-label={collapsed ? `${label} (coming soon)` : undefined}
+              className={cn(className, "cursor-not-allowed opacity-55")}
+              disabled
+              type="button"
+            >
+              {content}
             </button>
           );
           return collapsed ? (
             <Tooltip key={label}>
-              <TooltipTrigger render={button} />
-              <TooltipContent>{label}</TooltipContent>
+              <TooltipTrigger render={control} />
+              <TooltipContent>{to ? label : `${label} - coming soon`}</TooltipContent>
             </Tooltip>
           ) : (
-            <div key={label}>{button}</div>
+            <div key={label}>{control}</div>
           );
         })}
       </nav>
