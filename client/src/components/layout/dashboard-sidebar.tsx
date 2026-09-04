@@ -2,7 +2,6 @@
 import {
   GearIcon,
   HouseIcon,
-  KanbanIcon,
   ListChecksIcon,
   SidebarSimpleIcon,
   SignOutIcon,
@@ -43,7 +42,6 @@ type DashboardSidebarProps = {
 export function DashboardSidebar({
   workspaces,
   mobile = false,
-  user,
   onNavigate,
 }: DashboardSidebarProps) {
   const storedCollapsed = useUiStore((state) => state.isSidebarCollapsed);

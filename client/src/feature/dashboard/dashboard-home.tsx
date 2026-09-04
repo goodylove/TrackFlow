@@ -7,6 +7,7 @@ import {
 } from "@phosphor-icons/react";
 
 import { AssignedIssues } from "@/feature/dashboard/components/assigned-issues";
+import { DashboardEmptyState } from "@/feature/dashboard/components/dashboard-empty-state";
 import { PriorityOverview } from "@/feature/dashboard/components/priority-overview";
 import { RecentIssuesTable } from "@/feature/dashboard/components/recent-issues-table";
 import { StatsCard } from "@/feature/dashboard/components/stats-card";
@@ -16,9 +17,20 @@ import type { DashboardIssue, DashboardUser } from "@/feature/dashboard/types";
 type DashboardHomeProps = {
   issues: DashboardIssue[];
   currentUser: DashboardUser;
+  hasWorkspace?: boolean;
+  onAddWorkspace?: () => void;
 };
 
-export function DashboardHome({ issues, currentUser }: DashboardHomeProps) {
+export function DashboardHome({
+  issues,
+  currentUser,
+  hasWorkspace = true,
+  onAddWorkspace,
+}: DashboardHomeProps) {
+  if (!hasWorkspace) {
+    return <DashboardEmptyState onAddWorkspace={onAddWorkspace} />;
+  }
+
   const assignedIssues = issues.filter(
     (issue) => issue.assignee?._id === currentUser._id,
   );
@@ -50,28 +62,36 @@ export function DashboardHome({ issues, currentUser }: DashboardHomeProps) {
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
       >
         <StatsCard
-          helper="in this workspace"
+          helper={issues.length === 0 ? "No issues yet" : "in this workspace"}
           icon={ClipboardTextIcon}
           label="Total issues"
           tone="total"
           value={issues.length}
         />
         <StatsCard
-          helper="owned by you"
+          helper={
+            assignedIssues.length === 0 ? "Nothing assigned" : "owned by you"
+          }
           icon={UserCircleIcon}
           label="Assigned issues"
           tone="assigned"
           value={assignedIssues.length}
         />
         <StatsCard
-          helper="need an owner"
+          helper={
+            unassignedIssues.length === 0
+              ? "No unassigned work"
+              : "need an owner"
+          }
           icon={UserMinusIcon}
           label="Unassigned issues"
           tone="unassigned"
           value={unassignedIssues.length}
         />
         <StatsCard
-          helper="past due date"
+          helper={
+            overdueIssues.length === 0 ? "Nothing overdue" : "past due date"
+          }
           icon={WarningCircleIcon}
           label="Overdue issues"
           tone="overdue"

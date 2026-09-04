@@ -1,11 +1,10 @@
 // Displays searchable, filterable recent issues with row-level actions.
 import { useDeferredValue, useState } from "react";
 import {
-  CheckIcon,
   DotsThreeIcon,
+  ListChecksIcon,
   MagnifyingGlassIcon,
   PencilSimpleIcon,
-  SlidersHorizontalIcon,
   TrashIcon,
 } from "@phosphor-icons/react";
 
@@ -19,10 +18,16 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -31,6 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SectionEmptyState } from "@/feature/dashboard/components/section-empty-state";
 import {
   formatDueDate,
   formatUpdatedTime,
@@ -69,8 +75,6 @@ export function RecentIssuesTable({
     IssuePriority | "all"
   >("all");
   const deferredSearch = useDeferredValue(search.trim().toLowerCase());
-  const activeFilterCount =
-    Number(statusFilter !== "all") + Number(priorityFilter !== "all");
 
   const filteredIssues = issues
     .filter((issue) => {
@@ -88,11 +92,6 @@ export function RecentIssuesTable({
     })
     .slice(0, 6);
 
-  function clearFilters() {
-    setStatusFilter("all");
-    setPriorityFilter("all");
-  }
-
   return (
     <Card className="min-w-0 overflow-hidden">
       <CardHeader className="flex-col items-stretch border-b border-border/70">
@@ -103,7 +102,8 @@ export function RecentIssuesTable({
           </p>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        {issues.length > 0 ? (
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="relative w-full sm:max-w-64">
             <MagnifyingGlassIcon
               aria-hidden="true"
@@ -120,107 +120,101 @@ export function RecentIssuesTable({
             />
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  className="h-10 justify-start rounded-lg sm:ml-auto"
-                  type="button"
-                  variant="outline"
-                />
-              }
-            >
-              <SlidersHorizontalIcon aria-hidden="true" size={16} />
-              Filter
-              {activeFilterCount > 0 ? (
-                <span className="flex size-5 items-center justify-center rounded-full bg-[var(--marketing-action)] text-[0.65rem] font-bold text-white">
-                  {activeFilterCount}
-                </span>
-              ) : null}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Status</DropdownMenuLabel>
-                {statusOptions.map(([status, label]) => (
-                  <DropdownMenuItem
-                    key={status}
-                    onClick={() =>
-                      setStatusFilter((current) =>
-                        current === status ? "all" : status,
-                      )
+          <div className="flex flex-col gap-2 sm:ml-auto sm:flex-row sm:items-end">
+            <div className="grid gap-1.5">
+              {/* <span className="text-xs font-bold text-muted-foreground">
+                Status
+              </span> */}
+              <Select
+                onValueChange={(value) =>
+                  value && setStatusFilter(value as IssueStatus | "all")
+                }
+                value={statusFilter}
+              >
+                <SelectTrigger aria-label="Filter issues by status">
+                  <SelectValue>
+                    {() =>
+                      statusFilter === "all"
+                        ? "All statuses"
+                        : statusLabels[statusFilter]
                     }
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={`size-2 rounded-full ${
-                        status === "done"
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="w-20">
+                  <SelectItem value="all" >All statuses</SelectItem>
+                  {statusOptions.map(([status, label]) => (
+                    <SelectItem key={status} value={status}>
+                      <span
+                        aria-hidden="true"
+                        className={`size-2 rounded-full ${status === "done"
                           ? "bg-emerald-500"
                           : status === "in_progress"
                             ? "bg-blue-500"
                             : "bg-slate-400"
-                      }`}
-                    />
-                    <span className="flex-1">{label}</span>
-                    {statusFilter === status ? (
-                      <CheckIcon
-                        aria-hidden="true"
-                        className="text-[var(--marketing-action)]"
-                        size={15}
-                        weight="bold"
+                          }`}
                       />
-                    ) : null}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Priority</DropdownMenuLabel>
-                {priorityOptions.map(([priority, label]) => (
-                  <DropdownMenuItem
-                    key={priority}
-                    onClick={() =>
-                      setPriorityFilter((current) =>
-                        current === priority ? "all" : priority,
-                      )
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-1.5">
+              {/* <span className="text-xs font-bold text-muted-foreground">
+                Priority
+              </span> */}
+              <Select
+                onValueChange={(value) =>
+                  value && setPriorityFilter(value as IssuePriority | "all")
+                }
+                value={priorityFilter}
+              >
+                <SelectTrigger aria-label="Filter issues by priority" >
+                  <SelectValue>
+                    {() =>
+                      priorityFilter === "all"
+                        ? "All priorities"
+                        : priorityLabels[priorityFilter]
                     }
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={`size-2 rounded-full ${
-                        priority === "urgent"
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All priorities</SelectItem>
+                  {priorityOptions.map(([priority, label]) => (
+                    <SelectItem key={priority} value={priority}>
+                      <span
+                        aria-hidden="true"
+                        className={`size-2 rounded-full ${priority === "urgent"
                           ? "bg-red-500"
                           : priority === "high"
                             ? "bg-orange-500"
                             : priority === "medium"
                               ? "bg-amber-500"
                               : "bg-slate-400"
-                      }`}
-                    />
-                    <span className="flex-1">{label}</span>
-                    {priorityFilter === priority ? (
-                      <CheckIcon
-                        aria-hidden="true"
-                        className="text-[var(--marketing-action)]"
-                        size={15}
-                        weight="bold"
+                          }`}
                       />
-                    ) : null}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                disabled={activeFilterCount === 0}
-                onClick={clearFilters}
-              >
-                Clear filters
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          </div>
+        ) : null}
       </CardHeader>
 
-      <Table className="min-w-[52rem]">
+      {issues.length === 0 ? (
+        <div className="p-5">
+          <SectionEmptyState
+            description="New issues and their latest updates will appear here once work begins."
+            icon={ListChecksIcon}
+            title="No issues in this workspace"
+          />
+        </div>
+      ) : (
+        <Table className="min-w-[52rem]">
         <TableHeader>
           <TableRow className="bg-muted/35 hover:bg-muted/35">
             <TableHead>Issue</TableHead>
@@ -309,6 +303,7 @@ export function RecentIssuesTable({
                       <DropdownMenuGroup>
                         <DropdownMenuLabel>Issue actions</DropdownMenuLabel>
                         <DropdownMenuItem
+                          className="text-primary"
                           disabled={!onEditIssue}
                           onClick={() => onEditIssue?.(issue)}
                         >
@@ -340,7 +335,8 @@ export function RecentIssuesTable({
             </TableRow>
           )}
         </TableBody>
-      </Table>
+        </Table>
+      )}
     </Card>
   );
 }

@@ -30,6 +30,31 @@ export function WorkspaceSwitcher({
     workspaces.find((workspace) => workspace._id === selectedWorkspaceId) ??
     workspaces[0];
 
+  if (!selected) {
+    return (
+      <div
+        className={cn(
+          "flex w-full items-center rounded-xl border border-dashed border-border bg-muted/35 p-2.5 text-left",
+          collapsed ? "justify-center" : "gap-3",
+        )}
+      >
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+          <BuildingsIcon aria-hidden="true" size={17} />
+        </span>
+        {!collapsed ? (
+          <span className="min-w-0">
+            <span className="block text-[0.65rem] font-medium text-muted-foreground">
+              Workspace
+            </span>
+            <span className="block text-sm font-bold text-muted-foreground">
+              No workspace yet
+            </span>
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger

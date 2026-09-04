@@ -1,4 +1,5 @@
 // Visualizes current workspace issue volume grouped by issue creation month.
+import { ChartLineUpIcon } from "@phosphor-icons/react";
 import {
   CartesianGrid,
   LineChart,
@@ -16,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SectionEmptyState } from "@/feature/dashboard/components/section-empty-state";
 import type { DashboardIssue } from "@/feature/dashboard/types";
 
 export function StatusOverview({ issues }: { issues: DashboardIssue[] }) {
@@ -65,8 +67,16 @@ export function StatusOverview({ issues }: { issues: DashboardIssue[] }) {
         </span>
       </CardHeader>
       <CardContent className="h-[16.5rem] pt-2">
-        <ResponsiveContainer height="100%" width="100%">
-          <LineChart data={data} margin={{ left: -22, right: 4, top: 8 }}>
+        {issues.length === 0 ? (
+          <SectionEmptyState
+            className="h-full"
+            description="Create your first issue to start seeing workspace activity over time."
+            icon={ChartLineUpIcon}
+            title="No issue activity yet"
+          />
+        ) : (
+          <ResponsiveContainer height="100%" width="100%">
+            <LineChart data={data} margin={{ left: -22, right: 4, top: 8 }}>
             <CartesianGrid
               stroke="var(--border)"
               strokeDasharray="4 6"
@@ -104,8 +114,9 @@ export function StatusOverview({ issues }: { issues: DashboardIssue[] }) {
               strokeWidth={3}
               type="monotone"
             />
-          </LineChart>
-        </ResponsiveContainer>
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   );
