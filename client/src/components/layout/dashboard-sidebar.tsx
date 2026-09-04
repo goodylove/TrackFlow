@@ -75,21 +75,13 @@ export function DashboardSidebar({
           to="/"
           className="flex items-center gap-2 text-[0.98rem] font-bold tracking-tight text-[var(--marketing-action)]"
         >
-          <span className="flex size-8 items-center justify-center rounded-[0.6rem] bg-[var(--marketing-action)] text-white">
-            <KanbanIcon aria-hidden="true" size={17} weight="fill" />
+          <span className="flex size-8 items-center justify-center rounded-[0.6rem] bg-[var(--marketing-action)]/95 text-white">
+            <BrandMark />
           </span>
           {!collapsed ? <span>TrackFlow</span> : null}
         </Link>
 
 
-
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-[0.98rem] font-bold tracking-tight text-[var(--marketing-action)]"
-        >
-          <BrandMark />
-          <span>TrackFlow</span>
-        </Link>
 
         {!mobile && !collapsed ? (
           <Button
@@ -98,7 +90,7 @@ export function DashboardSidebar({
             size="icon"
             variant="ghost"
           >
-            <SidebarSimpleIcon aria-hidden="true" size={19} />
+            <SidebarSimpleIcon aria-hidden="true" size={16} />
           </Button>
         ) : null}
       </div>
@@ -114,10 +106,10 @@ export function DashboardSidebar({
             <button
               aria-current={index === 0 ? "page" : undefined}
               className={cn(
-                "flex h-11 w-full items-center rounded-xl text-sm font-bold transition-colors",
+                "flex h-11 w-full items-center rounded-lg text-sm font-bold transition-colors cursor-pointer",
                 collapsed ? "justify-center" : "gap-3 px-3",
                 index === 0
-                  ? "bg-[var(--marketing-action)] text-white shadow-[0_12px_24px_-16px_var(--marketing-accent-shadow)]"
+                  ? "bg-[var(--marketing-action)]/95 text-white shadow-[0_12px_24px_-16px_var(--marketing-accent-shadow)]"
                   : "text-[var(--marketing-muted-foreground)] hover:bg-[var(--marketing-action-soft)] hover:text-[var(--marketing-action)]",
               )}
               onClick={onNavigate}

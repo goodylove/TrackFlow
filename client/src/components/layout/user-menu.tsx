@@ -39,7 +39,7 @@ export function UserMenu({ user, compact = false }: UserMenuProps) {
         }
       >
         <Avatar>
-          <AvatarFallback className="bg-[var(--marketing-action)] text-white">
+          <AvatarFallback className="bg-[var(--marketing-action)]/95 text-white">
             {getInitials(user.name)}
           </AvatarFallback>
         </Avatar>

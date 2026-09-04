@@ -47,7 +47,7 @@ function BrandLockup({ inverse = false }: { inverse?: boolean }) {
             <span
                 className={cn(
                     "flex size-8 items-center justify-center rounded-[0.7rem]",
-                    inverse ? "bg-white/12 text-white" : "bg-[var(--marketing-action)] text-white"
+                    inverse ? "bg-white/12 text-white" : "bg-[var(--marketing-action)]/95 text-white"
                 )}
             >
                 <Kanban className="size-[1.05rem]" weight="fill" />
@@ -359,7 +359,7 @@ export function Auth({ mode }: AuthPageProps) {
                                                 <FormControl>
                                                     <Checkbox
                                                         checked={field.value}
-                                                        className="border-[var(--marketing-action)] data-checked:bg-[var(--marketing-action)]"
+                                                        className="border-[var(--marketing-action)] data-checked:bg-[var(--marketing-action)]/95"
                                                         name={field.name}
                                                         onBlur={field.onBlur}
                                                         onCheckedChange={field.onChange}
@@ -375,7 +375,7 @@ export function Auth({ mode }: AuthPageProps) {
                                 ) : null}
 
                                 <Button
-                                    className="mt-2 h-11 w-full rounded-md bg-[var(--marketing-action)] font-semibold text-white hover:bg-[var(--marketing-action-strong)]"
+                                    className="mt-2 h-11 w-full rounded-md bg-[var(--marketing-action)]/95 font-semibold text-white hover:bg-[var(--marketing-action-strong)]"
                                     disabled={isSubmitting}
                                     size="default"
                                     type="submit"

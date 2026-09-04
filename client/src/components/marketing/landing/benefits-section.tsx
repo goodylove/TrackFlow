@@ -20,7 +20,7 @@ export function BenefitsSection() {
       <Reveal direction="left">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <SectionHeading centered={false} title="Streamline your issue process" description="Managing project work should feel like a habit. TrackFlow helps your team work smarter, not harder." />
-          <Link className={cn(buttonVariants({ size: "lg" }), "w-fit rounded-[var(--radius-pill)] bg-[var(--marketing-action)] px-6 text-[0.82rem] hover:bg-[var(--marketing-action-strong)]")} to="/signup">Join us now<ArrowRight className="size-4" /></Link>
+          <Link className={cn(buttonVariants({ size: "lg" }), "w-fit rounded-[var(--radius-pill)] bg-[var(--marketing-action)]/95 px-6 text-[0.82rem] hover:bg-[var(--marketing-action-strong)]")} to="/signup">Join us now<ArrowRight className="size-4" /></Link>
         </div>
       </Reveal>
       <div className="mt-12 grid gap-5 lg:grid-cols-3">

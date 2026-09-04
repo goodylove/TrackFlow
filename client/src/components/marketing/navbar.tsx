@@ -57,7 +57,7 @@ export function Navbar() {
             <Link className="rounded-[var(--radius-pill)] px-3 py-2 text-[0.78rem] font-semibold text-[#282837] transition-colors hover:text-[var(--marketing-action)]" to="/login">
               Sign in
             </Link>
-            <Link className={cn(buttonVariants({ size: "sm" }), "h-9 rounded-[var(--radius-pill)] bg-[var(--marketing-action)] px-5 text-[0.78rem] hover:bg-[var(--marketing-action-strong)]")} to="/signup">
+            <Link className={cn(buttonVariants({ size: "sm" }), "h-9 rounded-[var(--radius-pill)] bg-[var(--marketing-action)]/95 px-5 text-[0.78rem] hover:bg-[var(--marketing-action-strong)]")} to="/signup">
               Sign up
             </Link>
             <a
@@ -106,7 +106,7 @@ export function Navbar() {
               <Link className={buttonVariants({ variant: "outline", size: "sm" })} to="/login">
                 Sign in
               </Link>
-              <Link className={cn(buttonVariants({ size: "sm" }), "bg-[var(--marketing-action)] hover:bg-[var(--marketing-action-strong)]")} to="/signup">
+              <Link className={cn(buttonVariants({ size: "sm" }), "bg-[var(--marketing-action)]/95 hover:bg-[var(--marketing-action-strong)]")} to="/signup">
                 Sign up
               </Link>
             </div>

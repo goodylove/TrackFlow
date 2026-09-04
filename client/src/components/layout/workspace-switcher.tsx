@@ -44,7 +44,7 @@ export function WorkspaceSwitcher({
           />
         }
       >
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--marketing-action)] text-white">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--marketing-action)]/95 text-white">
           <BuildingsIcon aria-hidden="true" size={17} weight="fill" />
         </span>
         {!collapsed ? (
@@ -65,23 +65,23 @@ export function WorkspaceSwitcher({
         <DropdownMenuGroup>
           <DropdownMenuLabel>Switch workspace</DropdownMenuLabel>
           {workspaces.map((workspace) => (
-          <DropdownMenuItem
-            key={workspace._id}
-            onClick={() => selectWorkspace(workspace._id)}
-          >
-            <span className="flex size-7 items-center justify-center rounded-md bg-[var(--marketing-action-soft)] text-xs font-black text-[var(--marketing-action)]">
-              {workspace.name[0]}
-            </span>
-            <span className="flex-1">{workspace.name}</span>
-            {workspace._id === selected._id ? (
-              <CheckIcon
-                aria-hidden="true"
-                className="text-[var(--marketing-action)]"
-                size={15}
-                weight="bold"
-              />
-            ) : null}
-          </DropdownMenuItem>
+            <DropdownMenuItem
+              key={workspace._id}
+              onClick={() => selectWorkspace(workspace._id)}
+            >
+              <span className="flex size-7 items-center justify-center rounded-md bg-[var(--marketing-action-soft)] text-xs font-black text-[var(--marketing-action)]">
+                {workspace.name[0]}
+              </span>
+              <span className="flex-1">{workspace.name}</span>
+              {workspace._id === selected._id ? (
+                <CheckIcon
+                  aria-hidden="true"
+                  className="text-[var(--marketing-action)]"
+                  size={15}
+                  weight="bold"
+                />
+              ) : null}
+            </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
       </DropdownMenuContent>

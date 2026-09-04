@@ -41,9 +41,9 @@ export function DashboardHome({ issues, currentUser }: DashboardHomeProps) {
             Good morning, {currentUser.name.split(" ")[0]}
           </h1>
         </div>
-        <p className="max-w-sm text-sm leading-6 text-muted-foreground">
+        {/* <p className="max-w-sm text-sm leading-6 text-muted-foreground">
           Here is what needs attention across your TrackFlow workspace.
-        </p>
+        </p> */}
       </div>
       <section
         aria-label="Issue statistics"
