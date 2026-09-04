@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
 
 
@@ -5,7 +6,10 @@ import { Hero } from "@/components/marketing/hero"
 import { LandingSections } from "@/components/marketing/landing-sections"
 import { Navbar } from "@/components/marketing/navbar"
 import { Seo } from "@/components/shared/seo"
+import { ProtectedRoute, PublicOnlyRoute } from "@/feature/auth/auth-route-guard"
 import AuthPage from "./pages/auth/auth.page"
+
+const DashboardPage = lazy(() => import("./pages/dashboard/dashboard.page"))
 
 function LandingPage() {
   return (
@@ -52,8 +56,23 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<AuthRoute mode="login" />} />
-      <Route path="/signup" element={<AuthRoute mode="signup" />} />
+      <Route path="/login" element={<PublicOnlyRoute><AuthRoute mode="login" /></PublicOnlyRoute>} />
+      <Route path="/signup" element={<PublicOnlyRoute><AuthRoute mode="signup" /></PublicOnlyRoute>} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Seo
+              description="Review workspace issue activity, priorities, ownership, and recent updates in TrackFlow."
+              noIndex
+              title="Dashboard"
+            />
+            <Suspense fallback={<div className="grid min-h-screen place-items-center bg-background text-sm font-bold text-muted-foreground">Loading dashboard...</div>}>
+              <DashboardPage />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
       <Route path="*" element={<Navigate replace to="/" />} />
     </Routes>
   )

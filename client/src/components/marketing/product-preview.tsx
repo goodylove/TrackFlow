@@ -22,7 +22,7 @@ export function ProductPreview() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="flex size-8 items-center justify-center rounded-[0.65rem] bg-[var(--marketing-action)] text-white">
+                <span className="flex size-8 items-center justify-center rounded-[0.65rem] bg-[var(--marketing-action)]/95 text-white">
                   <Kanban className="size-4" weight="fill" />
                 </span>
                 <div>
@@ -54,7 +54,7 @@ export function ProductPreview() {
               TrackFlow
             </div> */}
 
-            <div className="flex items-center gap-2 rounded-[var(--radius-pill)] bg-[var(--marketing-action)] px-3 py-2 text-[0.72rem] font-semibold text-white">
+            <div className="flex items-center gap-2 rounded-[var(--radius-pill)] bg-[var(--marketing-action)]/95 px-3 py-2 text-[0.72rem] font-semibold text-white">
               <Plus className="size-3.5" />
               New issue
             </div>
@@ -70,53 +70,53 @@ export function ProductPreview() {
 
           <div className="mt-4 grid min-w-[34rem] grid-cols-3 gap-3">
             {boardColumns.map((column) => (
-                <div
-                  key={column.name}
-                  className="rounded-[0.8rem] border border-[var(--marketing-border)] bg-[#f8f9fc] p-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#3e4054]">
-                        {column.name}
-                      </span>
-                      <span className="rounded-full bg-white px-1.5 py-0.5 text-[0.6rem] text-[var(--marketing-muted-foreground)]">
-                        {column.count}
-                      </span>
-                    </div>
-                    <DotsThree className="size-3.5 text-[var(--marketing-muted-foreground)]" weight="bold" />
+              <div
+                key={column.name}
+                className="rounded-[0.8rem] border border-[var(--marketing-border)] bg-[#f8f9fc] p-3"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#3e4054]">
+                      {column.name}
+                    </span>
+                    <span className="rounded-full bg-white px-1.5 py-0.5 text-[0.6rem] text-[var(--marketing-muted-foreground)]">
+                      {column.count}
+                    </span>
                   </div>
+                  <DotsThree className="size-3.5 text-[var(--marketing-muted-foreground)]" weight="bold" />
+                </div>
 
-                  <article className="mt-3 rounded-[0.75rem] border border-[var(--marketing-border)] bg-white p-3 shadow-[0_12px_24px_-22px_rgba(17,16,28,0.4)]">
-                    {/* <div className="flex items-center justify-between gap-2">
+                <article className="mt-3 rounded-[0.75rem] border border-[var(--marketing-border)] bg-white p-3 shadow-[0_12px_24px_-22px_rgba(17,16,28,0.4)]">
+                  {/* <div className="flex items-center justify-between gap-2">
                       <span className={cn("rounded-full px-2 py-1 text-[0.62rem] font-bold", priorityClass(issue.priority))}>
                         {issue.priority}
                       </span>
                       <CheckCircle className="size-4 text-[var(--marketing-action)]" weight="fill" />
                     </div> */}
-                    <div className="mt-4 space-y-2">
-                      <div className="h-2 rounded-full bg-[#edeef5]" />
-                      <div className="h-2 w-2/3 rounded-full bg-[#f1f2f7]" />
-                    </div>
+                  <div className="mt-4 space-y-2">
+                    <div className="h-2 rounded-full bg-[#edeef5]" />
+                    <div className="h-2 w-2/3 rounded-full bg-[#f1f2f7]" />
+                  </div>
 
-                    {/* <h3 className="mt-3 line-clamp-2 text-[0.78rem] font-bold leading-5 text-[#202033]">
+                  {/* <h3 className="mt-3 line-clamp-2 text-[0.78rem] font-bold leading-5 text-[#202033]">
                       {issue.title}
                     </h3> */}
-                    <div className="mt-4 space-y-2">
-                      <div className="h-2 rounded-full bg-[#edeef5]" />
-                      {/* <div className="h-2 w-2/3 rounded-full bg-[#f1f2f7]" /> */}
-                    </div>
-
-                    <div className="mt-4 space-y-2">
-                      <div className="h-2 rounded-full bg-[#edeef5]" />
-                      <div className="h-2 w-2/3 rounded-full bg-[#f1f2f7]" />
-                    </div>
-                  </article>
-
-                  <div className="mt-3 rounded-[0.75rem] border border-dashed border-[var(--marketing-border)] bg-white/75 px-3 py-4">
-                    <div className="h-2 rounded-full bg-[#eeeff6]" />
-                    <div className="mt-2 h-2 w-3/4 rounded-full bg-[#f3f4f8]" />
+                  <div className="mt-4 space-y-2">
+                    <div className="h-2 rounded-full bg-[#edeef5]" />
+                    {/* <div className="h-2 w-2/3 rounded-full bg-[#f1f2f7]" /> */}
                   </div>
+
+                  <div className="mt-4 space-y-2">
+                    <div className="h-2 rounded-full bg-[#edeef5]" />
+                    <div className="h-2 w-2/3 rounded-full bg-[#f1f2f7]" />
+                  </div>
+                </article>
+
+                <div className="mt-3 rounded-[0.75rem] border border-dashed border-[var(--marketing-border)] bg-white/75 px-3 py-4">
+                  <div className="h-2 rounded-full bg-[#eeeff6]" />
+                  <div className="mt-2 h-2 w-3/4 rounded-full bg-[#f3f4f8]" />
                 </div>
+              </div>
             ))}
           </div>
         </div>

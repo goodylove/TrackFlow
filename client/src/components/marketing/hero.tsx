@@ -36,27 +36,27 @@ export function Hero() {
 
             <LoadReveal delay={270} distance={32}>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link
-                className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "h-11 rounded-[var(--radius-pill)] bg-[var(--marketing-action)] px-6 text-[0.82rem] hover:bg-[var(--marketing-action-strong)]"
-                )}
-                to="/signup"
-              >
-                Get started
-                <ArrowRight className="size-4" />
-              </Link>
+                <Link
+                  className={cn(
+                    buttonVariants({ size: "lg" }),
+                    "h-11 rounded-[var(--radius-pill)] bg-[var(--marketing-action)]/95 px-6 text-[0.82rem] hover:bg-[var(--marketing-action-strong)]"
+                  )}
+                  to="/signup"
+                >
+                  Get started
+                  <ArrowRight className="size-4" />
+                </Link>
 
-              <a
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "lg" }),
-                  "h-11 rounded-[var(--radius-pill)] border-transparent bg-white px-5 text-[0.82rem] shadow-[0_12px_30px_-24px_rgba(17,16,28,0.45)]"
-                )}
-                href="#how-it-works"
-              >
-                <PlayCircle className="size-4 text-[var(--marketing-action)]" weight="fill" />
-                See workflow
-              </a>
+                <Link
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "lg" }),
+                    "h-11 rounded-[var(--radius-pill)] border-transparent bg-white px-5 text-[0.82rem] shadow-[0_12px_30px_-24px_rgba(17,16,28,0.45)]"
+                  )}
+                  to="#how-it-works"
+                >
+                  <PlayCircle className="size-4 text-[var(--marketing-action)]" weight="fill" />
+                  See workflow
+                </Link>
               </div>
             </LoadReveal>
           </div>
@@ -77,7 +77,7 @@ export function Hero() {
                 key={tag}
                 className="flex items-center justify-center gap-2 text-center text-[0.82rem] font-bold text-[#9a9daa]"
               >
-                <span className="size-2 rounded-full bg-[var(--marketing-action)]" />
+                <span className="size-2 rounded-full bg-[var(--marketing-action)]/95" />
                 {tag}
               </div>
             ))}
