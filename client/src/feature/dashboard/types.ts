@@ -15,6 +15,9 @@ export type DashboardWorkspace = {
   slug: string
   description?: string
   role: "owner" | "admin" | "member"
+  memberCount: number
+  openIssueCount: number
+  createdAt: string
 }
 
 export type DashboardIssue = {

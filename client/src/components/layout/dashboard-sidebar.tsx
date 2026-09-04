@@ -93,7 +93,11 @@ export function DashboardSidebar({
         ) : null}
       </div>
       <div className={cn("py-5", collapsed ? "px-3" : "px-4")}>
-        <WorkspaceSwitcher collapsed={collapsed} workspaces={workspaces} />
+        <WorkspaceSwitcher
+          collapsed={collapsed}
+          onNavigate={onNavigate}
+          workspaces={workspaces}
+        />
       </div>
       <nav
         aria-label="Dashboard navigation"

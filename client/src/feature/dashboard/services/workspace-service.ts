@@ -16,11 +16,11 @@ export type CreatedWorkspace = {
   _id: string;
   name: string;
   description?: string;
+  createdAt: string;
 };
 
 export type WorkspaceDetails = CreatedWorkspace & {
   createdBy: string;
-  createdAt: string;
   updatedAt: string;
 };
 
@@ -47,10 +47,14 @@ type WorkspaceMembership = {
   role: "owner" | "admin" | "member";
   workspace: (CreatedWorkspace & {
     createdBy?: string;
-    createdAt?: string;
     updatedAt?: string;
+    memberCount: number;
+    openIssueCount: number;
   }) | null;
 };
+
+type WorkspaceSummaryInput = CreatedWorkspace &
+  Partial<Pick<DashboardWorkspace, "memberCount" | "openIssueCount">>;
 
 export const workspaceQueryKeys = {
   all: ["workspaces"] as const,
@@ -62,7 +66,7 @@ export const workspaceQueryKeys = {
 };
 
 function toDashboardWorkspace(
-  workspace: CreatedWorkspace,
+  workspace: WorkspaceSummaryInput,
   role: DashboardWorkspace["role"],
 ): DashboardWorkspace {
   return {
@@ -70,6 +74,9 @@ function toDashboardWorkspace(
     name: workspace.name,
     description: workspace.description,
     role,
+    memberCount: workspace.memberCount ?? 1,
+    openIssueCount: workspace.openIssueCount ?? 0,
+    createdAt: workspace.createdAt,
     slug: workspace.name
       .trim()
       .toLowerCase()

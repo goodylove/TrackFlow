@@ -1,7 +1,6 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
     ArrowLeft,
-    CheckCircle,
     Eye,
     EyeSlash,
     GithubLogo,
@@ -9,6 +8,7 @@ import {
     Kanban,
     SpinnerGap,
 } from "@phosphor-icons/react"
+import { toast } from "sonner"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, type ControllerRenderProps, type SubmitHandler } from "react-hook-form"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
@@ -117,11 +117,6 @@ export function Auth({ mode }: AuthPageProps) {
         requestedPath?.startsWith("/") && !requestedPath.startsWith("//")
             ? requestedPath
             : "/dashboard"
-    const [notice, setNotice] = useState(
-        !isSignup && searchParams.get("registered") === "1"
-            ? "Your account is ready. Sign in to continue."
-            : ""
-    )
     const form = useForm<AuthFormValues>({
         defaultValues: {
             email: "",
@@ -147,9 +142,17 @@ export function Auth({ mode }: AuthPageProps) {
         ? "Set up your workspace and start moving work forward."
         : "Enter your details to sign in."
 
+    useEffect(() => {
+        if (!isSignup && searchParams.get("registered") === "1") {
+            toast.success("Your account is ready", {
+                description: "Sign in to continue.",
+                id: "account-ready",
+            })
+        }
+    }, [isSignup, searchParams])
+
     const onSubmit: SubmitHandler<AuthFormValues> = async (values) => {
         clearErrors("root")
-        setNotice("")
 
         try {
             if (isSignup) {
@@ -202,7 +205,9 @@ export function Auth({ mode }: AuthPageProps) {
 
     function showUnavailable(provider: string) {
         clearErrors("root")
-        setNotice(`${provider} sign-in is not available yet.`)
+        toast.info(`${provider} sign-in is not available yet.`, {
+            id: `unavailable-${provider.toLowerCase()}`,
+        })
     }
 
     return (
@@ -265,13 +270,6 @@ export function Auth({ mode }: AuthPageProps) {
                                 {description}
                             </p>
                         </div>
-
-                        {notice ? (
-                            <Alert className="mt-5 flex items-start gap-2" role="status" variant="success">
-                                <CheckCircle className="mt-0.5 size-4 shrink-0" weight="fill" />
-                                {notice}
-                            </Alert>
-                        ) : null}
 
                         {errors.root?.message ? (
                             <Alert className="mt-5" variant="destructive">

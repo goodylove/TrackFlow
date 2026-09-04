@@ -1,8 +1,8 @@
 // Connects the selected workspace to its server-backed detail view.
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Seo } from "@/components/shared/seo";
-import { Alert } from "@/components/ui/alert";
 import { DashboardEmptyState } from "@/feature/dashboard/components/dashboard-empty-state";
 import { useWorkspaceDetailsService } from "@/feature/dashboard/services/workspace-service";
 import {
@@ -17,7 +17,6 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 
 export default function WorkspaceSettingsPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [deletedWorkspaceName, setDeletedWorkspaceName] = useState<string | null>(null);
   const { currentUser, onAddWorkspace, workspaces } =
     useDashboardOutletContext();
   const selectedWorkspaceId = useWorkspaceStore(
@@ -51,12 +50,6 @@ export default function WorkspaceSettingsPage() {
           </p>
         </header>
 
-        {deletedWorkspaceName ? (
-          <Alert role="status" variant="success">
-            {deletedWorkspaceName} was deleted successfully.
-          </Alert>
-        ) : null}
-
         {!selectedWorkspace ? (
           <DashboardEmptyState
             description="Create a workspace before managing its profile, members, and access settings."
@@ -80,14 +73,17 @@ export default function WorkspaceSettingsPage() {
             {selectedWorkspace.role === "owner" ? (
               <WorkspaceDangerZone
                 onDelete={() => {
-                  setDeletedWorkspaceName(null);
                   setDeleteModalOpen(true);
                 }}
                 workspaceName={workspaceQuery.data.name}
               />
             ) : null}
             <DeleteWorkspaceModal
-              onDeleted={() => setDeletedWorkspaceName(workspaceQuery.data.name)}
+              onDeleted={() =>
+                toast.success("Workspace deleted", {
+                  description: `${workspaceQuery.data.name} was deleted successfully.`,
+                })
+              }
               onOpenChange={setDeleteModalOpen}
               open={deleteModalOpen}
               userId={currentUser._id}

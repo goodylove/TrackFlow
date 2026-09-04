@@ -1,4 +1,5 @@
-// Renders a responsive, searchable directory from workspace membership records.
+
+
 import {
   ArrowClockwiseIcon,
   DotsThreeIcon,

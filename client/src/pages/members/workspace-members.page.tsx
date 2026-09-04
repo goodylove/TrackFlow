@@ -1,9 +1,9 @@
 // Connects the selected workspace to its member directory endpoint.
 import { UserPlusIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Seo } from "@/components/shared/seo";
-import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { DashboardEmptyState } from "@/feature/dashboard/components/dashboard-empty-state";
 import { useWorkspaceMembersService } from "@/feature/dashboard/services/workspace-service";
@@ -21,11 +21,8 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 
 export default function WorkspaceMembersPage() {
   const [addMemberOpen, setAddMemberOpen] = useState(false);
-  const [addedMemberEmail, setAddedMemberEmail] = useState<string | null>(null);
   const [memberToEdit, setMemberToEdit] = useState<WorkspaceMember | null>(null);
-  const [roleUpdateMessage, setRoleUpdateMessage] = useState<string | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<WorkspaceMember | null>(null);
-  const [removalMessage, setRemovalMessage] = useState<string | null>(null);
   const { currentUser, onAddWorkspace, workspaces } =
     useDashboardOutletContext();
   const selectedWorkspaceId = useWorkspaceStore(
@@ -62,12 +59,7 @@ export default function WorkspaceMembersPage() {
           {selectedWorkspace && selectedWorkspace.role !== "member" ? (
             <Button
               className="h-10 shrink-0 rounded-lg bg-[var(--marketing-action)] px-4 hover:bg-[var(--marketing-action)]/90"
-              onClick={() => {
-                setAddedMemberEmail(null);
-                setRoleUpdateMessage(null);
-                setRemovalMessage(null);
-                setAddMemberOpen(true);
-              }}
+              onClick={() => setAddMemberOpen(true)}
               type="button"
             >
               <UserPlusIcon aria-hidden="true" size={17} weight="bold" />
@@ -75,22 +67,6 @@ export default function WorkspaceMembersPage() {
             </Button>
           ) : null}
         </header>
-
-        {addedMemberEmail ? (
-          <Alert role="status" variant="success">
-            {addedMemberEmail} now has access to {selectedWorkspace?.name}.
-          </Alert>
-        ) : null}
-        {roleUpdateMessage ? (
-          <Alert role="status" variant="success">
-            {roleUpdateMessage}
-          </Alert>
-        ) : null}
-        {removalMessage ? (
-          <Alert role="status" variant="success">
-            {removalMessage}
-          </Alert>
-        ) : null}
 
         {!selectedWorkspace ? (
           <DashboardEmptyState
@@ -112,12 +88,7 @@ export default function WorkspaceMembersPage() {
             members={membersQuery.data}
             onChangeRole={
               selectedWorkspace.role === "owner"
-                ? (member) => {
-                    setAddedMemberEmail(null);
-                    setRoleUpdateMessage(null);
-                    setRemovalMessage(null);
-                    setMemberToEdit(member);
-                  }
+                ? setMemberToEdit
                 : undefined
             }
             canRemoveMember={(member) =>
@@ -127,12 +98,7 @@ export default function WorkspaceMembersPage() {
             }
             onRemoveMember={
               selectedWorkspace.role !== "member"
-                ? (member) => {
-                    setAddedMemberEmail(null);
-                    setRoleUpdateMessage(null);
-                    setRemovalMessage(null);
-                    setMemberToRemove(member);
-                  }
+                ? setMemberToRemove
                 : undefined
             }
           />
@@ -140,7 +106,11 @@ export default function WorkspaceMembersPage() {
         {selectedWorkspace && selectedWorkspace.role !== "member" ? (
           <AddWorkspaceMemberModal
             actorRole={selectedWorkspace.role}
-            onAdded={setAddedMemberEmail}
+            onAdded={(email) =>
+              toast.success("Member added", {
+                description: `${email} now has access to ${selectedWorkspace.name}.`,
+              })
+            }
             onOpenChange={setAddMemberOpen}
             open={addMemberOpen}
             userId={currentUser._id}
@@ -155,9 +125,9 @@ export default function WorkspaceMembersPage() {
               if (!open) setMemberToEdit(null);
             }}
             onUpdated={(memberName, role) => {
-              setRoleUpdateMessage(
-                `${memberName} is now ${role === "admin" ? "an admin" : "a member"}.`,
-              );
+              toast.success("Member role updated", {
+                description: `${memberName} is now ${role === "admin" ? "an admin" : "a member"}.`,
+              });
             }}
             open
             userId={currentUser._id}
@@ -171,7 +141,9 @@ export default function WorkspaceMembersPage() {
               if (!open) setMemberToRemove(null);
             }}
             onRemoved={(memberName) =>
-              setRemovalMessage(`${memberName} was removed from the workspace.`)
+              toast.success("Member removed", {
+                description: `${memberName} no longer has access to ${selectedWorkspace.name}.`,
+              })
             }
             open
             userId={currentUser._id}

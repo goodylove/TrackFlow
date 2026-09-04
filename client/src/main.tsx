@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import "./styles/index.css"
 import App from './App.tsx'
 import { queryClient } from './lib/query/query-client'
+import { Toaster } from './components/ui/sonner'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <App />
+          <Toaster />
         </BrowserRouter>
       </QueryClientProvider>
     </HelmetProvider>

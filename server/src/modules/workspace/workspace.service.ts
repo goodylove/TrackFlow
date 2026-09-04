@@ -15,6 +15,7 @@ import {
 } from "../../errors/workspace.error.js";
 import { User } from "../user/user.model.js";
 import { UserNotFoundError } from "../../errors/authentication.error.js";
+import { Issue } from "../issue/issue.modal.js";
 
 type AssignableWorkspaceRole = "admin" | "member";
 
@@ -47,11 +48,21 @@ export const createWorkSpace = async (input: createWorkSpaceInput, userId: strin
 
 export const getWorkspacesByUserId = async (userId: string) => {
   const membership = await WorkspaceMember.find({ user: userId })
-    .populate({
+    .populate<{
+      workspace: {
+        _id: Types.ObjectId;
+        name: string;
+        description?: string;
+        createdBy: Types.ObjectId;
+        createdAt: Date;
+        updatedAt: Date;
+      } | null;
+    }>({
       path: "workspace",
       select: "name description createdBy createdAt updatedAt",
     })
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .lean();
 
   if (!membership) {
     throw {
@@ -59,7 +70,46 @@ export const getWorkspacesByUserId = async (userId: string) => {
       message: "No workspaces found for the user",
     };
   }
-  return membership;
+
+  const workspaceIds = membership.flatMap(({ workspace }) =>
+    workspace ? [workspace._id] : [],
+  );
+  const [memberCounts, openIssueCounts] = await Promise.all([
+    WorkspaceMember.aggregate<{ _id: Types.ObjectId; count: number }>([
+      { $match: { workspace: { $in: workspaceIds } } },
+      { $group: { _id: "$workspace", count: { $sum: 1 } } },
+    ]),
+    Issue.aggregate<{ _id: Types.ObjectId; count: number }>([
+      {
+        $match: {
+          workspace: { $in: workspaceIds },
+          status: { $ne: "done" },
+        },
+      },
+      { $group: { _id: "$workspace", count: { $sum: 1 } } },
+    ]),
+  ]);
+  const memberCountByWorkspace = new Map(
+    memberCounts.map(({ _id, count }) => [_id.toString(), count]),
+  );
+  const openIssueCountByWorkspace = new Map(
+    openIssueCounts.map(({ _id, count }) => [_id.toString(), count]),
+  );
+
+  return membership.map((item) => {
+    if (!item.workspace) return item;
+
+    const workspaceId = item.workspace._id.toString();
+
+    return {
+      ...item,
+      workspace: {
+        ...item.workspace,
+        memberCount: memberCountByWorkspace.get(workspaceId) ?? 0,
+        openIssueCount: openIssueCountByWorkspace.get(workspaceId) ?? 0,
+      },
+    };
+  });
 };
 
 export const getWorkspaceById = async (workspaceId: string) => {

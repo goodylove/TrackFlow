@@ -14,6 +14,7 @@ const DashboardLayout = lazy(() => import("./pages/dashboard/dashboard-layout"))
 const IssuesPage = lazy(() => import("./pages/issues/issues.page"))
 const WorkspaceMembersPage = lazy(() => import("./pages/members/workspace-members.page"))
 const WorkspaceSettingsPage = lazy(() => import("./pages/settings/workspace-settings.page"))
+const WorkspacesPage = lazy(() => import("./pages/workspace/workspaces.page"))
 
 function LandingPage() {
   return (
@@ -76,6 +77,7 @@ function App() {
         <Route path="issues" element={<IssuesPage />} />
         <Route path="members" element={<WorkspaceMembersPage />} />
         <Route path="settings" element={<WorkspaceSettingsPage />} />
+        <Route path="workspace" element={<WorkspacesPage />} />
       </Route>
       <Route path="*" element={<Navigate replace to="/" />} />
     </Routes>

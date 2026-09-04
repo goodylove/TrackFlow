@@ -28,6 +28,53 @@ describe("Create workspace flow", () => {
     expect(response.body).toHaveProperty("data");
   });
 
+  it("returns workspace card metrics", async () => {
+    await request(app).post("/api/v1/users/register").send(UserData);
+    await request(app).post("/api/v1/users/register").send(UserDataB);
+    const loginResponse = await request(app).post("/api/v1/users/login").send(login);
+    const token = loginResponse.body.data.user.token;
+    const workspaceResponse = await request(app)
+      .post("/api/v1/workspaces")
+      .send(data)
+      .set("Authorization", `Bearer ${token}`);
+    const workspaceId = workspaceResponse.body.data._id;
+
+    await request(app)
+      .post(`/api/v1/workspaces/${workspaceId}/members`)
+      .send({ email: UserDataB.email, role: "member" })
+      .set("Authorization", `Bearer ${token}`);
+    await request(app)
+      .post(`/api/v1/workspaces/${workspaceId}/issues`)
+      .send({
+        title: "Open issue",
+        status: "todo",
+        priority: "medium",
+        assigneeId: null,
+      })
+      .set("Authorization", `Bearer ${token}`);
+    await request(app)
+      .post(`/api/v1/workspaces/${workspaceId}/issues`)
+      .send({
+        title: "Completed issue",
+        status: "done",
+        priority: "low",
+        assigneeId: null,
+      })
+      .set("Authorization", `Bearer ${token}`);
+
+    const response = await request(app)
+      .get("/api/v1/workspaces")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data[0].workspace).toMatchObject({
+      _id: workspaceId,
+      memberCount: 2,
+      openIssueCount: 1,
+    });
+    expect(response.body.data[0].workspace.createdAt).toEqual(expect.any(String));
+  });
+
   it("membership protection", async () => {
     // User A register and login and token;
     await request(app).post("/api/v1/users/register").send(UserData);

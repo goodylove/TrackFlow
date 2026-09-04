@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BuildingsIcon, SpinnerGapIcon } from "@phosphor-icons/react";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -78,6 +79,9 @@ export function CreateWorkspaceModal({
       onCreated(workspace);
       reset(defaultValues);
       onOpenChange(false);
+      toast.success("Workspace created", {
+        description: `${workspace.name} is ready for your team.`,
+      });
     } catch (submissionError) {
       if (submissionError instanceof ApiError && submissionError.fieldErrors) {
         (["name", "description"] as const).forEach((field) => {
