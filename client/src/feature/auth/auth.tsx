@@ -112,6 +112,11 @@ export function Auth({ mode }: AuthPageProps) {
     const loginMutation = useAuthLoginService()
     const registerMutation = useAuthRegisterService()
     const [searchParams] = useSearchParams()
+    const requestedPath = searchParams.get("redirect")
+    const postLoginPath =
+        requestedPath?.startsWith("/") && !requestedPath.startsWith("//")
+            ? requestedPath
+            : "/dashboard"
     const [notice, setNotice] = useState(
         !isSignup && searchParams.get("registered") === "1"
             ? "Your account is ready. Sign in to continue."
@@ -171,7 +176,7 @@ export function Auth({ mode }: AuthPageProps) {
                 { id: user.id, name: user.name, email: user.email },
                 values.remember
             )
-            navigate("/", { replace: true })
+            navigate(postLoginPath, { replace: true })
         } catch (submissionError) {
             if (submissionError instanceof ApiError && submissionError.fieldErrors) {
                 const fieldErrors = submissionError.fieldErrors

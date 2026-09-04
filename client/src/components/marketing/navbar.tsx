@@ -1,10 +1,11 @@
 import { useId, useState } from "react"
-import { ArrowUpRight, GithubLogo, Kanban, List, X } from "@phosphor-icons/react"
+import { ArrowUpRight, GithubLogo, List, X } from "@phosphor-icons/react"
 import { Link } from "react-router-dom"
 
 import { Container } from "@/components/shared/container"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { BrandMark } from "../shared/brandMark"
 
 const navigation = [
   { href: "#benefits", label: "About" },
@@ -13,17 +14,12 @@ const navigation = [
   { href: "https://github.com/goodylove/TrackFlow", label: "GitHub" },
 ]
 
-function BrandMark() {
-  return (
-    <div className="flex size-7 items-center justify-center rounded-[0.55rem] bg-[var(--marketing-action)] shadow-[0_10px_24px_-16px_rgba(47,55,244,0.75)]">
-      <Kanban className="size-4 text-white" weight="fill" />
-    </div>
-  )
-}
+
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const menuId = useId()
+
 
   return (
     <Container className="pt-4">
@@ -41,18 +37,20 @@ export function Navbar() {
             aria-label="Primary"
             className="hidden items-center gap-1 lg:flex"
           >
-            {navigation.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                rel={item.href.startsWith("https://") ? "noreferrer" : undefined}
-                target={item.href.startsWith("https://") ? "_blank" : undefined}
-                className="inline-flex items-center gap-1 rounded-[var(--radius-pill)] px-3 py-2 text-[0.78rem] font-semibold leading-none text-[#282837] transition-colors hover:bg-[var(--marketing-action-soft)] hover:text-[var(--marketing-action)]"
-              >
-                {item.label}
-                {item.href.startsWith("https://") ? <ArrowUpRight className="size-3" /> : null}
-              </a>
-            ))}
+            {navigation.map((item) => {
+              const className = "inline-flex items-center gap-1 rounded-[var(--radius-pill)] px-3 py-2 text-[0.78rem] font-semibold leading-none text-[#282837] transition-colors hover:bg-[var(--marketing-action-soft)] hover:text-[var(--marketing-action)]"
+
+              if (item.href.startsWith("https://")) {
+                return (
+                  <a className={className} href={item.href} key={item.label} rel="noreferrer" target="_blank">
+                    {item.label}
+                    <ArrowUpRight className="size-3" />
+                  </a>
+                )
+              }
+
+              return <Link className={className} key={item.label} to={item.href}>{item.label}</Link>
+            })}
           </nav>
 
           <div className="hidden items-center gap-2 md:flex">
@@ -93,18 +91,15 @@ export function Navbar() {
             id={menuId}
           >
             <nav aria-label="Mobile primary" className="flex flex-col gap-1">
-              {navigation.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  rel={item.href.startsWith("https://") ? "noreferrer" : undefined}
-                  target={item.href.startsWith("https://") ? "_blank" : undefined}
-                  className="rounded-[0.8rem] px-4 py-3 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--marketing-action-soft)]"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.label}
-                </a>
-              ))}
+              {navigation.map((item) => {
+                const className = "rounded-[0.8rem] px-4 py-3 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--marketing-action-soft)]"
+
+                if (item.href.startsWith("https://")) {
+                  return <a className={className} href={item.href} key={item.label} onClick={() => setIsOpen(false)} rel="noreferrer" target="_blank">{item.label}</a>
+                }
+
+                return <Link className={className} key={item.label} onClick={() => setIsOpen(false)} to={item.href}>{item.label}</Link>
+              })}
             </nav>
 
             <div className="mt-4 flex flex-col gap-2">

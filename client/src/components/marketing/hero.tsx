@@ -47,16 +47,16 @@ export function Hero() {
                 <ArrowRight className="size-4" />
               </Link>
 
-              <a
+              <Link
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
                   "h-11 rounded-[var(--radius-pill)] border-transparent bg-white px-5 text-[0.82rem] shadow-[0_12px_30px_-24px_rgba(17,16,28,0.45)]"
                 )}
-                href="#how-it-works"
+                to="#how-it-works"
               >
                 <PlayCircle className="size-4 text-[var(--marketing-action)]" weight="fill" />
                 See workflow
-              </a>
+              </Link>
               </div>
             </LoadReveal>
           </div>
