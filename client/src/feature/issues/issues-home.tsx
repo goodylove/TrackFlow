@@ -1,11 +1,15 @@
 // Composes the issue management page and its prerequisite empty states.
 import { ArrowsLeftRightIcon, PlusIcon } from "@phosphor-icons/react";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { CreateIssueModal } from "@/feature/issues/components/create-issue-modal";
 import { DashboardEmptyState } from "@/feature/dashboard/components/dashboard-empty-state";
+import { CreateIssueModal } from "@/feature/issues/components/create-issue-modal";
 import { IssuesEmptyState } from "@/feature/issues/components/issues-empty-state";
+import {
+  IssuesErrorState,
+  IssuesLoadingState,
+} from "@/feature/issues/components/issues-load-state";
 import {
   IssuesToolbar,
   type PriorityFilter,
@@ -17,7 +21,11 @@ import type { Issue, IssueStatus } from "@/feature/issues/types";
 type IssuesHomeProps = {
   currentUserId: string;
   initialIssues: Issue[];
+  isLoading?: boolean;
+  loadError?: string;
   onAddWorkspace: () => void;
+  onRetry: () => void;
+  retrying?: boolean;
   workspaceId?: string;
   workspaceName?: string;
 };
@@ -25,7 +33,11 @@ type IssuesHomeProps = {
 export function IssuesHome({
   currentUserId,
   initialIssues,
+  isLoading = false,
+  loadError,
   onAddWorkspace,
+  onRetry,
+  retrying = false,
   workspaceId,
   workspaceName,
 }: IssuesHomeProps) {
@@ -35,6 +47,10 @@ export function IssuesHome({
   const [status, setStatus] = useState<StatusFilter>("all");
   const [priority, setPriority] = useState<PriorityFilter>("all");
   const [assigneeId, setAssigneeId] = useState("all");
+
+  useLayoutEffect(() => {
+    setIssues(initialIssues);
+  }, [initialIssues]);
 
   const assignees = useMemo(
     () =>
@@ -129,6 +145,14 @@ export function IssuesHome({
           description="Issues belong to a workspace. Create one first, then you can add issues, assign owners, and track progress."
           onAddWorkspace={onAddWorkspace}
           title="Create a workspace before adding issues"
+        />
+      ) : isLoading ? (
+        <IssuesLoadingState />
+      ) : loadError ? (
+        <IssuesErrorState
+          message={loadError}
+          onRetry={onRetry}
+          retrying={retrying}
         />
       ) : issues.length === 0 ? (
         <IssuesEmptyState onCreateIssue={() => setCreateIssueOpen(true)} />

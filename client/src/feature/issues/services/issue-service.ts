@@ -1,4 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import type { WorkspaceMember } from "@/feature/dashboard/services/workspace-service";
 import type {
@@ -23,18 +27,54 @@ export type CreateIssueInput = {
   dueDate?: string;
 };
 
-export type CreatedIssue = {
+type ApiIssueCore = {
   _id: string;
   workspace: string;
   title: string;
   description?: string;
   status: IssueStatus;
   priority: IssuePriority;
-  reporter: string;
-  assignee: string | null;
   dueDate?: string;
   createdAt: string;
   updatedAt: string;
+};
+
+type ApiIssueUser = {
+  _id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+};
+
+export type CreatedIssue = ApiIssueCore & {
+  reporter: string;
+  assignee: string | null;
+};
+
+type ListedIssue = ApiIssueCore & {
+  reporter: ApiIssueUser;
+  assignee: ApiIssueUser | null;
+};
+
+type IssueListPayload = {
+  issues: ListedIssue[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalIssues: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+};
+
+export type IssueListResult = Omit<IssueListPayload, "issues"> & {
+  issues: Issue[];
+};
+
+export const issueQueryKeys = {
+  all: ["issues"] as const,
+  list: (workspaceId: string) => ["issues", workspaceId, "list"] as const,
 };
 
 async function createIssue(workspaceId: string, input: CreateIssueInput) {
@@ -56,13 +96,35 @@ async function createIssue(workspaceId: string, input: CreateIssueInput) {
   }
 }
 
+async function getIssues(workspaceId: string): Promise<IssueListResult> {
+  try {
+    const { data: payload } = await apiClient.get<ApiResponse<IssueListPayload>>(
+      `/workspaces/${workspaceId}/issues`,
+      { params: { limit: 100 } },
+    );
+
+    if (!payload.success || !payload.data || !Array.isArray(payload.data.issues)) {
+      throw new ApiError(payload.message || "Unable to load issues.");
+    }
+
+    return {
+      ...payload.data,
+      issues: payload.data.issues.map((issue) =>
+        toBoardIssue(issue, issue.assignee ?? undefined),
+      ),
+    };
+  } catch (error) {
+    throw toApiError(error);
+  }
+}
+
 function getTemporaryIdentifier(issueId: string) {
   return `TF-${issueId.slice(-5).toUpperCase()}`;
 }
 
 export function toBoardIssue(
-  issue: CreatedIssue,
-  assignee?: WorkspaceMember["user"],
+  issue: ApiIssueCore,
+  assignee?: WorkspaceMember["user"] | ApiIssueUser,
 ): Issue {
   return {
     id: issue._id,
@@ -84,8 +146,22 @@ export function toBoardIssue(
 }
 
 export function useCreateIssueService(workspaceId: string) {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["issues", workspaceId, "create"],
     mutationFn: (input: CreateIssueInput) => createIssue(workspaceId, input),
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: issueQueryKeys.list(workspaceId),
+      }),
+  });
+}
+
+export function useIssuesService(workspaceId: string) {
+  return useQuery({
+    queryKey: issueQueryKeys.list(workspaceId),
+    queryFn: () => getIssues(workspaceId),
+    enabled: Boolean(workspaceId),
   });
 }
