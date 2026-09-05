@@ -1,5 +1,4 @@
-
-
+// Renders a responsive, searchable directory from workspace membership records.
 import {
   ArrowClockwiseIcon,
   DotsThreeIcon,
@@ -86,10 +85,10 @@ export function WorkspaceMembersList({
       className="overflow-hidden rounded-2xl border border-[var(--marketing-border)] bg-white shadow-[0_16px_40px_-34px_rgba(23,23,34,0.35)]"
     >
       <div className="flex flex-col gap-4 border-b border-[var(--marketing-border)] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <div>
+        {/* <div>
           <div className="flex items-center gap-2">
             <h2 className="text-base font-black" id="members-directory-title">
-              Member directory
+              Members
             </h2>
             <Badge variant="secondary">
               {members.length} {members.length === 1 ? "member" : "members"}
@@ -98,7 +97,7 @@ export function WorkspaceMembersList({
           <p className="mt-1 text-sm text-muted-foreground">
             People who can access this workspace.
           </p>
-        </div>
+        </div> */}
         <label className="relative block w-full sm:w-72">
           <span className="sr-only">Search members</span>
           <MagnifyingGlassIcon

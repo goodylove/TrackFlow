@@ -19,12 +19,12 @@ export function SectionEmptyState({
   return (
     <div
       className={cn(
-        "flex min-h-44 flex-col items-center justify-center rounded-xl border border-dashed border-[var(--marketing-border)] bg-muted/20 px-5 py-8 text-center",
+        "flex min-h-44 flex-col items-center justify-center rounded-xl border border-dashed border-[var(--marketing-border)]  px-5 py-8 text-center",
         className,
       )}
     >
-      <span className="flex size-11 items-center justify-center rounded-xl bg-[var(--marketing-action-soft)] text-[var(--marketing-action)]">
-        <EmptyIcon aria-hidden="true" size={21} weight="duotone" />
+      <span className="flex size-11 items-center justify-center text-[var(--marketing-action)]">
+        <EmptyIcon aria-hidden="true" size={50} weight="regular" />
       </span>
       <h3 className="mt-4 text-sm font-bold text-foreground">{title}</h3>
       <p className="mt-1 max-w-xs text-xs leading-5 text-muted-foreground">

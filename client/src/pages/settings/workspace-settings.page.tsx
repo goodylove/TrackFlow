@@ -39,9 +39,7 @@ export default function WorkspaceSettingsPage() {
       />
       <div className="space-y-5">
         <header>
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-action)]">
-            Workspace administration
-          </p>
+
           <h1 className="mt-1 text-3xl font-black tracking-[-0.04em] sm:text-4xl">
             Workspace settings
           </h1>
