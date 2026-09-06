@@ -1,6 +1,7 @@
 // Composes the issue management page and its prerequisite empty states.
 import { ArrowsLeftRightIcon, PlusIcon } from "@phosphor-icons/react";
 import { useLayoutEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { DashboardEmptyState } from "@/feature/dashboard/components/dashboard-empty-state";
@@ -16,7 +17,9 @@ import {
   type StatusFilter,
 } from "@/feature/issues/components/issues-toolbar";
 import { KanbanBoard } from "@/feature/issues/components/kanban-board";
+import { useUpdateIssueStatusService } from "@/feature/issues/services/issue-service";
 import type { Issue, IssueStatus } from "@/feature/issues/types";
+import { ApiError } from "@/lib/api/api-error";
 
 type IssuesHomeProps = {
   currentUserId: string;
@@ -42,11 +45,15 @@ export function IssuesHome({
   workspaceName,
 }: IssuesHomeProps) {
   const [issues, setIssues] = useState(initialIssues);
+  const [pendingIssueIds, setPendingIssueIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [createIssueOpen, setCreateIssueOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [priority, setPriority] = useState<PriorityFilter>("all");
   const [assigneeId, setAssigneeId] = useState("all");
+  const updateStatusMutation = useUpdateIssueStatusService(workspaceId ?? "");
 
   useLayoutEffect(() => {
     setIssues(initialIssues);
@@ -96,7 +103,18 @@ export function IssuesHome({
     priority !== "all" ||
     assigneeId !== "all";
 
-  function moveIssue(issueId: string, nextStatus: IssueStatus) {
+  async function moveIssue(issueId: string, nextStatus: IssueStatus) {
+    const previousIssue = issues.find((issue) => issue.id === issueId);
+    if (
+      !workspaceId ||
+      !previousIssue ||
+      previousIssue.status === nextStatus ||
+      pendingIssueIds.has(issueId)
+    ) {
+      return;
+    }
+
+    setPendingIssueIds((current) => new Set(current).add(issueId));
     setIssues((currentIssues) =>
       currentIssues.map((issue) =>
         issue.id === issueId
@@ -104,6 +122,49 @@ export function IssuesHome({
           : issue,
       ),
     );
+
+    try {
+      const updatedIssue = await updateStatusMutation.mutateAsync({
+        issueId,
+        status: nextStatus,
+      });
+
+      setIssues((currentIssues) =>
+        currentIssues.map((issue) =>
+          issue.id === issueId
+            ? {
+                ...issue,
+                status: updatedIssue.status,
+                updatedAt: updatedIssue.updatedAt,
+              }
+            : issue,
+        ),
+      );
+    } catch (updateError) {
+      setIssues((currentIssues) =>
+        currentIssues.map((issue) =>
+          issue.id === issueId
+            ? {
+                ...issue,
+                status: previousIssue.status,
+                updatedAt: previousIssue.updatedAt,
+              }
+            : issue,
+        ),
+      );
+      toast.error("Status change was not saved", {
+        description:
+          updateError instanceof ApiError
+            ? updateError.message
+            : "Please try moving the issue again.",
+      });
+    } finally {
+      setPendingIssueIds((current) => {
+        const next = new Set(current);
+        next.delete(issueId);
+        return next;
+      });
+    }
   }
 
   function clearFilters() {
@@ -182,7 +243,11 @@ export function IssuesHome({
             </p>
           </div>
 
-          <KanbanBoard issues={filteredIssues} onMoveIssue={moveIssue} />
+          <KanbanBoard
+            issues={filteredIssues}
+            onMoveIssue={moveIssue}
+            pendingIssueIds={pendingIssueIds}
+          />
         </>
       )}
 

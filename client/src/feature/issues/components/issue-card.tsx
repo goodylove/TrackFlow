@@ -45,6 +45,7 @@ function formatDueDate(value: string) {
 type IssueCardProps = {
   issue: Issue;
   isDragging: boolean;
+  isUpdating: boolean;
   onDragEnd: () => void;
   onDragStart: (issueId: string) => void;
   onMoveIssue: (issueId: string, status: IssueStatus) => void;
@@ -53,18 +54,24 @@ type IssueCardProps = {
 export function IssueCard({
   issue,
   isDragging,
+  isUpdating,
   onDragEnd,
   onDragStart,
   onMoveIssue,
 }: IssueCardProps) {
   function handleDragStart(event: DragEvent<HTMLElement>) {
+    if (isUpdating) {
+      event.preventDefault();
+      return;
+    }
+
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", issue.id);
     onDragStart(issue.id);
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
-    if (event.target !== event.currentTarget) return;
+    if (isUpdating || event.target !== event.currentTarget) return;
 
     const currentIndex = issueStatuses.indexOf(issue.status);
     const nextIndex =
@@ -90,29 +97,43 @@ export function IssueCard({
     <article
       aria-describedby={`${issue.id}-keyboard-help`}
       aria-grabbed={isDragging}
+      aria-busy={isUpdating}
       className={cn(
         "group cursor-grab rounded-xl border border-[var(--marketing-border)] bg-white p-4 shadow-[0_10px_28px_-24px_rgba(23,23,34,0.45)] outline-none transition duration-200 hover:-translate-y-0.5 hover:border-[var(--marketing-border-strong)] hover:shadow-[0_18px_34px_-24px_rgba(23,23,34,0.35)] focus-visible:ring-2 focus-visible:ring-[var(--marketing-action)]/35 active:cursor-grabbing",
         isDragging &&
           "scale-[0.98] border-[var(--marketing-action)]/35 opacity-50 shadow-none",
+        isUpdating &&
+          "cursor-wait border-[var(--marketing-action)]/25 bg-[var(--marketing-action-soft)]/20",
       )}
-      draggable
+      draggable={!isUpdating}
       onDragEnd={onDragEnd}
       onDragStart={handleDragStart}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
       <span className="sr-only" id={`${issue.id}-keyboard-help`}>
-        Press left or right arrow to move this issue between status columns.
+        {isUpdating
+          ? "Saving status change."
+          : "Press left or right arrow to move this issue between status columns."}
       </span>
 
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-1.5">
-          <DotsSixVerticalIcon
-            aria-hidden="true"
-            className="-ml-1 shrink-0 text-slate-300 transition-colors group-hover:text-slate-500"
-            size={16}
-            weight="bold"
-          />
+          {isUpdating ? (
+            <SpinnerGapIcon
+              aria-hidden="true"
+              className="-ml-1 shrink-0 animate-spin text-[var(--marketing-action)]"
+              size={16}
+              weight="bold"
+            />
+          ) : (
+            <DotsSixVerticalIcon
+              aria-hidden="true"
+              className="-ml-1 shrink-0 text-slate-300 transition-colors group-hover:text-slate-500"
+              size={16}
+              weight="bold"
+            />
+          )}
           <span className="font-mono text-[0.68rem] font-bold tracking-wide text-muted-foreground">
             {issue.identifier}
           </span>
@@ -126,6 +147,7 @@ export function IssueCard({
                 <Button
                   aria-label={`Move ${issue.identifier}`}
                   className="-mr-2 size-7 rounded-lg text-muted-foreground opacity-70 hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+                  disabled={isUpdating}
                   draggable={false}
                   size="icon"
                   variant="ghost"
@@ -141,7 +163,7 @@ export function IssueCard({
                   const StatusIcon = statusIcons[status];
                   return (
                     <DropdownMenuItem
-                      disabled={status === issue.status}
+                      disabled={isUpdating || status === issue.status}
                       key={status}
                       onClick={() => onMoveIssue(issue.id, status)}
                     >

@@ -11,9 +11,14 @@ import {
 type KanbanBoardProps = {
   issues: Issue[];
   onMoveIssue: (issueId: string, status: IssueStatus) => void;
+  pendingIssueIds: ReadonlySet<string>;
 };
 
-export function KanbanBoard({ issues, onMoveIssue }: KanbanBoardProps) {
+export function KanbanBoard({
+  issues,
+  onMoveIssue,
+  pendingIssueIds,
+}: KanbanBoardProps) {
   const [draggingIssueId, setDraggingIssueId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<IssueStatus | null>(null);
   const [announcement, setAnnouncement] = useState("");
@@ -69,6 +74,7 @@ export function KanbanBoard({ issues, onMoveIssue }: KanbanBoardProps) {
               onDragStart={setDraggingIssueId}
               onDrop={moveIssue}
               onMoveIssue={moveIssue}
+              pendingIssueIds={pendingIssueIds}
               status={status}
             />
           );

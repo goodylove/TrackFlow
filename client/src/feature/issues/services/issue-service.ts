@@ -27,6 +27,11 @@ export type CreateIssueInput = {
   dueDate?: string;
 };
 
+export type UpdateIssueStatusInput = {
+  issueId: string;
+  status: IssueStatus;
+};
+
 type ApiIssueCore = {
   _id: string;
   workspace: string;
@@ -118,6 +123,27 @@ async function getIssues(workspaceId: string): Promise<IssueListResult> {
   }
 }
 
+async function updateIssueStatus(
+  workspaceId: string,
+  { issueId, status }: UpdateIssueStatusInput,
+) {
+  try {
+    const { data: payload } = await apiClient.patch<
+      ApiResponse<{ issue: CreatedIssue }>
+    >(`/workspaces/${workspaceId}/issues/${issueId}`, { status });
+
+    if (!payload.success || !payload.data?.issue) {
+      throw new ApiError(payload.message || "Unable to update issue status.", {
+        fieldErrors: extractFieldErrors(payload.errors),
+      });
+    }
+
+    return payload.data.issue;
+  } catch (error) {
+    throw toApiError(error);
+  }
+}
+
 function getTemporaryIdentifier(issueId: string) {
   return `TF-${issueId.slice(-5).toUpperCase()}`;
 }
@@ -163,5 +189,13 @@ export function useIssuesService(workspaceId: string) {
     queryKey: issueQueryKeys.list(workspaceId),
     queryFn: () => getIssues(workspaceId),
     enabled: Boolean(workspaceId),
+  });
+}
+
+export function useUpdateIssueStatusService(workspaceId: string) {
+  return useMutation({
+    mutationKey: ["issues", workspaceId, "update-status"],
+    mutationFn: (input: UpdateIssueStatusInput) =>
+      updateIssueStatus(workspaceId, input),
   });
 }

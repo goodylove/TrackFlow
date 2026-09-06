@@ -48,6 +48,7 @@ type KanbanColumnProps = {
   onDragStart: (issueId: string) => void;
   onDrop: (issueId: string, status: IssueStatus) => void;
   onMoveIssue: (issueId: string, status: IssueStatus) => void;
+  pendingIssueIds: ReadonlySet<string>;
   status: IssueStatus;
 };
 
@@ -60,6 +61,7 @@ export function KanbanColumn({
   onDragStart,
   onDrop,
   onMoveIssue,
+  pendingIssueIds,
   status,
 }: KanbanColumnProps) {
   const [visibleCount, setVisibleCount] = useState(recentIssueLimit);
@@ -124,6 +126,7 @@ export function KanbanColumn({
             onDragEnd={onDragEnd}
             onDragStart={onDragStart}
             onMoveIssue={onMoveIssue}
+            isUpdating={pendingIssueIds.has(issue.id)}
           />
         ))}
 
