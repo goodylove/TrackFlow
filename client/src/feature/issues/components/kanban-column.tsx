@@ -52,6 +52,7 @@ type KanbanColumnProps = {
   onDragStart: (issueId: string) => void;
   onDrop: (issueId: string, status: IssueStatus) => void;
   onMoveIssue: (issueId: string, status: IssueStatus) => void;
+  onOpenComments: (issue: Issue) => void;
   pendingIssueIds: ReadonlySet<string>;
   status: IssueStatus;
 };
@@ -69,6 +70,7 @@ export function KanbanColumn({
   onDragStart,
   onDrop,
   onMoveIssue,
+  onOpenComments,
   pendingIssueIds,
   status,
 }: KanbanColumnProps) {
@@ -138,6 +140,7 @@ export function KanbanColumn({
             onDragEnd={onDragEnd}
             onDragStart={onDragStart}
             onMoveIssue={onMoveIssue}
+            onOpenComments={onOpenComments}
             isUpdating={pendingIssueIds.has(issue.id)}
           />
         ))}

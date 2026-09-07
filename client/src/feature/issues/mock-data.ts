@@ -17,6 +17,7 @@ export const mockIssues: Issue[] = [
     assignee: mockIssueAssignees[0],
     dueDate: "2026-09-08",
     commentCount: 6,
+    createdAt: "2026-08-29T10:15:00.000Z",
     updatedAt: "2026-09-05T00:45:00.000Z",
   },
   {
@@ -28,6 +29,7 @@ export const mockIssues: Issue[] = [
     assignee: null,
     dueDate: "2026-09-11",
     commentCount: 3,
+    createdAt: "2026-08-30T14:30:00.000Z",
     updatedAt: "2026-09-04T15:20:00.000Z",
   },
   {
@@ -39,6 +41,7 @@ export const mockIssues: Issue[] = [
     assignee: mockIssueAssignees[1],
     dueDate: null,
     commentCount: 1,
+    createdAt: "2026-09-01T08:20:00.000Z",
     updatedAt: "2026-09-03T09:10:00.000Z",
   },
   {
@@ -50,6 +53,7 @@ export const mockIssues: Issue[] = [
     assignee: mockIssueAssignees[3],
     dueDate: "2026-09-17",
     commentCount: 2,
+    createdAt: "2026-08-28T12:10:00.000Z",
     updatedAt: "2026-09-01T16:40:00.000Z",
   },
   {
@@ -61,6 +65,7 @@ export const mockIssues: Issue[] = [
     assignee: mockIssueAssignees[2],
     dueDate: "2026-09-07",
     commentCount: 8,
+    createdAt: "2026-08-25T09:45:00.000Z",
     updatedAt: "2026-09-05T01:05:00.000Z",
   },
   {
@@ -72,6 +77,7 @@ export const mockIssues: Issue[] = [
     assignee: mockIssueAssignees[3],
     dueDate: "2026-09-14",
     commentCount: 4,
+    createdAt: "2026-08-30T11:25:00.000Z",
     updatedAt: "2026-09-04T12:35:00.000Z",
   },
   {
@@ -83,6 +89,7 @@ export const mockIssues: Issue[] = [
     assignee: null,
     dueDate: null,
     commentCount: 2,
+    createdAt: "2026-08-27T16:00:00.000Z",
     updatedAt: "2026-09-02T18:15:00.000Z",
   },
   {
@@ -94,6 +101,7 @@ export const mockIssues: Issue[] = [
     assignee: mockIssueAssignees[1],
     dueDate: "2026-09-09",
     commentCount: 11,
+    createdAt: "2026-08-22T13:40:00.000Z",
     updatedAt: "2026-08-31T14:25:00.000Z",
   },
   {
@@ -105,6 +113,7 @@ export const mockIssues: Issue[] = [
     assignee: mockIssueAssignees[0],
     dueDate: "2026-09-02",
     commentCount: 7,
+    createdAt: "2026-08-20T10:05:00.000Z",
     updatedAt: "2026-09-05T00:15:00.000Z",
   },
   {
@@ -116,6 +125,7 @@ export const mockIssues: Issue[] = [
     assignee: mockIssueAssignees[1],
     dueDate: "2026-09-04",
     commentCount: 5,
+    createdAt: "2026-08-23T09:30:00.000Z",
     updatedAt: "2026-09-04T10:50:00.000Z",
   },
   {
@@ -127,6 +137,7 @@ export const mockIssues: Issue[] = [
     assignee: mockIssueAssignees[2],
     dueDate: null,
     commentCount: 2,
+    createdAt: "2026-08-26T15:45:00.000Z",
     updatedAt: "2026-09-03T08:30:00.000Z",
   },
   {
@@ -138,6 +149,7 @@ export const mockIssues: Issue[] = [
     assignee: mockIssueAssignees[3],
     dueDate: "2026-08-29",
     commentCount: 3,
+    createdAt: "2026-08-18T08:50:00.000Z",
     updatedAt: "2026-09-01T11:45:00.000Z",
   },
   {
@@ -149,6 +161,7 @@ export const mockIssues: Issue[] = [
     assignee: null,
     dueDate: null,
     commentCount: 4,
+    createdAt: "2026-08-19T14:15:00.000Z",
     updatedAt: "2026-08-30T17:20:00.000Z",
   },
 ];

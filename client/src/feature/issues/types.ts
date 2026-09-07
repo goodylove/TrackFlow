@@ -20,6 +20,7 @@ export type Issue = {
   assignee: IssueAssignee | null;
   dueDate: string | null;
   commentCount: number;
+  createdAt: string;
   updatedAt: string;
 };
 

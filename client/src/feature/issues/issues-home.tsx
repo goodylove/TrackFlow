@@ -9,6 +9,7 @@ import { ChangeIssueAssigneeModal } from "@/feature/issues/components/change-iss
 import { CreateIssueModal } from "@/feature/issues/components/create-issue-modal";
 import { DeleteIssueModal } from "@/feature/issues/components/delete-issue-modal";
 import { EditIssueModal } from "@/feature/issues/components/edit-issue-modal";
+import { IssueCommentsModal } from "@/feature/issues/components/issue-comments-modal";
 import { IssuesEmptyState } from "@/feature/issues/components/issues-empty-state";
 import {
   IssuesErrorState,
@@ -61,6 +62,7 @@ export function IssuesHome({
   const [issueToAssign, setIssueToAssign] = useState<Issue | null>(null);
   const [issueToDelete, setIssueToDelete] = useState<Issue | null>(null);
   const [issueToEdit, setIssueToEdit] = useState<Issue | null>(null);
+  const [issueWithComments, setIssueWithComments] = useState<Issue | null>(null);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [priority, setPriority] = useState<PriorityFilter>("all");
@@ -262,6 +264,7 @@ export function IssuesHome({
             onEditIssue={setIssueToEdit}
             onDeleteIssue={setIssueToDelete}
             onMoveIssue={moveIssue}
+            onOpenComments={setIssueWithComments}
             pendingIssueIds={pendingIssueIds}
           />
         </>
@@ -345,6 +348,55 @@ export function IssuesHome({
           }}
           onOpenChange={(open) => {
             if (!open) setIssueToDelete(null);
+          }}
+          open
+          workspaceId={workspaceId}
+        />
+      ) : null}
+
+      {workspaceId && issueWithComments ? (
+        <IssueCommentsModal
+          currentUserId={currentUserId}
+          issue={issueWithComments}
+          onCommentCreated={(issueId) => {
+            setIssues((currentIssues) =>
+              currentIssues.map((issue) =>
+                issue.id === issueId
+                  ? { ...issue, commentCount: issue.commentCount + 1 }
+                  : issue,
+              ),
+            );
+            setIssueWithComments((currentIssue) =>
+              currentIssue?.id === issueId
+                ? {
+                    ...currentIssue,
+                    commentCount: currentIssue.commentCount + 1,
+                  }
+                : currentIssue,
+            );
+          }}
+          onCommentDeleted={(issueId) => {
+            setIssues((currentIssues) =>
+              currentIssues.map((issue) =>
+                issue.id === issueId
+                  ? {
+                      ...issue,
+                      commentCount: Math.max(issue.commentCount - 1, 0),
+                    }
+                  : issue,
+              ),
+            );
+            setIssueWithComments((currentIssue) =>
+              currentIssue?.id === issueId
+                ? {
+                    ...currentIssue,
+                    commentCount: Math.max(currentIssue.commentCount - 1, 0),
+                  }
+                : currentIssue,
+            );
+          }}
+          onOpenChange={(open) => {
+            if (!open) setIssueWithComments(null);
           }}
           open
           workspaceId={workspaceId}

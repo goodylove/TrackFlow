@@ -1,5 +1,6 @@
 import {
   CalendarBlankIcon,
+  CalendarPlusIcon,
   ChatCircleIcon,
   CheckCircleIcon,
   CircleIcon,
@@ -46,6 +47,13 @@ function formatDueDate(value: string) {
   }).format(new Date(`${value}T12:00:00`));
 }
 
+function formatCreatedDate(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+  }).format(new Date(value));
+}
+
 type IssueCardProps = {
   canDeleteIssue: boolean;
   issue: Issue;
@@ -57,6 +65,7 @@ type IssueCardProps = {
   onEditIssue: (issue: Issue) => void;
   onDeleteIssue: (issue: Issue) => void;
   onMoveIssue: (issueId: string, status: IssueStatus) => void;
+  onOpenComments: (issue: Issue) => void;
 };
 
 export function IssueCard({
@@ -70,9 +79,14 @@ export function IssueCard({
   onEditIssue,
   onDeleteIssue,
   onMoveIssue,
+  onOpenComments,
 }: IssueCardProps) {
   function handleDragStart(event: DragEvent<HTMLElement>) {
-    if (isUpdating) {
+    const dragOrigin = event.target;
+    if (
+      isUpdating ||
+      (dragOrigin instanceof HTMLElement && dragOrigin.closest("button"))
+    ) {
       event.preventDefault();
       return;
     }
@@ -113,9 +127,9 @@ export function IssueCard({
       className={cn(
         "group cursor-grab rounded-xl border border-[var(--marketing-border)] bg-white p-4 shadow-[0_10px_28px_-24px_rgba(23,23,34,0.45)] outline-none transition duration-200 hover:-translate-y-0.5 hover:border-[var(--marketing-border-strong)] hover:shadow-[0_18px_34px_-24px_rgba(23,23,34,0.35)] focus-visible:ring-2 focus-visible:ring-[var(--marketing-action)]/35 active:cursor-grabbing",
         isDragging &&
-          "scale-[0.98] border-[var(--marketing-action)]/35 opacity-50 shadow-none",
+        "scale-[0.98] border-[var(--marketing-action)]/35 opacity-50 shadow-none",
         isUpdating &&
-          "cursor-wait border-[var(--marketing-action)]/25 bg-[var(--marketing-action-soft)]/20",
+        "cursor-wait border-[var(--marketing-action)]/25 bg-[var(--marketing-action-soft)]/20",
       )}
       draggable={!isUpdating}
       onDragEnd={onDragEnd}
@@ -218,26 +232,51 @@ export function IssueCard({
         </div>
       </div>
 
-      <h3 className="mt-3 min-h-12 text-[0.94rem] font-bold leading-6 tracking-[-0.015em] text-[#232331]">
-        {issue.title}
-      </h3>
+      <div className="mt-2 min-h-[3.5rem] min-w-0 space-y-1">
+        <h3 className=" text-[0.94rem] font-bold leading-6 tracking-[-0.015em] text-[#232331]">
+          {issue.title}
+        </h3>
+        <p className="text-sm font-normal leading-6 text-foreground/85">
+          {issue.description ?? ""}
+        </p>
+      </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
-        <div className="flex min-w-0 items-center gap-3 text-xs font-semibold text-muted-foreground">
+      <div className="mt-4 flex items-end justify-between gap-3 border-t border-slate-100 pt-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold text-muted-foreground">
+          <time
+            className="inline-flex items-center gap-1.5 whitespace-nowrap"
+            dateTime={issue.createdAt}
+            title={`Created ${new Date(issue.createdAt).toLocaleString()}`}
+          >
+            <CalendarPlusIcon aria-hidden="true" size={15} />
+            Created {formatCreatedDate(issue.createdAt)}
+          </time>
           {issue.dueDate ? (
+            <time
+              className="inline-flex items-center gap-1.5 whitespace-nowrap"
+              dateTime={issue.dueDate}
+            >
+              <CalendarBlankIcon aria-hidden="true" size={15} />
+              Due {formatDueDate(issue.dueDate)}
+            </time>
+          ) : (
             <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
               <CalendarBlankIcon aria-hidden="true" size={15} />
-              <span className="sr-only">Due </span>
-              {formatDueDate(issue.dueDate)}
+              No due date
             </span>
-          ) : null}
-          <span
-            aria-label={`${issue.commentCount} ${issue.commentCount === 1 ? "comment" : "comments"}`}
-            className="inline-flex items-center gap-1.5"
+          )}
+          <button
+            aria-label={`View ${issue.commentCount} ${issue.commentCount === 1 ? "comment" : "comments"} for ${issue.identifier}`}
+            className="inline-flex items-center gap-1.5 rounded-md outline-none transition-colors hover:text-[var(--marketing-action)] focus-visible:ring-2 focus-visible:ring-[var(--marketing-action)]/35"
+            disabled={isUpdating}
+            draggable={false}
+            onClick={() => onOpenComments(issue)}
+            type="button"
           >
             <ChatCircleIcon aria-hidden="true" size={15} />
-            {issue.commentCount}
-          </span>
+            {issue.commentCount}{" "}
+            {issue.commentCount === 1 ? "comment" : "comments"}
+          </button>
         </div>
         <AssigneeAvatar assignee={issue.assignee} />
       </div>

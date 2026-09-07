@@ -47,7 +47,7 @@ export function AssignedIssues({ issues }: { issues: DashboardIssue[] }) {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <span className="text-[0.65rem] font-bold text-muted-foreground">
-                    {issue._id}
+                    {issue.identifier}
                   </span>
                   <h3 className="mt-1 truncate text-sm font-bold">
                     {issue.title}

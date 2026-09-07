@@ -12,7 +12,11 @@ import { PriorityOverview } from "@/feature/dashboard/components/priority-overvi
 import { RecentIssuesTable } from "@/feature/dashboard/components/recent-issues-table";
 import { StatsCard } from "@/feature/dashboard/components/stats-card";
 import { StatusOverview } from "@/feature/dashboard/components/status-overview";
-import type { DashboardIssue, DashboardUser } from "@/feature/dashboard/types";
+import type {
+  DashboardIssue,
+  DashboardStats,
+  DashboardUser,
+} from "@/feature/dashboard/types";
 import { getGreeting } from "@/lib/helper";
 
 type DashboardHomeProps = {
@@ -20,6 +24,16 @@ type DashboardHomeProps = {
   currentUser: DashboardUser;
   hasWorkspace?: boolean;
   onAddWorkspace?: () => void;
+  stats?: DashboardStats;
+};
+
+const emptyStats: DashboardStats = {
+  totalIssues: 0,
+  byStatus: { todo: 0, in_progress: 0, done: 0 },
+  byPriority: { low: 0, medium: 0, high: 0, urgent: 0 },
+  assignedIssues: 0,
+  unassignedIssues: 0,
+  overdueIssues: 0,
 };
 
 export function DashboardHome({
@@ -27,6 +41,7 @@ export function DashboardHome({
   currentUser,
   hasWorkspace = true,
   onAddWorkspace,
+  stats = emptyStats,
 }: DashboardHomeProps) {
   if (!hasWorkspace) {
     return <DashboardEmptyState onAddWorkspace={onAddWorkspace} />;
@@ -35,14 +50,6 @@ export function DashboardHome({
   const assignedIssues = issues.filter(
     (issue) => issue.assignee?._id === currentUser._id,
   );
-  const unassignedIssues = issues.filter((issue) => issue.assignee === null);
-  const overdueIssues = issues.filter(
-    (issue) =>
-      issue.dueDate &&
-      issue.status !== "done" &&
-      new Date(issue.dueDate).getTime() < Date.now(),
-  );
-
   return (
     <div className="space-y-5">
       <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
@@ -63,40 +70,42 @@ export function DashboardHome({
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
       >
         <StatsCard
-          helper={issues.length === 0 ? "No issues yet" : "in this workspace"}
+          helper={
+            stats.totalIssues === 0 ? "No issues yet" : "in this workspace"
+          }
           icon={ClipboardTextIcon}
           label="Total issues"
           tone="total"
-          value={issues.length}
+          value={stats.totalIssues}
         />
         <StatsCard
           helper={
-            assignedIssues.length === 0 ? "Nothing assigned" : "owned by you"
+            stats.assignedIssues === 0 ? "Nothing assigned" : "have an owner"
           }
           icon={UserCircleIcon}
           label="Assigned issues"
           tone="assigned"
-          value={assignedIssues.length}
+          value={stats.assignedIssues}
         />
         <StatsCard
           helper={
-            unassignedIssues.length === 0
+            stats.unassignedIssues === 0
               ? "No unassigned work"
               : "need an owner"
           }
           icon={UserMinusIcon}
           label="Unassigned issues"
           tone="unassigned"
-          value={unassignedIssues.length}
+          value={stats.unassignedIssues}
         />
         <StatsCard
           helper={
-            overdueIssues.length === 0 ? "Nothing overdue" : "past due date"
+            stats.overdueIssues === 0 ? "Nothing overdue" : "past due date"
           }
           icon={WarningCircleIcon}
           label="Overdue issues"
           tone="overdue"
-          value={overdueIssues.length}
+          value={stats.overdueIssues}
         />
       </section>
       <section
@@ -104,7 +113,10 @@ export function DashboardHome({
         className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(20rem,0.8fr)]"
       >
         <StatusOverview issues={issues} />
-        <PriorityOverview issues={issues} />
+        <PriorityOverview
+          byPriority={stats.byPriority}
+          totalIssues={stats.totalIssues}
+        />
       </section>
       <section
         aria-label="Issue activity"

@@ -14,20 +14,26 @@ import {
 } from "../errors/authentication.error.js";
 import { EmailAlreadyExistsError } from "../modules/user/user.service.js";
 
-// const isHttpError = (
-//   err: unknown,
-// ): err is {
-//   status: number;
-//   message: string;
-// } => {
-//   if (typeof err !== "object" || err === null) {
-//     return false;
-//   }
+const isHttpError = (
+  err: unknown,
+): err is {
+  status: number;
+  message: string;
+} => {
+  if (typeof err !== "object" || err === null) {
+    return false;
+  }
 
-//   const candidate = err as { status?: unknown; message?: unknown };
+  const candidate = err as { status?: unknown; message?: unknown };
 
-//   return typeof candidate.status === "number" && typeof candidate.message === "string";
-// };
+  return (
+    typeof candidate.status === "number" &&
+    Number.isInteger(candidate.status) &&
+    candidate.status >= 400 &&
+    candidate.status <= 599 &&
+    typeof candidate.message === "string"
+  );
+};
 
 export const errorHandler = (
   err: unknown,
@@ -125,15 +131,15 @@ export const errorHandler = (
     return;
   }
 
-  // if (isHttpError(err)) {
-  //   res.status(err.status).json({
-  //     success: false,
-  //     status: "error",
-  //     message: err.message,
-  //   });
+  if (isHttpError(err)) {
+    res.status(err.status).json({
+      success: false,
+      status: "error",
+      message: err.message,
+    });
 
-  //   return;
-  // }
+    return;
+  }
 
   console.log(err);
   res

@@ -81,7 +81,7 @@ export function RecentIssuesTable({
       const matchesSearch =
         !deferredSearch ||
         issue.title.toLowerCase().includes(deferredSearch) ||
-        issue._id.toLowerCase().includes(deferredSearch) ||
+        issue.identifier.toLowerCase().includes(deferredSearch) ||
         issue.assignee?.name.toLowerCase().includes(deferredSearch);
       const matchesStatus =
         statusFilter === "all" || issue.status === statusFilter;
@@ -236,7 +236,7 @@ export function RecentIssuesTable({
                       {issue.title}
                     </p>
                     <span className="text-[0.68rem] text-muted-foreground">
-                      {issue._id}
+                      {issue.identifier}
                     </span>
                   </div>
                 </TableCell>

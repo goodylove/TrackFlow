@@ -255,6 +255,7 @@ export function toBoardIssue(
       : null,
     dueDate: issue.dueDate?.slice(0, 10) ?? null,
     commentCount: issue.commentCount ?? 0,
+    createdAt: issue.createdAt,
     updatedAt: issue.updatedAt,
   };
 }
