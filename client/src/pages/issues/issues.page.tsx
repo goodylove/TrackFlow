@@ -31,6 +31,10 @@ export default function IssuesPage() {
         title="Issues"
       />
       <IssuesHome
+        canDeleteIssues={
+          selectedWorkspace?.role === "owner" ||
+          selectedWorkspace?.role === "admin"
+        }
         currentUserId={currentUser._id}
         initialIssues={issuesQuery.data?.issues ?? emptyIssues}
         isLoading={Boolean(selectedWorkspace && issuesQuery.isPending)}

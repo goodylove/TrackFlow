@@ -7,6 +7,7 @@ import {
 import type { WorkspaceMember } from "@/feature/dashboard/services/workspace-service";
 import type {
   Issue,
+  IssueAssignee,
   IssuePriority,
   IssueStatus,
 } from "@/feature/issues/types";
@@ -30,6 +31,19 @@ export type CreateIssueInput = {
 export type UpdateIssueStatusInput = {
   issueId: string;
   status: IssueStatus;
+};
+
+export type SetIssueAssigneeInput = {
+  issueId: string;
+  assigneeId: string | null;
+};
+
+export type UpdateIssueDetailsInput = {
+  issueId: string;
+  title: string;
+  description: string;
+  priority: IssuePriority;
+  dueDate: string | null;
 };
 
 type ApiIssueCore = {
@@ -59,6 +73,7 @@ export type CreatedIssue = ApiIssueCore & {
 type ListedIssue = ApiIssueCore & {
   reporter: ApiIssueUser;
   assignee: ApiIssueUser | null;
+  commentCount: number;
 };
 
 type IssueListPayload = {
@@ -144,18 +159,91 @@ async function updateIssueStatus(
   }
 }
 
+async function updateIssueDetails(
+  workspaceId: string,
+  { issueId, ...input }: UpdateIssueDetailsInput,
+) {
+  try {
+    const { data: payload } = await apiClient.patch<
+      ApiResponse<{ issue: CreatedIssue }>
+    >(`/workspaces/${workspaceId}/issues/${issueId}`, input);
+
+    if (!payload.success || !payload.data?.issue) {
+      throw new ApiError(payload.message || "Unable to update issue.", {
+        fieldErrors: extractFieldErrors(payload.errors),
+      });
+    }
+
+    return payload.data.issue;
+  } catch (error) {
+    throw toApiError(error);
+  }
+}
+
+async function setIssueAssignee(
+  workspaceId: string,
+  { issueId, assigneeId }: SetIssueAssigneeInput,
+): Promise<{ assignee: IssueAssignee | null; updatedAt: string }> {
+  try {
+    const { data: payload } = await apiClient.patch<
+      ApiResponse<
+        ApiIssueCore & {
+          reporter: string;
+          assignee: ApiIssueUser | null;
+        }
+      >
+    >(`/workspaces/${workspaceId}/issues/${issueId}/assignee`, {
+      assigneeId,
+    });
+
+    if (!payload.success || !payload.data) {
+      throw new ApiError(payload.message || "Unable to change assignee.", {
+        fieldErrors: extractFieldErrors(payload.errors),
+      });
+    }
+
+    return {
+      assignee: payload.data.assignee
+        ? {
+            id: payload.data.assignee._id,
+            name: payload.data.assignee.name,
+            avatarUrl: payload.data.assignee.avatarUrl,
+          }
+        : null,
+      updatedAt: payload.data.updatedAt,
+    };
+  } catch (error) {
+    throw toApiError(error);
+  }
+}
+
+async function deleteIssue(workspaceId: string, issueId: string) {
+  try {
+    const { data: payload } = await apiClient.delete<ApiResponse<never>>(
+      `/workspaces/${workspaceId}/issues/${issueId}`,
+    );
+
+    if (!payload.success) {
+      throw new ApiError(payload.message || "Unable to delete issue.");
+    }
+  } catch (error) {
+    throw toApiError(error);
+  }
+}
+
 function getTemporaryIdentifier(issueId: string) {
   return `TF-${issueId.slice(-5).toUpperCase()}`;
 }
 
 export function toBoardIssue(
-  issue: ApiIssueCore,
+  issue: ApiIssueCore & { commentCount?: number },
   assignee?: WorkspaceMember["user"] | ApiIssueUser,
 ): Issue {
   return {
     id: issue._id,
     identifier: getTemporaryIdentifier(issue._id),
     title: issue.title,
+    description: issue.description ?? "",
     status: issue.status,
     priority: issue.priority,
     assignee: assignee
@@ -166,7 +254,7 @@ export function toBoardIssue(
         }
       : null,
     dueDate: issue.dueDate?.slice(0, 10) ?? null,
-    commentCount: 0,
+    commentCount: issue.commentCount ?? 0,
     updatedAt: issue.updatedAt,
   };
 }
@@ -197,5 +285,34 @@ export function useUpdateIssueStatusService(workspaceId: string) {
     mutationKey: ["issues", workspaceId, "update-status"],
     mutationFn: (input: UpdateIssueStatusInput) =>
       updateIssueStatus(workspaceId, input),
+  });
+}
+
+export function useSetIssueAssigneeService(workspaceId: string) {
+  return useMutation({
+    mutationKey: ["issues", workspaceId, "set-assignee"],
+    mutationFn: (input: SetIssueAssigneeInput) =>
+      setIssueAssignee(workspaceId, input),
+  });
+}
+
+export function useUpdateIssueDetailsService(workspaceId: string) {
+  return useMutation({
+    mutationKey: ["issues", workspaceId, "update-details"],
+    mutationFn: (input: UpdateIssueDetailsInput) =>
+      updateIssueDetails(workspaceId, input),
+  });
+}
+
+export function useDeleteIssueService(workspaceId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["issues", workspaceId, "delete"],
+    mutationFn: (issueId: string) => deleteIssue(workspaceId, issueId),
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: issueQueryKeys.list(workspaceId),
+      }),
   });
 }

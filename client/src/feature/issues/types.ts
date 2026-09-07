@@ -14,6 +14,7 @@ export type Issue = {
   id: string;
   identifier: string;
   title: string;
+  description?: string;
   status: IssueStatus;
   priority: IssuePriority;
   assignee: IssueAssignee | null;

@@ -5,7 +5,10 @@ import {
   CircleIcon,
   DotsSixVerticalIcon,
   DotsThreeIcon,
+  PencilSimpleIcon,
   SpinnerGapIcon,
+  TrashIcon,
+  UserSwitchIcon,
   type Icon,
 } from "@phosphor-icons/react";
 import type { DragEvent, KeyboardEvent } from "react";
@@ -17,6 +20,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AssigneeAvatar } from "@/feature/issues/components/assignee-avatar";
@@ -43,20 +47,28 @@ function formatDueDate(value: string) {
 }
 
 type IssueCardProps = {
+  canDeleteIssue: boolean;
   issue: Issue;
   isDragging: boolean;
   isUpdating: boolean;
   onDragEnd: () => void;
   onDragStart: (issueId: string) => void;
+  onChangeAssignee: (issue: Issue) => void;
+  onEditIssue: (issue: Issue) => void;
+  onDeleteIssue: (issue: Issue) => void;
   onMoveIssue: (issueId: string, status: IssueStatus) => void;
 };
 
 export function IssueCard({
+  canDeleteIssue,
   issue,
   isDragging,
   isUpdating,
+  onChangeAssignee,
   onDragEnd,
   onDragStart,
+  onEditIssue,
+  onDeleteIssue,
   onMoveIssue,
 }: IssueCardProps) {
   function handleDragStart(event: DragEvent<HTMLElement>) {
@@ -145,7 +157,7 @@ export function IssueCard({
             <DropdownMenuTrigger
               render={
                 <Button
-                  aria-label={`Move ${issue.identifier}`}
+                  aria-label={`Actions for ${issue.identifier}`}
                   className="-mr-2 size-7 rounded-lg text-muted-foreground opacity-70 hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
                   disabled={isUpdating}
                   draggable={false}
@@ -173,6 +185,34 @@ export function IssueCard({
                   );
                 })}
               </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                disabled={isUpdating}
+                onClick={() => onEditIssue(issue)}
+              >
+                <PencilSimpleIcon aria-hidden="true" size={16} />
+                Edit issue
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={isUpdating}
+                onClick={() => onChangeAssignee(issue)}
+              >
+                <UserSwitchIcon aria-hidden="true" size={16} />
+                Change assignee
+              </DropdownMenuItem>
+              {canDeleteIssue ? (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                    disabled={isUpdating}
+                    onClick={() => onDeleteIssue(issue)}
+                  >
+                    <TrashIcon aria-hidden="true" size={16} />
+                    Delete issue
+                  </DropdownMenuItem>
+                </>
+              ) : null}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

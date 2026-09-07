@@ -40,9 +40,13 @@ const columnStyles: Record<
 };
 
 type KanbanColumnProps = {
+  canDeleteIssues: boolean;
   draggingIssueId: string | null;
   isDropTarget: boolean;
   issues: Issue[];
+  onChangeAssignee: (issue: Issue) => void;
+  onEditIssue: (issue: Issue) => void;
+  onDeleteIssue: (issue: Issue) => void;
   onDragEnd: () => void;
   onDragEnter: (status: IssueStatus) => void;
   onDragStart: (issueId: string) => void;
@@ -53,9 +57,13 @@ type KanbanColumnProps = {
 };
 
 export function KanbanColumn({
+  canDeleteIssues,
   draggingIssueId,
   isDropTarget,
   issues,
+  onChangeAssignee,
+  onEditIssue,
+  onDeleteIssue,
   onDragEnd,
   onDragEnter,
   onDragStart,
@@ -120,9 +128,13 @@ export function KanbanColumn({
       <div className="flex flex-1 flex-col gap-3">
         {visibleIssues.map((issue) => (
           <IssueCard
+            canDeleteIssue={canDeleteIssues}
             isDragging={draggingIssueId === issue.id}
             issue={issue}
             key={issue.id}
+            onChangeAssignee={onChangeAssignee}
+            onEditIssue={onEditIssue}
+            onDeleteIssue={onDeleteIssue}
             onDragEnd={onDragEnd}
             onDragStart={onDragStart}
             onMoveIssue={onMoveIssue}

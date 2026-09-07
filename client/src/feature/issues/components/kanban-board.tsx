@@ -9,13 +9,21 @@ import {
 } from "@/feature/issues/types";
 
 type KanbanBoardProps = {
+  canDeleteIssues: boolean;
   issues: Issue[];
+  onChangeAssignee: (issue: Issue) => void;
+  onEditIssue: (issue: Issue) => void;
+  onDeleteIssue: (issue: Issue) => void;
   onMoveIssue: (issueId: string, status: IssueStatus) => void;
   pendingIssueIds: ReadonlySet<string>;
 };
 
 export function KanbanBoard({
+  canDeleteIssues,
   issues,
+  onChangeAssignee,
+  onEditIssue,
+  onDeleteIssue,
   onMoveIssue,
   pendingIssueIds,
 }: KanbanBoardProps) {
@@ -65,10 +73,14 @@ export function KanbanBoard({
 
           return (
             <KanbanColumn
+              canDeleteIssues={canDeleteIssues}
               draggingIssueId={draggingIssueId}
               isDropTarget={dropTarget === status}
               issues={statusIssues}
               key={status}
+              onChangeAssignee={onChangeAssignee}
+              onEditIssue={onEditIssue}
+              onDeleteIssue={onDeleteIssue}
               onDragEnd={clearDragState}
               onDragEnter={setDropTarget}
               onDragStart={setDraggingIssueId}

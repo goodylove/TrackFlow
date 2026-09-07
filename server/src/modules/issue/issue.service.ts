@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 
+import { Comment } from "../comment/comment.model.js";
 import { WorkspaceMember } from "../workspace/workspace-member.model.js";
 import { Issue } from "./issue.modal.js";
 import type {
@@ -60,8 +61,9 @@ export const getIssuesByWorkspaceId = async (
   workspaceId: string,
   filters: GetIssuesInput,
 ) => {
+  const workspaceObjectId = new Types.ObjectId(workspaceId);
   const query = {
-    workspace: new Types.ObjectId(workspaceId),
+    workspace: workspaceObjectId,
 
     ...(filters.search !== undefined && {
       title: {
@@ -116,10 +118,35 @@ export const getIssuesByWorkspaceId = async (
     Issue.countDocuments(query),
   ]);
 
+  const commentCounts =
+    issues.length === 0
+      ? []
+      : await Comment.aggregate<{ _id: Types.ObjectId; count: number }>([
+          {
+            $match: {
+              workspace: workspaceObjectId,
+              issue: { $in: issues.map((issue) => issue._id) },
+            },
+          },
+          {
+            $group: {
+              _id: "$issue",
+              count: { $sum: 1 },
+            },
+          },
+        ]);
+  const commentCountByIssueId = new Map(
+    commentCounts.map(({ _id, count }) => [_id.toString(), count]),
+  );
+  const issuesWithCommentCounts = issues.map((issue) => ({
+    ...issue.toObject(),
+    commentCount: commentCountByIssueId.get(issue._id.toString()) ?? 0,
+  }));
+
   const totalPages = Math.ceil(totalIssues / filters.limit);
 
   return {
-    issues,
+    issues: issuesWithCommentCounts,
     pagination: {
       page: filters.page,
       limit: filters.limit,
@@ -251,7 +278,11 @@ export const updateIssueDetails = async (
   }
 
   if (input.dueDate !== undefined) {
-    issue.dueDate = input.dueDate;
+    if (input.dueDate === null) {
+      issue.set("dueDate", undefined);
+    } else {
+      issue.dueDate = input.dueDate;
+    }
   }
 
   await issue.save();
