@@ -22,6 +22,7 @@ export type DashboardWorkspace = {
 
 export type DashboardIssue = {
   _id: string
+  identifier: string
   workspace: string
   title: string
   description: string
@@ -34,7 +35,23 @@ export type DashboardIssue = {
   updatedAt: string
 }
 
+export type DashboardStats = {
+  totalIssues: number
+  byStatus: Record<IssueStatus, number>
+  byPriority: Record<IssuePriority, number>
+  assignedIssues: number
+  unassignedIssues: number
+  overdueIssues: number
+}
+
 export type IssueListResponse = {
   issues: DashboardIssue[]
-  pagination: { page: number; limit: number; total: number; totalPages: number }
+  pagination: {
+    page: number
+    limit: number
+    totalIssues: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+  }
 }

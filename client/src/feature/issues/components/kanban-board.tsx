@@ -9,11 +9,26 @@ import {
 } from "@/feature/issues/types";
 
 type KanbanBoardProps = {
+  canDeleteIssues: boolean;
   issues: Issue[];
+  onChangeAssignee: (issue: Issue) => void;
+  onEditIssue: (issue: Issue) => void;
+  onDeleteIssue: (issue: Issue) => void;
   onMoveIssue: (issueId: string, status: IssueStatus) => void;
+  onOpenComments: (issue: Issue) => void;
+  pendingIssueIds: ReadonlySet<string>;
 };
 
-export function KanbanBoard({ issues, onMoveIssue }: KanbanBoardProps) {
+export function KanbanBoard({
+  canDeleteIssues,
+  issues,
+  onChangeAssignee,
+  onEditIssue,
+  onDeleteIssue,
+  onMoveIssue,
+  onOpenComments,
+  pendingIssueIds,
+}: KanbanBoardProps) {
   const [draggingIssueId, setDraggingIssueId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<IssueStatus | null>(null);
   const [announcement, setAnnouncement] = useState("");
@@ -60,15 +75,21 @@ export function KanbanBoard({ issues, onMoveIssue }: KanbanBoardProps) {
 
           return (
             <KanbanColumn
+              canDeleteIssues={canDeleteIssues}
               draggingIssueId={draggingIssueId}
               isDropTarget={dropTarget === status}
               issues={statusIssues}
               key={status}
+              onChangeAssignee={onChangeAssignee}
+              onEditIssue={onEditIssue}
+              onDeleteIssue={onDeleteIssue}
               onDragEnd={clearDragState}
               onDragEnter={setDropTarget}
               onDragStart={setDraggingIssueId}
               onDrop={moveIssue}
               onMoveIssue={moveIssue}
+              onOpenComments={onOpenComments}
+              pendingIssueIds={pendingIssueIds}
               status={status}
             />
           );

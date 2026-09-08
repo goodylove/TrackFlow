@@ -1,11 +1,15 @@
 import {
   CalendarBlankIcon,
+  CalendarPlusIcon,
   ChatCircleIcon,
   CheckCircleIcon,
   CircleIcon,
   DotsSixVerticalIcon,
   DotsThreeIcon,
+  PencilSimpleIcon,
   SpinnerGapIcon,
+  TrashIcon,
+  UserSwitchIcon,
   type Icon,
 } from "@phosphor-icons/react";
 import type { DragEvent, KeyboardEvent } from "react";
@@ -17,6 +21,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AssigneeAvatar } from "@/feature/issues/components/assignee-avatar";
@@ -42,29 +47,57 @@ function formatDueDate(value: string) {
   }).format(new Date(`${value}T12:00:00`));
 }
 
+function formatCreatedDate(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+  }).format(new Date(value));
+}
+
 type IssueCardProps = {
+  canDeleteIssue: boolean;
   issue: Issue;
   isDragging: boolean;
+  isUpdating: boolean;
   onDragEnd: () => void;
   onDragStart: (issueId: string) => void;
+  onChangeAssignee: (issue: Issue) => void;
+  onEditIssue: (issue: Issue) => void;
+  onDeleteIssue: (issue: Issue) => void;
   onMoveIssue: (issueId: string, status: IssueStatus) => void;
+  onOpenComments: (issue: Issue) => void;
 };
 
 export function IssueCard({
+  canDeleteIssue,
   issue,
   isDragging,
+  isUpdating,
+  onChangeAssignee,
   onDragEnd,
   onDragStart,
+  onEditIssue,
+  onDeleteIssue,
   onMoveIssue,
+  onOpenComments,
 }: IssueCardProps) {
   function handleDragStart(event: DragEvent<HTMLElement>) {
+    const dragOrigin = event.target;
+    if (
+      isUpdating ||
+      (dragOrigin instanceof HTMLElement && dragOrigin.closest("button"))
+    ) {
+      event.preventDefault();
+      return;
+    }
+
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", issue.id);
     onDragStart(issue.id);
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
-    if (event.target !== event.currentTarget) return;
+    if (isUpdating || event.target !== event.currentTarget) return;
 
     const currentIndex = issueStatuses.indexOf(issue.status);
     const nextIndex =
@@ -90,29 +123,43 @@ export function IssueCard({
     <article
       aria-describedby={`${issue.id}-keyboard-help`}
       aria-grabbed={isDragging}
+      aria-busy={isUpdating}
       className={cn(
         "group cursor-grab rounded-xl border border-[var(--marketing-border)] bg-white p-4 shadow-[0_10px_28px_-24px_rgba(23,23,34,0.45)] outline-none transition duration-200 hover:-translate-y-0.5 hover:border-[var(--marketing-border-strong)] hover:shadow-[0_18px_34px_-24px_rgba(23,23,34,0.35)] focus-visible:ring-2 focus-visible:ring-[var(--marketing-action)]/35 active:cursor-grabbing",
         isDragging &&
-          "scale-[0.98] border-[var(--marketing-action)]/35 opacity-50 shadow-none",
+        "scale-[0.98] border-[var(--marketing-action)]/35 opacity-50 shadow-none",
+        isUpdating &&
+        "cursor-wait border-[var(--marketing-action)]/25 bg-[var(--marketing-action-soft)]/20",
       )}
-      draggable
+      draggable={!isUpdating}
       onDragEnd={onDragEnd}
       onDragStart={handleDragStart}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
       <span className="sr-only" id={`${issue.id}-keyboard-help`}>
-        Press left or right arrow to move this issue between status columns.
+        {isUpdating
+          ? "Saving status change."
+          : "Press left or right arrow to move this issue between status columns."}
       </span>
 
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-1.5">
-          <DotsSixVerticalIcon
-            aria-hidden="true"
-            className="-ml-1 shrink-0 text-slate-300 transition-colors group-hover:text-slate-500"
-            size={16}
-            weight="bold"
-          />
+          {isUpdating ? (
+            <SpinnerGapIcon
+              aria-hidden="true"
+              className="-ml-1 shrink-0 animate-spin text-[var(--marketing-action)]"
+              size={16}
+              weight="bold"
+            />
+          ) : (
+            <DotsSixVerticalIcon
+              aria-hidden="true"
+              className="-ml-1 shrink-0 text-slate-300 transition-colors group-hover:text-slate-500"
+              size={16}
+              weight="bold"
+            />
+          )}
           <span className="font-mono text-[0.68rem] font-bold tracking-wide text-muted-foreground">
             {issue.identifier}
           </span>
@@ -124,8 +171,9 @@ export function IssueCard({
             <DropdownMenuTrigger
               render={
                 <Button
-                  aria-label={`Move ${issue.identifier}`}
+                  aria-label={`Actions for ${issue.identifier}`}
                   className="-mr-2 size-7 rounded-lg text-muted-foreground opacity-70 hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+                  disabled={isUpdating}
                   draggable={false}
                   size="icon"
                   variant="ghost"
@@ -141,7 +189,7 @@ export function IssueCard({
                   const StatusIcon = statusIcons[status];
                   return (
                     <DropdownMenuItem
-                      disabled={status === issue.status}
+                      disabled={isUpdating || status === issue.status}
                       key={status}
                       onClick={() => onMoveIssue(issue.id, status)}
                     >
@@ -151,31 +199,84 @@ export function IssueCard({
                   );
                 })}
               </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                disabled={isUpdating}
+                onClick={() => onEditIssue(issue)}
+              >
+                <PencilSimpleIcon aria-hidden="true" size={16} />
+                Edit issue
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={isUpdating}
+                onClick={() => onChangeAssignee(issue)}
+              >
+                <UserSwitchIcon aria-hidden="true" size={16} />
+                Change assignee
+              </DropdownMenuItem>
+              {canDeleteIssue ? (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                    disabled={isUpdating}
+                    onClick={() => onDeleteIssue(issue)}
+                  >
+                    <TrashIcon aria-hidden="true" size={16} />
+                    Delete issue
+                  </DropdownMenuItem>
+                </>
+              ) : null}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
 
-      <h3 className="mt-3 min-h-12 text-[0.94rem] font-bold leading-6 tracking-[-0.015em] text-[#232331]">
-        {issue.title}
-      </h3>
+      <div className="mt-2 min-h-[3.5rem] min-w-0 space-y-1">
+        <h3 className=" text-[0.94rem] font-bold leading-6 tracking-[-0.015em] text-[#232331]">
+          {issue.title}
+        </h3>
+        <p className="text-sm font-normal leading-6 text-foreground/85">
+          {issue.description ?? ""}
+        </p>
+      </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
-        <div className="flex min-w-0 items-center gap-3 text-xs font-semibold text-muted-foreground">
+      <div className="mt-4 flex items-end justify-between gap-3 border-t border-slate-100 pt-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold text-muted-foreground">
+          <time
+            className="inline-flex items-center gap-1.5 whitespace-nowrap"
+            dateTime={issue.createdAt}
+            title={`Created ${new Date(issue.createdAt).toLocaleString()}`}
+          >
+            <CalendarPlusIcon aria-hidden="true" size={15} />
+            Created {formatCreatedDate(issue.createdAt)}
+          </time>
           {issue.dueDate ? (
+            <time
+              className="inline-flex items-center gap-1.5 whitespace-nowrap"
+              dateTime={issue.dueDate}
+            >
+              <CalendarBlankIcon aria-hidden="true" size={15} />
+              Due {formatDueDate(issue.dueDate)}
+            </time>
+          ) : (
             <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
               <CalendarBlankIcon aria-hidden="true" size={15} />
-              <span className="sr-only">Due </span>
-              {formatDueDate(issue.dueDate)}
+              No due date
             </span>
-          ) : null}
-          <span
-            aria-label={`${issue.commentCount} ${issue.commentCount === 1 ? "comment" : "comments"}`}
-            className="inline-flex items-center gap-1.5"
+          )}
+          <button
+            aria-label={`View ${issue.commentCount} ${issue.commentCount === 1 ? "comment" : "comments"} for ${issue.identifier}`}
+            className="inline-flex items-center gap-1.5 rounded-md outline-none transition-colors hover:text-[var(--marketing-action)] focus-visible:ring-2 focus-visible:ring-[var(--marketing-action)]/35"
+            disabled={isUpdating}
+            draggable={false}
+            onClick={() => onOpenComments(issue)}
+            type="button"
           >
             <ChatCircleIcon aria-hidden="true" size={15} />
-            {issue.commentCount}
-          </span>
+            {issue.commentCount}{" "}
+            {issue.commentCount === 1 ? "comment" : "comments"}
+          </button>
         </div>
         <AssigneeAvatar assignee={issue.assignee} />
       </div>

@@ -36,7 +36,8 @@ export const setIssueAssigneeSchema = z.object({
   body: z.object({
     assigneeId: z
       .string()
-      .refine((value) => Types.ObjectId.isValid(value), "Invalid assignee ID"),
+      .refine((value) => Types.ObjectId.isValid(value), "Invalid assignee ID")
+      .nullable(),
   }),
 });
 
@@ -57,6 +58,7 @@ export const updateIssueSchema = z.object({
         .string()
         .datetime("Due date must be a valid ISO date")
         .transform((value) => new Date(value))
+        .nullable()
         .optional(),
     })
     .refine(

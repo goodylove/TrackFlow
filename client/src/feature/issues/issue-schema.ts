@@ -24,3 +24,20 @@ export const createIssueFormSchema = z.object({
 });
 
 export type CreateIssueFormValues = z.infer<typeof createIssueFormSchema>;
+
+export const changeIssueAssigneeSchema = z.object({
+  assigneeId: z.string().min(1, "Choose an assignee or leave it unassigned"),
+});
+
+export type ChangeIssueAssigneeValues = z.infer<
+  typeof changeIssueAssigneeSchema
+>;
+
+export const editIssueFormSchema = createIssueFormSchema.pick({
+  title: true,
+  description: true,
+  priority: true,
+  dueDate: true,
+});
+
+export type EditIssueFormValues = z.infer<typeof editIssueFormSchema>;

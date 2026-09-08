@@ -16,7 +16,7 @@ function TableRow({ className, ...props }: ComponentProps<"tr">) {
   return <tr className={cn("border-b border-border/70 transition-colors hover:bg-muted/45", className)} data-slot="table-row" {...props} />
 }
 function TableHead({ className, ...props }: ComponentProps<"th">) {
-  return <th className={cn("h-11 px-4 text-left align-middle text-[0.7rem] font-bold uppercase tracking-[0.08em] text-muted-foreground", className)} data-slot="table-head" {...props} />
+  return <th className={cn("h-11 px-4 text-left align-middle  text-[0.9rem] font-semibold tracking-[-0.2px] text-muted-foreground", className)} data-slot="table-head" {...props} />
 }
 function TableCell({ className, ...props }: ComponentProps<"td">) {
   return <td className={cn("px-4 py-3.5 align-middle whitespace-nowrap", className)} data-slot="table-cell" {...props} />

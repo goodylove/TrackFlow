@@ -9,12 +9,12 @@ import { cn } from "@/lib/utils";
 type ModalProps = {
   children: ReactNode;
   className?: string;
-  description: ReactNode;
+  description?: ReactNode;
   icon?: ReactNode;
   onOpenChange: (open: boolean) => void;
   open: boolean;
   preventClose?: boolean;
-  title: ReactNode;
+  title?: ReactNode;
 };
 
 function Modal({

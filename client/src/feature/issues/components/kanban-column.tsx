@@ -40,26 +40,38 @@ const columnStyles: Record<
 };
 
 type KanbanColumnProps = {
+  canDeleteIssues: boolean;
   draggingIssueId: string | null;
   isDropTarget: boolean;
   issues: Issue[];
+  onChangeAssignee: (issue: Issue) => void;
+  onEditIssue: (issue: Issue) => void;
+  onDeleteIssue: (issue: Issue) => void;
   onDragEnd: () => void;
   onDragEnter: (status: IssueStatus) => void;
   onDragStart: (issueId: string) => void;
   onDrop: (issueId: string, status: IssueStatus) => void;
   onMoveIssue: (issueId: string, status: IssueStatus) => void;
+  onOpenComments: (issue: Issue) => void;
+  pendingIssueIds: ReadonlySet<string>;
   status: IssueStatus;
 };
 
 export function KanbanColumn({
+  canDeleteIssues,
   draggingIssueId,
   isDropTarget,
   issues,
+  onChangeAssignee,
+  onEditIssue,
+  onDeleteIssue,
   onDragEnd,
   onDragEnter,
   onDragStart,
   onDrop,
   onMoveIssue,
+  onOpenComments,
+  pendingIssueIds,
   status,
 }: KanbanColumnProps) {
   const [visibleCount, setVisibleCount] = useState(recentIssueLimit);
@@ -118,12 +130,18 @@ export function KanbanColumn({
       <div className="flex flex-1 flex-col gap-3">
         {visibleIssues.map((issue) => (
           <IssueCard
+            canDeleteIssue={canDeleteIssues}
             isDragging={draggingIssueId === issue.id}
             issue={issue}
             key={issue.id}
+            onChangeAssignee={onChangeAssignee}
+            onEditIssue={onEditIssue}
+            onDeleteIssue={onDeleteIssue}
             onDragEnd={onDragEnd}
             onDragStart={onDragStart}
             onMoveIssue={onMoveIssue}
+            onOpenComments={onOpenComments}
+            isUpdating={pendingIssueIds.has(issue.id)}
           />
         ))}
 

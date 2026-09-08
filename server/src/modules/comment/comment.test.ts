@@ -58,6 +58,16 @@ describe("Comment API integration tests", () => {
       })
       .set("Authorization", `Bearer ${tokenA}`);
 
+    expect(createCommentResponse.status).toBe(201);
+    expect(createCommentResponse.body).toMatchObject({
+      success: true,
+      message: "Comment created successfully",
+      data: {
+        content: "owner comment",
+        author: { email: UserData.email },
+      },
+    });
+
     const commentId = createCommentResponse.body.data._id;
 
     return {
@@ -68,6 +78,58 @@ describe("Comment API integration tests", () => {
       workspaceId,
     };
   };
+
+  it("returns paginated comments for a workspace issue", async () => {
+    const { workspaceId, issueId, tokenA } =
+      await setupCommentOwnershipScenario();
+
+    const response = await request(app)
+      .get(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments`)
+      .query({ page: 1, limit: 10 })
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Comments retrieved successfully",
+      data: {
+        comments: [
+          {
+            content: "owner comment",
+            author: { email: UserData.email },
+          },
+        ],
+        pagination: {
+          page: 1,
+          limit: 10,
+          totalComments: 1,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      },
+    });
+  });
+
+  it("allows an author to update their own comment", async () => {
+    const { workspaceId, issueId, commentId, tokenA } =
+      await setupCommentOwnershipScenario();
+
+    const response = await request(app)
+      .patch(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments/${commentId}`)
+      .send({ content: "updated owner comment" })
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Comment updated successfully",
+      data: {
+        content: "updated owner comment",
+        author: { email: UserData.email },
+      },
+    });
+  });
 
   it("prevents a workspace member from updating another user's comment", async () => {
     const { workspaceId, issueId, commentId, tokenB } =
@@ -80,10 +142,39 @@ describe("Comment API integration tests", () => {
       })
       .set("Authorization", `Bearer ${tokenB}`);
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
     expect(response.body).toMatchObject({
       success: false,
       status: "error",
+      message: "Comment not found or you are not allowed to update it",
+    });
+  });
+
+  it("allows an author to delete their own comment", async () => {
+    const { workspaceId, issueId, commentId, tokenA } =
+      await setupCommentOwnershipScenario();
+
+    const deleteResponse = await request(app)
+      .delete(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments/${commentId}`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(deleteResponse.status).toBe(200);
+    expect(deleteResponse.body).toMatchObject({
+      success: true,
+      message: "Comment deleted successfully",
+    });
+
+    const listResponse = await request(app)
+      .get(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(listResponse.status).toBe(200);
+    expect(listResponse.body.data).toMatchObject({
+      comments: [],
+      pagination: {
+        totalComments: 0,
+        totalPages: 0,
+      },
     });
   });
 
@@ -95,10 +186,11 @@ describe("Comment API integration tests", () => {
       .delete(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments/${commentId}`)
       .set("Authorization", `Bearer ${tokenB}`);
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
     expect(response.body).toMatchObject({
       success: false,
       status: "error",
+      message: "Comment not found or you are not allowed to delete it",
     });
   });
 });

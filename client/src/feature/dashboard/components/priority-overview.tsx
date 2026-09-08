@@ -12,7 +12,7 @@ import {
 import { SectionEmptyState } from "@/feature/dashboard/components/section-empty-state";
 import { priorityLabels } from "@/feature/dashboard/dashboard-utils";
 import type {
-  DashboardIssue,
+  DashboardStats,
   IssuePriority,
 } from "@/feature/dashboard/types";
 
@@ -24,10 +24,18 @@ const colors: Record<IssuePriority, string> = {
   urgent: "#2f37f4",
 };
 
-export function PriorityOverview({ issues }: { issues: DashboardIssue[] }) {
+type PriorityOverviewProps = Pick<
+  DashboardStats,
+  "byPriority" | "totalIssues"
+>;
+
+export function PriorityOverview({
+  byPriority,
+  totalIssues,
+}: PriorityOverviewProps) {
   const data = priorities.map((priority) => ({
     name: priorityLabels[priority],
-    value: issues.filter((issue) => issue.priority === priority).length,
+    value: byPriority[priority],
     priority,
   }));
 
@@ -42,7 +50,7 @@ export function PriorityOverview({ issues }: { issues: DashboardIssue[] }) {
         </div>
       </CardHeader>
       <CardContent>
-        {issues.length === 0 ? (
+        {totalIssues === 0 ? (
           <SectionEmptyState
             className="min-h-[15.75rem]"
             description="Priority distribution will appear as soon as issues are added to this workspace."
@@ -81,7 +89,7 @@ export function PriorityOverview({ issues }: { issues: DashboardIssue[] }) {
                 </PieChart>
               </ResponsiveContainer>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <strong className="text-3xl font-black">{issues.length}</strong>
+                <strong className="text-3xl font-black">{totalIssues}</strong>
                 <span className="text-[0.68rem] text-muted-foreground">
                   Total issues
                 </span>
