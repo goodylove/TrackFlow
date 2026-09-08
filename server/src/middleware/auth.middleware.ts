@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 
 import { env } from "../config/env.js";
+import { AUTH_COOKIE_NAME } from "../config/auth-cookie.js";
 import { User } from "../modules/user/user.model.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -10,10 +11,11 @@ export const authenticate = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  // 1. Read the Authorization header
-  const authorizationHeader = req.headers.authorization;
+  // Browsers send this cookie automatically, while httpOnly prevents
+  // application JavaScript from reading the JWT.
+  const token = req.cookies[AUTH_COOKIE_NAME] as unknown;
 
-  if (!authorizationHeader) {
+  if (typeof token !== "string" || token.length === 0) {
     res.status(StatusCodes.UNAUTHORIZED).json({
       success: false,
       message: "Authentication token is required",
@@ -22,21 +24,9 @@ export const authenticate = async (
     return;
   }
 
-  // 2. Separate "Bearer" from the token
-  const [scheme, token] = authorizationHeader.split(" ");
-
-  if (scheme !== "Bearer" || !token) {
-    res.status(StatusCodes.UNAUTHORIZED).json({
-      success: false,
-      message: "Use the format: Bearer <token>",
-    });
-
-    return;
-  }
-
   let payload: JwtPayload;
 
-  // 4. Verify the JWT
+  // Verify the JWT before trusting any claims.
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET);
 
@@ -59,7 +49,7 @@ export const authenticate = async (
     return;
   }
 
-  // 5. Read the user ID from the token
+  // Read the user ID from the verified token.
   const userId = payload.sub;
 
   if (!userId) {
@@ -71,7 +61,7 @@ export const authenticate = async (
     return;
   }
 
-  // 6. Confirm that the user still exists
+  // Confirm that the user still exists.
   const user = await User.findById(userId);
 
   if (!user) {
@@ -83,7 +73,7 @@ export const authenticate = async (
     return;
   }
 
-  // 7. Prevent suspended users from continuing
+  // Prevent suspended users from continuing.
   if (user.status !== "active") {
     res.status(StatusCodes.FORBIDDEN).json({
       success: false,
@@ -93,13 +83,12 @@ export const authenticate = async (
     return;
   }
 
-  // 8. Attach the authenticated user to the request
+  // Attach the authenticated user to the request.
   req.user = {
     id: user._id.toString(),
     name: user.name,
     email: user.email,
   };
 
-  // 9. Continue to the controller
   next();
 };

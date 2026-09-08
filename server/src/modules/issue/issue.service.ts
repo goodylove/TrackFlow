@@ -206,6 +206,13 @@ export const setIssueAssignee = async (
     };
   }
 
+  if(issue.status === "done") {
+    throw {
+      status: StatusCodes.BAD_REQUEST,
+      message: " Cannot reassign an issue that is marked as done",
+    };
+  }
+
   // null means remove the current assignee
   if (input.assigneeId === null) {
     issue.assignee = null;

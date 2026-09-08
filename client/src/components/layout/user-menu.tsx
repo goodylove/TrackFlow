@@ -1,6 +1,7 @@
 // Provides shared profile and logout actions for dashboard navigation surfaces.
 import { GearIcon, SignOutIcon, UserCircleIcon } from "@phosphor-icons/react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/toaster";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -13,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getInitials } from "@/feature/dashboard/dashboard-utils";
+import { logoutUser } from "@/feature/auth/services/auth-service";
 import { resetClientState } from "@/stores/reset-client-state";
 
 type UserMenuProps = {
@@ -22,9 +24,14 @@ type UserMenuProps = {
 
 export function UserMenu({ user, compact = false }: UserMenuProps) {
   const navigate = useNavigate();
-  function logout() {
-    resetClientState();
-    navigate("/login");
+  async function logout() {
+    try {
+      await logoutUser();
+      resetClientState();
+      navigate("/login");
+    } catch {
+      toast.error("Unable to log out. Please try again.");
+    }
   }
 
   return (
@@ -73,7 +80,7 @@ export function UserMenu({ user, compact = false }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="text-destructive focus:bg-destructive/10"
-          onClick={logout}
+          onClick={() => void logout()}
         >
           <SignOutIcon aria-hidden="true" size={17} />
           Log out

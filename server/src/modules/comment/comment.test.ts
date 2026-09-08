@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import request from "supertest";
 
 import app from "../../app.js";
-import { login, LoginUserB, UserData, UserDataB } from "../../test/auth.helper.js";
+import { getAuthCookie, login, LoginUserB, UserData, UserDataB } from "../../test/auth.helper.js";
 
 describe("Comment API integration tests", () => {
   const workspaceData = {
@@ -13,18 +13,18 @@ describe("Comment API integration tests", () => {
   const setupCommentOwnershipScenario = async () => {
     await request(app).post("/api/v1/users/register").send(UserData);
     const loginResponseA = await request(app).post("/api/v1/users/login").send(login);
-    const tokenA = loginResponseA.body.data.user.token;
+    const tokenA = getAuthCookie(loginResponseA);
 
     await request(app).post("/api/v1/users/register").send(UserDataB);
     const loginResponseB = await request(app)
       .post("/api/v1/users/login")
       .send(LoginUserB);
-    const tokenB = loginResponseB.body.data.user.token;
+    const tokenB = getAuthCookie(loginResponseB);
 
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
       .send(workspaceData)
-      .set("Authorization", `Bearer ${tokenA}`);
+      .set("Cookie", tokenA);
 
     const workspaceId = workspaceResponse.body.data._id;
 
@@ -34,7 +34,7 @@ describe("Comment API integration tests", () => {
         email: UserDataB.email,
         role: "member",
       })
-      .set("Authorization", `Bearer ${tokenA}`);
+      .set("Cookie", tokenA);
 
     expect(addMemberResponse.status).toBe(200);
 
@@ -47,7 +47,7 @@ describe("Comment API integration tests", () => {
         priority: "medium",
         assigneeId: null,
       })
-      .set("Authorization", `Bearer ${tokenA}`);
+      .set("Cookie", tokenA);
 
     const issueId = createIssueResponse.body.data._id;
 
@@ -56,7 +56,7 @@ describe("Comment API integration tests", () => {
       .send({
         content: "owner comment",
       })
-      .set("Authorization", `Bearer ${tokenA}`);
+      .set("Cookie", tokenA);
 
     expect(createCommentResponse.status).toBe(201);
     expect(createCommentResponse.body).toMatchObject({
@@ -86,7 +86,7 @@ describe("Comment API integration tests", () => {
     const response = await request(app)
       .get(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments`)
       .query({ page: 1, limit: 10 })
-      .set("Authorization", `Bearer ${tokenA}`);
+      .set("Cookie", tokenA);
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
@@ -118,7 +118,7 @@ describe("Comment API integration tests", () => {
     const response = await request(app)
       .patch(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments/${commentId}`)
       .send({ content: "updated owner comment" })
-      .set("Authorization", `Bearer ${tokenA}`);
+      .set("Cookie", tokenA);
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
@@ -140,7 +140,7 @@ describe("Comment API integration tests", () => {
       .send({
         content: "updated by another member",
       })
-      .set("Authorization", `Bearer ${tokenB}`);
+      .set("Cookie", tokenB);
 
     expect(response.status).toBe(404);
     expect(response.body).toMatchObject({
@@ -156,7 +156,7 @@ describe("Comment API integration tests", () => {
 
     const deleteResponse = await request(app)
       .delete(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments/${commentId}`)
-      .set("Authorization", `Bearer ${tokenA}`);
+      .set("Cookie", tokenA);
 
     expect(deleteResponse.status).toBe(200);
     expect(deleteResponse.body).toMatchObject({
@@ -166,7 +166,7 @@ describe("Comment API integration tests", () => {
 
     const listResponse = await request(app)
       .get(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments`)
-      .set("Authorization", `Bearer ${tokenA}`);
+      .set("Cookie", tokenA);
 
     expect(listResponse.status).toBe(200);
     expect(listResponse.body.data).toMatchObject({
@@ -184,7 +184,7 @@ describe("Comment API integration tests", () => {
 
     const response = await request(app)
       .delete(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments/${commentId}`)
-      .set("Authorization", `Bearer ${tokenB}`);
+      .set("Cookie", tokenB);
 
     expect(response.status).toBe(404);
     expect(response.body).toMatchObject({

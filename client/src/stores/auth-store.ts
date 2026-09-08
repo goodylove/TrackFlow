@@ -1,31 +1,23 @@
-// Holds the authenticated user and token while delegating browser persistence to the session helper.
+// Holds non-sensitive user state; the JWT lives only in the server-managed cookie.
 import { create } from "zustand"
 
-import {
-  clearAuthSession,
-  getAuthSession,
-  saveAuthSession,
-  type AuthSessionUser,
-} from "@/lib/auth-session"
+export type AuthSessionUser = {
+  id: string
+  name: string
+  email: string
+}
 
 type AuthStore = {
-  token: string | null
+  status: "loading" | "authenticated" | "unauthenticated"
   currentUser: AuthSessionUser | null
-  setSession: (token: string, user: AuthSessionUser, remember: boolean) => void
+  setCurrentUser: (user: AuthSessionUser) => void
   clearSession: () => void
 }
 
-const initialSession = getAuthSession()
-
 export const useAuthStore = create<AuthStore>()((set) => ({
-  token: initialSession?.token ?? null,
-  currentUser: initialSession?.user ?? null,
-  setSession: (token, user, remember) => {
-    saveAuthSession(token, user, remember)
-    set({ token, currentUser: user })
-  },
-  clearSession: () => {
-    clearAuthSession()
-    set({ token: null, currentUser: null })
-  },
+  status: "loading",
+  currentUser: null,
+  setCurrentUser: (currentUser) =>
+    set({ status: "authenticated", currentUser }),
+  clearSession: () => set({ status: "unauthenticated", currentUser: null }),
 }))

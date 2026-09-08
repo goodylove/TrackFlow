@@ -7,6 +7,7 @@ export type AuthPageProps = {
 export type LoginParams = {
   email: string;
   password: string;
+  remember: boolean;
 };
 
 export type RegisterParams = {
@@ -19,7 +20,6 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
-  token?: string;
 };
 
 export type AuthResponse = {

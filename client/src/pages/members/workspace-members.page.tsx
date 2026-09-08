@@ -1,7 +1,7 @@
 // Connects the selected workspace to its member directory endpoint.
 import { UserPlusIcon } from "@phosphor-icons/react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toaster";
 
 import { Seo } from "@/components/shared/seo";
 import { Button } from "@/components/ui/button";

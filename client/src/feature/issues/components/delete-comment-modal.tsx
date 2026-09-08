@@ -1,5 +1,5 @@
 import { SpinnerGapIcon, TrashIcon, WarningIcon } from "@phosphor-icons/react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toaster";
 
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";

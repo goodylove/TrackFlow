@@ -1,6 +1,7 @@
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { NotFound } from "./middleware/notfound.js";
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -10,12 +11,19 @@ import workspaceRouter from "./modules/workspace/workspace.routes.js";
 import issueRouter from "./modules/issue/issue.routes.js";
 import commentRoute from "./modules/comment/comment.routes.js";
 import dashboardRouter from "./modules/dashboard/dashboard.routes.js";
+import { env } from "./config/env.js";
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: env.CLIENT_ORIGIN,
+    credentials: true,
+  }),
+);
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res

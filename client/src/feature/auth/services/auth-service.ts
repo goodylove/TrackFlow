@@ -60,6 +60,30 @@ export function registerUser(params: RegisterParams) {
   return authRequest<AuthResponse, RegisterParams>("/users/register", params)
 }
 
+export async function getCurrentUser() {
+  try {
+    const { data: payload } = await publicApiClient.get<ApiResponse<AuthResponse>>(
+      "/users/currentUser"
+    )
+
+    if (!payload.success || !payload.data?.user) {
+      throw new ApiError(payload.message || "Unable to restore your session.")
+    }
+
+    return payload.data.user
+  } catch (error) {
+    throw toApiError(error)
+  }
+}
+
+export async function logoutUser() {
+  try {
+    await publicApiClient.post("/users/logout")
+  } catch (error) {
+    throw toApiError(error)
+  }
+}
+
 export function useAuthLoginService() {
   return useMutation({
     mutationKey: authMutationKeys.login,

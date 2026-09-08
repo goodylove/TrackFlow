@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import app from "../../app.js";
 import request from "supertest";
-import { login, LoginUserB, UserData, UserDataB } from "../../test/auth.helper.js";
+import { getAuthCookie, login, LoginUserB, UserData, UserDataB } from "../../test/auth.helper.js";
 
 describe("Create workspace flow", () => {
   const data = {
@@ -13,12 +13,12 @@ describe("Create workspace flow", () => {
     await request(app).post("/api/v1/users/register").send(UserData);
     const loginResponse = await request(app).post("/api/v1/users/login").send(login);
 
-    const token = loginResponse.body.data.user.token;
+    const token = getAuthCookie(loginResponse);
 
     const response = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(response.status).toBe(201);
     expect(response.body).toMatchObject({
@@ -32,17 +32,17 @@ describe("Create workspace flow", () => {
     await request(app).post("/api/v1/users/register").send(UserData);
     await request(app).post("/api/v1/users/register").send(UserDataB);
     const loginResponse = await request(app).post("/api/v1/users/login").send(login);
-    const token = loginResponse.body.data.user.token;
+    const token = getAuthCookie(loginResponse);
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     const workspaceId = workspaceResponse.body.data._id;
 
     await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/members`)
       .send({ email: UserDataB.email, role: "member" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/issues`)
       .send({
@@ -51,7 +51,7 @@ describe("Create workspace flow", () => {
         priority: "medium",
         assigneeId: null,
       })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/issues`)
       .send({
@@ -60,11 +60,11 @@ describe("Create workspace flow", () => {
         priority: "low",
         assigneeId: null,
       })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     const response = await request(app)
       .get("/api/v1/workspaces")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(response.status).toBe(200);
     expect(response.body.data[0].workspace).toMatchObject({
@@ -80,7 +80,7 @@ describe("Create workspace flow", () => {
     await request(app).post("/api/v1/users/register").send(UserData);
     const loginResponseA = await request(app).post("/api/v1/users/login").send(login);
 
-    const tokenA = loginResponseA.body.data.user.token;
+    const tokenA = getAuthCookie(loginResponseA);
 
     // User B register and login and token;
 
@@ -89,14 +89,14 @@ describe("Create workspace flow", () => {
       .post("/api/v1/users/login")
       .send(LoginUserB);
 
-    const tokenB = loginResponseB.body.data.user.token;
+    const tokenB = getAuthCookie(loginResponseB);
 
     // UserA creates a workspace
 
     const response = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${tokenA}`);
+      .set("Cookie", tokenA);
 
     //store userA workspace ID
 
@@ -106,7 +106,7 @@ describe("Create workspace flow", () => {
 
     const getWorkspaceResponse = await request(app)
       .get(`/api/v1/workspaces/${workspaceId}`)
-      .set("Authorization", `Bearer ${tokenB}`);
+      .set("Cookie", tokenB);
 
     expect(getWorkspaceResponse.status).toBe(403);
     expect(getWorkspaceResponse.body).toMatchObject({
@@ -119,18 +119,18 @@ describe("Create workspace flow", () => {
     await request(app).post("/api/v1/users/register").send(UserDataB);
 
     const loginResponse = await request(app).post("/api/v1/users/login").send(login);
-    const token = loginResponse.body.data.user.token;
+    const token = getAuthCookie(loginResponse);
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     const workspaceId = workspaceResponse.body.data._id;
     const memberInput = { email: UserDataB.email, role: "member" };
 
     const addMemberResponse = await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/members`)
       .send(memberInput)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(addMemberResponse.status).toBe(200);
     expect(addMemberResponse.body).toMatchObject({
@@ -148,7 +148,7 @@ describe("Create workspace flow", () => {
     const duplicateResponse = await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/members`)
       .send(memberInput)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(duplicateResponse.status).toBe(409);
     expect(duplicateResponse.body).toMatchObject({
@@ -162,22 +162,22 @@ describe("Create workspace flow", () => {
     await request(app).post("/api/v1/users/register").send(UserDataB);
 
     const loginResponse = await request(app).post("/api/v1/users/login").send(login);
-    const token = loginResponse.body.data.user.token;
+    const token = getAuthCookie(loginResponse);
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     const workspaceId = workspaceResponse.body.data._id;
     const addMemberResponse = await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/members`)
       .send({ email: UserDataB.email, role: "member" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     const memberId = addMemberResponse.body.data._id;
 
     const updateResponse = await request(app)
       .patch(`/api/v1/workspaces/${workspaceId}/members/${memberId}/role`)
       .send({ role: "admin" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(updateResponse.status).toBe(200);
     expect(updateResponse.body).toMatchObject({
@@ -188,7 +188,7 @@ describe("Create workspace flow", () => {
 
     const membersResponse = await request(app)
       .get(`/api/v1/workspaces/${workspaceId}/members`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     const ownerMembership = membersResponse.body.data.find(
       (membership: { role: string }) => membership.role === "owner",
     );
@@ -197,7 +197,7 @@ describe("Create workspace flow", () => {
         `/api/v1/workspaces/${workspaceId}/members/${ownerMembership._id}/role`,
       )
       .send({ role: "member" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(ownerUpdateResponse.status).toBe(403);
     expect(ownerUpdateResponse.body).toMatchObject({
@@ -208,7 +208,7 @@ describe("Create workspace flow", () => {
     const invalidIdResponse = await request(app)
       .patch(`/api/v1/workspaces/${workspaceId}/members/not-an-id/role`)
       .send({ role: "member" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(invalidIdResponse.status).toBe(400);
     expect(invalidIdResponse.body).toMatchObject({
@@ -231,32 +231,32 @@ describe("Create workspace flow", () => {
     const ownerLoginResponse = await request(app)
       .post("/api/v1/users/login")
       .send(login);
-    const ownerToken = ownerLoginResponse.body.data.user.token;
+    const ownerToken = getAuthCookie(ownerLoginResponse);
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
     const workspaceId = workspaceResponse.body.data._id;
     const adminResponse = await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/members`)
       .send({ email: UserDataB.email, role: "admin" })
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
     const memberResponse = await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/members`)
       .send({ email: userDataC.email, role: "member" })
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
     const adminMembershipId = adminResponse.body.data._id;
     const memberMembershipId = memberResponse.body.data._id;
 
     const adminLoginResponse = await request(app)
       .post("/api/v1/users/login")
       .send(LoginUserB);
-    const adminToken = adminLoginResponse.body.data.user.token;
+    const adminToken = getAuthCookie(adminLoginResponse);
     const removeMemberResponse = await request(app)
       .delete(
         `/api/v1/workspaces/${workspaceId}/members/${memberMembershipId}`,
       )
-      .set("Authorization", `Bearer ${adminToken}`);
+      .set("Cookie", adminToken);
 
     expect(removeMemberResponse.status).toBe(200);
     expect(removeMemberResponse.body).toMatchObject({
@@ -268,7 +268,7 @@ describe("Create workspace flow", () => {
       .delete(
         `/api/v1/workspaces/${workspaceId}/members/${adminMembershipId}`,
       )
-      .set("Authorization", `Bearer ${adminToken}`);
+      .set("Cookie", adminToken);
 
     expect(adminRemovesAdminResponse.status).toBe(403);
     expect(adminRemovesAdminResponse.body).toMatchObject({
@@ -280,13 +280,13 @@ describe("Create workspace flow", () => {
       .delete(
         `/api/v1/workspaces/${workspaceId}/members/${adminMembershipId}`,
       )
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
 
     expect(ownerRemovesAdminResponse.status).toBe(200);
 
     const membersResponse = await request(app)
       .get(`/api/v1/workspaces/${workspaceId}/members`)
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
     const ownerMembership = membersResponse.body.data.find(
       (membership: { role: string }) => membership.role === "owner",
     );
@@ -294,7 +294,7 @@ describe("Create workspace flow", () => {
       .delete(
         `/api/v1/workspaces/${workspaceId}/members/${ownerMembership._id}`,
       )
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
 
     expect(removeOwnerResponse.status).toBe(403);
     expect(removeOwnerResponse.body).toMatchObject({
@@ -304,7 +304,7 @@ describe("Create workspace flow", () => {
 
     const invalidIdResponse = await request(app)
       .delete(`/api/v1/workspaces/${workspaceId}/members/not-an-id`)
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
 
     expect(invalidIdResponse.status).toBe(400);
     expect(invalidIdResponse.body).toMatchObject({
