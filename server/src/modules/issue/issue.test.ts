@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import request from "supertest";
 import app from "../../app.js";
-import { login, LoginUserB, UserData, UserDataB } from "../../test/auth.helper.js";
+import { getAuthCookie, login, LoginUserB, UserData, UserDataB } from "../../test/auth.helper.js";
 
 describe("Issue API integration tests", () => {
   const data = {
@@ -13,12 +13,12 @@ describe("Issue API integration tests", () => {
     await request(app).post("/api/v1/users/register").send(UserData);
     const workspaceMember = await request(app).post("/api/v1/users/login").send(login);
 
-    const token = workspaceMember.body.data.user.token;
+    const token = getAuthCookie(workspaceMember);
 
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     const workspaceId = workspaceResponse.body.data._id;
     // const createdById = workspaceResponse.body.data.createdBy;
@@ -32,7 +32,7 @@ describe("Issue API integration tests", () => {
         priority: "medium",
         assigneeId: null,
       })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     console.log(response.body);
     // console.log(response.error.issues);
@@ -44,12 +44,12 @@ describe("Issue API integration tests", () => {
     await request(app).post("/api/v1/users/register").send(UserData);
     const workspaceMember = await request(app).post("/api/v1/users/login").send(login);
 
-    const token = workspaceMember.body.data.user.token;
+    const token = getAuthCookie(workspaceMember);
 
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     const workspaceId = workspaceResponse.body.data._id;
     // const createdById = workspaceResponse.body.data.createdBy;
@@ -63,22 +63,22 @@ describe("Issue API integration tests", () => {
         priority: "medium",
         assigneeId: null,
       })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     const issueId = issueResponse.body.data._id;
 
     await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments`)
       .send({ content: "First issue comment" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/comments`)
       .send({ content: "Second issue comment" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     const issuesResponse = await request(app)
       .get(`/api/v1/workspaces/${workspaceId}/issues`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(issuesResponse.status).toBe(200);
     expect(issuesResponse.body).toMatchObject({
@@ -96,12 +96,12 @@ describe("Issue API integration tests", () => {
     await request(app).post("/api/v1/users/register").send(UserData);
     const workspaceMember = await request(app).post("/api/v1/users/login").send(login);
 
-    const token = workspaceMember.body.data.user.token;
+    const token = getAuthCookie(workspaceMember);
 
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     const workspaceId = workspaceResponse.body.data._id;
     // const createdById = workspaceResponse.body.data.createdBy;
@@ -115,13 +115,13 @@ describe("Issue API integration tests", () => {
         priority: "medium",
         assigneeId: null,
       })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     const issueId = createIssueResponse.body.data._id;
 
     // const issuesResponse = await request(app)
     //   .get(`/api/v1/workspaces/${workspaceId}/issues/${issueId}`)
-    //   .set("Authorization", `Bearer ${token}`);
+    //   .set("Cookie", token);
 
     const updateIssueResponse = await request(app)
       .patch(`/api/v1/workspaces/${workspaceId}/issues/${issueId}`)
@@ -131,7 +131,7 @@ describe("Issue API integration tests", () => {
         priority: "high",
         dueDate: "2026-09-22T12:00:00.000Z",
       })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     expect(updateIssueResponse.status).toBe(200);
     expect(updateIssueResponse.body.data.issue).toMatchObject({
       title: "just testing okoowoow",
@@ -142,7 +142,7 @@ describe("Issue API integration tests", () => {
     const clearDueDateResponse = await request(app)
       .patch(`/api/v1/workspaces/${workspaceId}/issues/${issueId}`)
       .send({ dueDate: null })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(clearDueDateResponse.status).toBe(200);
     expect(clearDueDateResponse.body.data.issue.dueDate).toBeUndefined();
@@ -155,22 +155,22 @@ describe("Issue API integration tests", () => {
     const loginResponse = await request(app)
       .post("/api/v1/users/login")
       .send(login);
-    const token = loginResponse.body.data.user.token;
+    const token = getAuthCookie(loginResponse);
 
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     const workspaceId = workspaceResponse.body.data._id;
 
     await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/members`)
       .send({ email: UserDataB.email, role: "member" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     const membersResponse = await request(app)
       .get(`/api/v1/workspaces/${workspaceId}/members`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     const assignee = membersResponse.body.data.find(
       (membership: { user: { email: string } }) =>
         membership.user.email === UserDataB.email,
@@ -184,13 +184,13 @@ describe("Issue API integration tests", () => {
         priority: "medium",
         assigneeId: null,
       })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
     const issueId = issueResponse.body.data._id;
 
     const assignResponse = await request(app)
       .patch(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/assignee`)
       .send({ assigneeId: assignee._id })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(assignResponse.status).toBe(200);
     expect(assignResponse.body.data.assignee).toMatchObject({
@@ -201,7 +201,7 @@ describe("Issue API integration tests", () => {
     const unassignResponse = await request(app)
       .patch(`/api/v1/workspaces/${workspaceId}/issues/${issueId}/assignee`)
       .send({ assigneeId: null })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(unassignResponse.status).toBe(200);
     expect(unassignResponse.body.data.assignee).toBeNull();
@@ -217,19 +217,19 @@ describe("Issue API integration tests", () => {
     const memberLoginResponse = await request(app)
       .post("/api/v1/users/login")
       .send(LoginUserB);
-    const ownerToken = ownerLoginResponse.body.data.user.token;
-    const memberToken = memberLoginResponse.body.data.user.token;
+    const ownerToken = getAuthCookie(ownerLoginResponse);
+    const memberToken = getAuthCookie(memberLoginResponse);
 
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
     const workspaceId = workspaceResponse.body.data._id;
 
     await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/members`)
       .send({ email: UserDataB.email, role: "member" })
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
 
     const issueResponse = await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/issues`)
@@ -239,12 +239,12 @@ describe("Issue API integration tests", () => {
         priority: "medium",
         assigneeId: null,
       })
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
     const issueId = issueResponse.body.data._id;
 
     const forbiddenResponse = await request(app)
       .delete(`/api/v1/workspaces/${workspaceId}/issues/${issueId}`)
-      .set("Authorization", `Bearer ${memberToken}`);
+      .set("Cookie", memberToken);
 
     expect(forbiddenResponse.status).toBe(403);
     expect(forbiddenResponse.body.message).toBe(
@@ -253,7 +253,7 @@ describe("Issue API integration tests", () => {
 
     const deleteResponse = await request(app)
       .delete(`/api/v1/workspaces/${workspaceId}/issues/${issueId}`)
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
 
     expect(deleteResponse.status).toBe(200);
     expect(deleteResponse.body).toMatchObject({
@@ -263,7 +263,7 @@ describe("Issue API integration tests", () => {
 
     const issuesResponse = await request(app)
       .get(`/api/v1/workspaces/${workspaceId}/issues`)
-      .set("Authorization", `Bearer ${ownerToken}`);
+      .set("Cookie", ownerToken);
 
     expect(
       issuesResponse.body.data.issues.some(
@@ -276,7 +276,7 @@ describe("Issue API integration tests", () => {
     await request(app).post("/api/v1/users/register").send(UserData);
     const loginResponseA = await request(app).post("/api/v1/users/login").send(login);
 
-    const tokenA = loginResponseA.body.data.user.token;
+    const tokenA = getAuthCookie(loginResponseA);
 
     // User B register and login and token;
 
@@ -285,14 +285,14 @@ describe("Issue API integration tests", () => {
       .post("/api/v1/users/login")
       .send(LoginUserB);
 
-    const tokenB = loginResponseB.body.data.user.token;
+    const tokenB = getAuthCookie(loginResponseB);
 
     // UserA creates a workspace
 
     const response = await request(app)
       .post("/api/v1/workspaces")
       .send(data)
-      .set("Authorization", `Bearer ${tokenA}`);
+      .set("Cookie", tokenA);
 
     //store userA workspace ID
 
@@ -307,7 +307,7 @@ describe("Issue API integration tests", () => {
         priority: "medium",
         assigneeId: null,
       })
-      .set("Authorization", `Bearer ${tokenB}`);
+      .set("Cookie", tokenB);
 
     expect(res.status).toBe(403);
     expect(res.body).toMatchObject({
@@ -321,11 +321,11 @@ describe("Issue API integration tests", () => {
 
     const loginResponse = await request(app).post("/api/v1/users/login").send(login);
 
-    const token = loginResponse.body.data.user.token;
+    const token = getAuthCookie(loginResponse);
 
     const workspaceResponse = await request(app)
       .post("/api/v1/workspaces")
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", token)
       .send(data);
 
     expect(workspaceResponse.status).toBe(201);
@@ -334,7 +334,7 @@ describe("Issue API integration tests", () => {
 
     const todoIssueResponse = await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/issues`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", token)
       .send({
         title: "Fix login page",
         description: "Fix login redirect problem",
@@ -345,7 +345,7 @@ describe("Issue API integration tests", () => {
 
     const inProgressIssueResponse = await request(app)
       .post(`/api/v1/workspaces/${workspaceId}/issues`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", token)
       .send({
         title: "Build dashboard",
         description: "Implement dashboard statistics",
@@ -359,7 +359,7 @@ describe("Issue API integration tests", () => {
 
     const response = await request(app)
       .get(`/api/v1/workspaces/${workspaceId}/issues?status=todo`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", token);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);

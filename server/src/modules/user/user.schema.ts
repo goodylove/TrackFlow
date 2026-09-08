@@ -37,6 +37,8 @@ export const loginUserSchema = z.object({
       .string()
       .min(8, "Password must contain at least 8 characters")
       .max(72, "Password cannot exceed 72 characters"),
+
+    remember: z.boolean().optional().default(false),
   }),
 });
 

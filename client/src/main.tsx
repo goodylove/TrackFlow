@@ -6,14 +6,17 @@ import { BrowserRouter } from 'react-router-dom'
 import "./styles/index.css"
 import App from './App.tsx'
 import { queryClient } from './lib/query/query-client'
-import { Toaster } from './components/ui/sonner'
+import { Toaster } from './components/ui/toaster'
+import { AuthSessionProvider } from './feature/auth/auth-session-provider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <App />
+          <AuthSessionProvider>
+            <App />
+          </AuthSessionProvider>
           <Toaster />
         </BrowserRouter>
       </QueryClientProvider>

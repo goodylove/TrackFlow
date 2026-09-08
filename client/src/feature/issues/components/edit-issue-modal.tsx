@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PencilSimpleIcon, SpinnerGapIcon } from "@phosphor-icons/react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toaster";
 
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";

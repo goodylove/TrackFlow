@@ -3,6 +3,11 @@ import type { NextFunction, Request, Response } from "express";
 import { loginUserSchema, registerUserSchema } from "./user.schema.js";
 import { loginUser, registerUser } from "./user.service.js";
 import { StatusCodes } from "http-status-codes";
+import {
+  AUTH_COOKIE_NAME,
+  authCookieClearOptions,
+  getAuthCookieOptions,
+} from "../../config/auth-cookie.js";
 
 export const registerUserController = async (
   req: Request,
@@ -53,7 +58,10 @@ export const loginUserController = async (
     return;
   }
 
-  const user = await loginUser(result.data.body);
+  const { token, user } = await loginUser(result.data.body);
+
+  res.set("Cache-Control", "no-store");
+  res.cookie(AUTH_COOKIE_NAME, token, getAuthCookieOptions(result.data.body.remember));
 
   res.status(StatusCodes.OK).json({
     success: true,
@@ -64,11 +72,25 @@ export const loginUserController = async (
   });
 };
 
+export const logoutUserController = (
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+): void => {
+  res.set("Cache-Control", "no-store");
+  res.clearCookie(AUTH_COOKIE_NAME, authCookieClearOptions);
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: "Logout successful",
+  });
+};
+
 export const currentUserController = async (
   req: Request,
   res: Response,
   _next: NextFunction,
 ): Promise<void> => {
+  res.set("Cache-Control", "no-store");
   res.status(StatusCodes.OK).json({
     success: true,
     message: "Current user retrieved successfully",

@@ -1,7 +1,7 @@
 // Composes the issue management page and its prerequisite empty states.
 import { ArrowsLeftRightIcon, PlusIcon } from "@phosphor-icons/react";
 import { useLayoutEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toaster";
 
 import { Button } from "@/components/ui/button";
 import { DashboardEmptyState } from "@/feature/dashboard/components/dashboard-empty-state";

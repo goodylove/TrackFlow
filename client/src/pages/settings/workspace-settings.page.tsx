@@ -1,6 +1,6 @@
 // Connects the selected workspace to its server-backed detail view.
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toaster";
 
 import { Seo } from "@/components/shared/seo";
 import { DashboardEmptyState } from "@/feature/dashboard/components/dashboard-empty-state";

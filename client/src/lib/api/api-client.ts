@@ -2,7 +2,6 @@
 import axios from "axios"
 
 import { clientEnv } from "@/config/client-env"
-import { useAuthStore } from "@/stores/auth-store"
 import { resetClientState } from "@/stores/reset-client-state"
 
 export const AUTH_SESSION_EXPIRED_EVENT = "trackflow:auth-session-expired"
@@ -10,26 +9,16 @@ export const AUTH_SESSION_EXPIRED_EVENT = "trackflow:auth-session-expired"
 const axiosConfig = {
   baseURL: clientEnv.apiUrl,
   timeout: clientEnv.apiTimeoutMs,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
 }
 
-// Public endpoints should never receive a stale or unrelated bearer token.
+// Both clients allow the browser to send the httpOnly session cookie.
 export const publicApiClient = axios.create(axiosConfig)
 
-// Protected endpoints automatically receive the active session token.
 export const apiClient = axios.create(axiosConfig)
-
-apiClient.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token
-
-  if (token) {
-    config.headers.set("Authorization", `Bearer ${token}`)
-  }
-
-  return config
-})
 
 apiClient.interceptors.response.use(
   (response) => response,

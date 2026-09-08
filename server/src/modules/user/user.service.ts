@@ -66,7 +66,7 @@ export const loginUser = async (input: LoginUserInput) => {
     },
     JWT_SECRET,
     {
-      expiresIn: "7d",
+      expiresIn: input.remember ? "30d" : "7d",
     },
   );
   user.lastLoginAt = new Date();
@@ -74,13 +74,15 @@ export const loginUser = async (input: LoginUserInput) => {
 
   return {
     token,
-    id: user._id.toString(),
-    name: user.name,
-    email: user.email,
-    status: user.status,
-    isEmailVerified: user.isEmailVerified,
-    createdAt: user.createdAt,
-    lastLoginAt: user.lastLoginAt,
+    user: {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      status: user.status,
+      isEmailVerified: user.isEmailVerified,
+      createdAt: user.createdAt,
+      lastLoginAt: user.lastLoginAt,
+    },
   };
 };
 

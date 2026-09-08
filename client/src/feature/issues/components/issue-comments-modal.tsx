@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toaster";
 
 import { Alert } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

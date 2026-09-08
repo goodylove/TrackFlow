@@ -8,7 +8,7 @@ import {
     Kanban,
     SpinnerGap,
 } from "@phosphor-icons/react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toaster"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, type ControllerRenderProps, type SubmitHandler } from "react-hook-form"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
@@ -108,7 +108,7 @@ function PasswordField({
 export function Auth({ mode }: AuthPageProps) {
     const isSignup = mode === "signup"
     const navigate = useNavigate()
-    const setSession = useAuthStore((state) => state.setSession)
+    const setCurrentUser = useAuthStore((state) => state.setCurrentUser)
     const loginMutation = useAuthLoginService()
     const registerMutation = useAuthRegisterService()
     const [searchParams] = useSearchParams()
@@ -168,17 +168,10 @@ export function Auth({ mode }: AuthPageProps) {
             const { user } = await loginMutation.mutateAsync({
                 email: values.email,
                 password: values.password,
+                remember: values.remember,
             })
 
-            if (!user.token) {
-                throw new ApiError("TrackFlow did not return a session. Please try again.")
-            }
-
-            setSession(
-                user.token,
-                { id: user.id, name: user.name, email: user.email },
-                values.remember
-            )
+            setCurrentUser({ id: user.id, name: user.name, email: user.email })
             navigate(postLoginPath, { replace: true })
         } catch (submissionError) {
             if (submissionError instanceof ApiError && submissionError.fieldErrors) {

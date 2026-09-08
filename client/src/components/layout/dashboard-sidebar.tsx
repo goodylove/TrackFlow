@@ -9,6 +9,7 @@ import {
   type Icon,
 } from "@phosphor-icons/react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/toaster";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { resetClientState } from "@/stores/reset-client-state";
 import { useUiStore } from "@/stores/ui-store";
 import { BrandMark } from "../shared/brandMark";
+import { logoutUser } from "@/feature/auth/services/auth-service";
 
 type NavItem = { label: string; icon: Icon; to?: string };
 const navItems: NavItem[] = [
@@ -50,10 +52,15 @@ export function DashboardSidebar({
   const navigate = useNavigate();
   const location = useLocation();
 
-  function logout() {
-    resetClientState();
-    navigate("/login");
-    onNavigate?.();
+  async function logout() {
+    try {
+      await logoutUser();
+      resetClientState();
+      navigate("/login");
+      onNavigate?.();
+    } catch {
+      toast.error("Unable to log out. Please try again.");
+    }
   }
 
   return (
@@ -169,7 +176,7 @@ export function DashboardSidebar({
                 <button
                   aria-label="Log out"
                   className="flex size-11 items-center justify-center rounded-xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                  onClick={logout}
+                  onClick={() => void logout()}
                   type="button"
                 />
               }
@@ -181,7 +188,7 @@ export function DashboardSidebar({
         ) : (
           <button
             className="flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-bold text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-            onClick={logout}
+            onClick={() => void logout()}
             type="button"
           >
             <SignOutIcon aria-hidden="true" size={19} />
