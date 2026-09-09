@@ -33,9 +33,9 @@ const columnStyles: Record<
     iconClassName: "text-[var(--marketing-action)]",
   },
   done: {
-    accent: "bg-emerald-500",
+    accent: "bg-[var(--status-success)]",
     icon: CheckCircleIcon,
-    iconClassName: "text-emerald-600",
+    iconClassName: "text-[var(--status-success)]",
   },
 };
 
@@ -96,7 +96,7 @@ export function KanbanColumn({
     <section
       aria-labelledby={`${status}-column-title`}
       className={cn(
-        "relative flex min-h-[17rem] flex-col rounded-2xl border border-[var(--marketing-border)] bg-[#f1f2f6] p-3 transition duration-200",
+        "relative flex min-h-[19rem] snap-start flex-col rounded-2xl border border-[var(--marketing-border)] bg-[var(--marketing-sidebar)] p-3 transition duration-200",
         isDropTarget &&
           "border-[var(--marketing-action)]/55 bg-[var(--marketing-action-soft)]/55 shadow-[inset_0_0_0_1px_rgba(47,55,244,0.12)]",
       )}

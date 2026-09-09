@@ -6,6 +6,7 @@ import {
   MagnifyingGlassIcon,
   PencilSimpleIcon,
   TrashIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -75,6 +76,16 @@ export function RecentIssuesTable({
     IssuePriority | "all"
   >("all");
   const deferredSearch = useDeferredValue(search.trim().toLowerCase());
+  const hasActions = Boolean(onEditIssue || onDeleteIssue);
+  const hasActiveFilters = Boolean(
+    search || statusFilter !== "all" || priorityFilter !== "all",
+  );
+
+  function clearFilters() {
+    setSearch("");
+    setStatusFilter("all");
+    setPriorityFilter("all");
+  }
 
   const filteredIssues = issues
     .filter((issue) => {
@@ -96,7 +107,12 @@ export function RecentIssuesTable({
     <Card className="min-w-0 overflow-hidden">
       <CardHeader className="flex-col items-stretch border-b border-border/70">
         <div>
-          <CardTitle>Recent issues</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Recent issues</CardTitle>
+            <span className="rounded-full bg-[var(--marketing-action-soft)] px-2 py-0.5 text-[0.65rem] font-black text-[var(--marketing-action)]">
+              {filteredIssues.length}
+            </span>
+          </div>
           <p className="mt-1 text-xs text-muted-foreground">
             Latest updates in this workspace
           </p>
@@ -201,6 +217,18 @@ export function RecentIssuesTable({
                 </Select>
               </div>
             </div>
+            {hasActiveFilters ? (
+              <Button
+                className="col-span-2 h-10 gap-1.5 text-muted-foreground sm:col-span-1"
+                onClick={clearFilters}
+                size="sm"
+                type="button"
+                variant="ghost"
+              >
+                <XIcon aria-hidden="true" size={14} />
+                Clear
+              </Button>
+            ) : null}
           </div>
         ) : null}
       </CardHeader>
@@ -336,6 +364,8 @@ export function RecentIssuesTable({
             )}
           </TableBody>
         </Table>
+        </div>
+        </>
       )}
     </Card>
   );

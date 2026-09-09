@@ -5,15 +5,18 @@ import {
   ClockCounterClockwiseIcon,
   ListChecksIcon,
   PlusIcon,
+  TrashIcon,
   UsersIcon,
   UsersThreeIcon,
 } from "@phosphor-icons/react";
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Seo } from "@/components/shared/seo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toaster";
 import {
   Card,
   CardContent,
@@ -22,6 +25,7 @@ import {
 } from "@/components/ui/card";
 import { DashboardEmptyState } from "@/feature/dashboard/components/dashboard-empty-state";
 import type { DashboardWorkspace } from "@/feature/dashboard/types";
+import { DeleteWorkspaceModal } from "@/feature/workspace/components/delete-workspace-modal";
 import { useDashboardOutletContext } from "@/pages/dashboard/dashboard-layout";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { cn } from "@/lib/utils";
@@ -40,8 +44,11 @@ function formatCreatedAt(createdAt: string) {
 }
 
 export default function WorkspacesPage() {
+  const [workspaceToDelete, setWorkspaceToDelete] =
+    useState<DashboardWorkspace | null>(null);
   const navigate = useNavigate();
-  const { onAddWorkspace, workspaces } = useDashboardOutletContext();
+  const { currentUser, onAddWorkspace, workspaces } =
+    useDashboardOutletContext();
   const selectedWorkspaceId = useWorkspaceStore(
     (state) => state.selectedWorkspaceId,
   );
@@ -72,11 +79,11 @@ export default function WorkspacesPage() {
               Workspaces
             </h1>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {workspaces.length} {workspaces.length === 1 ? "workspace" : "workspaces"}
+              Switch between the {workspaces.length} {workspaces.length === 1 ? "workspace" : "workspaces"} available to your account.
             </p>
           </div>
           <Button
-            className="h-10 self-start rounded-lg bg-[var(--marketing-action)] px-4 hover:bg-[var(--marketing-action)]/90 sm:self-auto"
+            className="h-11 w-full self-start rounded-xl bg-[var(--marketing-action)] px-5 hover:bg-[var(--marketing-action-strong)] sm:w-auto sm:self-auto"
             onClick={onAddWorkspace}
             type="button"
           >
@@ -128,14 +135,15 @@ export default function WorkspacesPage() {
                         </p>
                       </div>
                     </div>
-                    {isSelected ? (
-                      <Badge className="gap-1 border-[var(--marketing-action)]/15 bg-[var(--marketing-action-soft)] text-[var(--marketing-action)]">
-                        <CheckCircleIcon aria-hidden="true" size={12} weight="fill" />
-                        Active
-                      </Badge>
-                    ) : (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {isSelected ? (
+                        <Badge className="gap-1 border-[var(--marketing-action)]/15 bg-[var(--marketing-action-soft)] text-[var(--marketing-action)]">
+                          <CheckCircleIcon aria-hidden="true" size={12} weight="fill" />
+                          Active
+                        </Badge>
+                      ) : null}
                       <Badge variant="outline">{roleLabels[workspace.role]}</Badge>
-                    )}
+                    </div>
                   </CardHeader>
 
                   <CardContent className="flex flex-1 flex-col">
@@ -171,18 +179,34 @@ export default function WorkspacesPage() {
                       </span>
                     </div>
 
-                    <div className="mt-auto pt-5">
-                      {!isSelected && (
-
+                    <div
+                      className={cn(
+                        "mt-auto grid gap-2 pt-5",
+                        !isSelected && workspace.role === "owner" &&
+                          "sm:grid-cols-2",
+                      )}
+                    >
+                      {!isSelected ? (
                         <Button
-                          className="h-10 w-full rounded-lg"
+                          className="h-11 w-full rounded-xl"
                           onClick={() => switchWorkspace(workspace._id)}
                           type="button"
                           variant="outline"
                         >
                           Switch to workspace
                         </Button>
-                      )}
+                      ) : null}
+                      {workspace.role === "owner" ? (
+                        <Button
+                          className="h-11 w-full rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5"
+                          onClick={() => setWorkspaceToDelete(workspace)}
+                          type="button"
+                          variant="outline"
+                        >
+                          <TrashIcon aria-hidden="true" size={16} weight="bold" />
+                          Delete workspace
+                        </Button>
+                      ) : null}
                     </div>
                   </CardContent>
                 </Card>
@@ -190,6 +214,22 @@ export default function WorkspacesPage() {
             })}
           </section>
         )}
+        {workspaceToDelete ? (
+          <DeleteWorkspaceModal
+            onDeleted={() =>
+              toast.success("Workspace deleted", {
+                description: `${workspaceToDelete.name} was deleted successfully.`,
+              })
+            }
+            onOpenChange={(open) => {
+              if (!open) setWorkspaceToDelete(null);
+            }}
+            open
+            userId={currentUser._id}
+            workspaceId={workspaceToDelete._id}
+            workspaceName={workspaceToDelete.name}
+          />
+        ) : null}
       </div>
     </>
   );

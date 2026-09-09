@@ -45,7 +45,9 @@ export function WorkspaceDetailsCard({
       className="overflow-hidden rounded-2xl border border-[var(--marketing-border)] bg-white shadow-[0_16px_40px_-34px_rgba(23,23,34,0.35)]"
     >
       <div className="flex flex-col gap-5 border-b border-[var(--marketing-border)] px-5 py-6 sm:flex-row sm:items-center sm:px-7">
-
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-[var(--marketing-action)]/15 bg-[var(--marketing-action-soft)] text-[var(--marketing-action)]">
+          <BuildingsIcon aria-hidden="true" size={22} weight="fill" />
+        </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2

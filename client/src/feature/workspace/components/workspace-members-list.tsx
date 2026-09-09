@@ -85,10 +85,10 @@ export function WorkspaceMembersList({
       className="overflow-hidden rounded-2xl border border-[var(--marketing-border)] bg-white shadow-[0_16px_40px_-34px_rgba(23,23,34,0.35)]"
     >
       <div className="flex flex-col gap-4 border-b border-[var(--marketing-border)] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        {/* <div>
+        <div>
           <div className="flex items-center gap-2">
             <h2 className="text-base font-black" id="members-directory-title">
-              Members
+              Directory
             </h2>
             <Badge variant="secondary">
               {members.length} {members.length === 1 ? "member" : "members"}
@@ -97,7 +97,7 @@ export function WorkspaceMembersList({
           <p className="mt-1 text-sm text-muted-foreground">
             People who can access this workspace.
           </p>
-        </div> */}
+        </div>
         <label className="relative block w-full sm:w-72">
           <span className="sr-only">Search members</span>
           <MagnifyingGlassIcon
@@ -145,14 +145,14 @@ export function WorkspaceMembersList({
               return (
                 <li
                   className={cn(
-                    "relative grid gap-4 px-5 py-4 transition-colors hover:bg-muted/20 sm:px-6 md:items-center",
+                    "relative grid grid-cols-2 gap-4 px-5 py-4 transition-colors hover:bg-muted/20 sm:px-6 md:items-center",
                     hasMemberActions
                       ? "md:grid-cols-[minmax(0,1.6fr)_0.7fr_0.8fr_0.8fr_2.5rem]"
                       : "md:grid-cols-[minmax(0,1.6fr)_0.7fr_0.8fr_0.8fr]",
                   )}
                   key={membership._id}
                 >
-                  <div className={cn("flex min-w-0 items-center gap-3", hasMemberActions && "pr-12 md:pr-0")}>
+                  <div className={cn("col-span-2 flex min-w-0 items-center gap-3 md:col-span-1", hasMemberActions && "pr-12 md:pr-0")}>
                     <Avatar className="size-10">
                       {user.avatarUrl ? (
                         <AvatarImage alt="" src={user.avatarUrl} />
@@ -192,7 +192,7 @@ export function WorkspaceMembersList({
                         aria-hidden="true"
                         className={cn(
                           "size-2 rounded-full",
-                          user.status === "active" ? "bg-emerald-500" : "bg-red-500",
+                          user.status === "active" ? "bg-[var(--status-success)]" : "bg-red-500",
                         )}
                       />
                       {user.status === "active" ? "Active" : "Suspended"}

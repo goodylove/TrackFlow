@@ -1,5 +1,5 @@
 // Provides shared profile and logout actions for dashboard navigation surfaces.
-import { GearIcon, SignOutIcon, UserCircleIcon } from "@phosphor-icons/react";
+import { GearIcon, SignOutIcon } from "@phosphor-icons/react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/toaster";
 
@@ -68,13 +68,9 @@ export function UserMenu({ user, compact = false }: UserMenuProps) {
             <span className="mt-0.5 block font-normal">{user.email}</span>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <UserCircleIcon aria-hidden="true" size={17} />
-            Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
             <GearIcon aria-hidden="true" size={17} />
-            Settings
+            Workspace settings
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

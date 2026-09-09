@@ -12,7 +12,7 @@ const avatarTones = [
   "bg-violet-100 text-violet-700",
   "bg-cyan-100 text-cyan-800",
   "bg-rose-100 text-rose-700",
-  "bg-emerald-100 text-emerald-700",
+  "bg-[var(--marketing-action-soft)] text-[var(--marketing-action)]",
 ];
 
 function getInitials(name: string) {

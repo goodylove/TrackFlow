@@ -1,5 +1,5 @@
-import { lazy, Suspense } from "react"
-import { Navigate, Route, Routes } from "react-router-dom"
+import { lazy, Suspense, useEffect } from "react"
+import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom"
 
 
 import { Hero } from "@/components/marketing/hero"
@@ -8,6 +8,7 @@ import { Navbar } from "@/components/marketing/navbar"
 import { Seo } from "@/components/shared/seo"
 import { ProtectedRoute, PublicOnlyRoute } from "@/feature/auth/auth-route-guard"
 import AuthPage from "./pages/auth/auth.page"
+import "@/styles/landing.css"
 
 const DashboardPage = lazy(() => import("./pages/dashboard/dashboard.page"))
 const DashboardLayout = lazy(() => import("./pages/dashboard/dashboard-layout"))
@@ -17,18 +18,34 @@ const WorkspaceSettingsPage = lazy(() => import("./pages/settings/workspace-sett
 const WorkspacesPage = lazy(() => import("./pages/workspace/workspaces.page"))
 
 function LandingPage() {
+  const { hash, key } = useLocation()
+
+  useEffect(() => {
+    if (!hash) return
+
+    const target = document.getElementById(hash.slice(1))
+    target?.scrollIntoView()
+    if (target?.tabIndex === -1) target.focus({ preventScroll: true })
+  }, [hash, key])
+
   return (
     <>
       <Seo
-        description="TrackFlow gives focused teams one place to organize issues, assign clear ownership, and keep work moving forward."
+        description="TrackFlow helps small teams organize bugs, tasks, and follow-ups. Assign owners, set priorities, and track issues from Todo to Done."
         keywords="issue tracking, project management, team collaboration, issue workflow"
-        title="Issue tracking for focused teams"
+        title="Issue tracking for small teams"
       />
-      <div className="min-h-screen px-0 py-0 text-[var(--foreground)] sm:px-6 sm:py-4">
-        <div className="mx-auto min-h-screen w-full max-w-[var(--landing-canvas-width)] overflow-hidden ">
+      <div className="landing-page min-h-screen px-0 py-0 text-[var(--foreground)] sm:px-6 sm:py-4">
+        <div className="mx-auto min-h-screen w-full max-w-[var(--landing-canvas-width)] overflow-clip">
+          <Link
+            className="fixed left-4 top-4 z-[60] -translate-y-24 rounded-lg bg-[var(--marketing-action)] px-4 py-2.5 text-sm font-bold text-white shadow-lg transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--marketing-action)]"
+            to="#landing-content"
+          >
+            Skip to main content
+          </Link>
           <Navbar />
 
-          <main>
+          <main id="landing-content" tabIndex={-1}>
             <Hero />
             <LandingSections />
           </main>

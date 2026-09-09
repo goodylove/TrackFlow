@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
@@ -14,7 +16,7 @@ import type { DashboardUser, DashboardWorkspace } from "@/feature/dashboard/type
 
 type DashboardShellProps = {
   children: ReactNode;
-  user:DashboardUser;
+  user: DashboardUser;
   workspaces: DashboardWorkspace[];
 };
 
@@ -24,10 +26,12 @@ export function DashboardShell({
   workspaces,
 }: DashboardShellProps) {
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
+  const location = useLocation();
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <TooltipProvider>
-      <div className="flex min-h-screen bg-[var(--marketing-bg)] text-[#171722]">
+      <div className="dashboard-shell flex min-h-screen bg-background text-foreground">
         <div className="sticky top-0 hidden h-screen lg:block">
           <DashboardSidebar workspaces={workspaces} />
         </div>
@@ -36,8 +40,16 @@ export function DashboardShell({
             onOpenNavigation={() => setMobileNavigationOpen(true)}
             user={user}
           />
-          <main className=" w-full  p-4 sm:p-6 lg:p-8">
-            {children}
+          <main className="w-full px-4 py-6 sm:px-6 sm:py-8 lg:px-8 xl:px-10">
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              className="mx-auto w-full max-w-[100rem]"
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+              key={location.pathname}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {children}
+            </motion.div>
           </main>
         </div>
       </div>

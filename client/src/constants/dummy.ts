@@ -12,7 +12,7 @@ export const boardColumns = [
   {
     name: "Done",
     count: 7,
-    accent: "bg-emerald-400",
+    accent: "bg-[var(--status-success)]",
   },
 ];
 

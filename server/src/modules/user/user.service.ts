@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import { env } from "../../config/env.js";
+import { SESSION_JWT_TTL_SECONDS, REMEMBERED_SESSION_TTL_SECONDS } from "../../config/auth-session.js";
 import { InvalidCredentialsError } from "../../errors/authentication.error.js";
 import { User } from "./user.model.js";
 import type { LoginUserInput, RegisterUserInput } from "./user.schema.js";
@@ -66,7 +67,7 @@ export const loginUser = async (input: LoginUserInput) => {
     },
     JWT_SECRET,
     {
-      expiresIn: input.remember ? "30d" : "7d",
+      expiresIn: input.remember ? REMEMBERED_SESSION_TTL_SECONDS : SESSION_JWT_TTL_SECONDS,
     },
   );
   user.lastLoginAt = new Date();

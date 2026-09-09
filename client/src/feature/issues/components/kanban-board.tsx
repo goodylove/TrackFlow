@@ -61,7 +61,7 @@ export function KanbanBoard({
       </p>
       <div
         aria-label="Issue status board"
-        className="grid auto-cols-[minmax(17.5rem,86vw)] grid-flow-col items-start gap-4 overflow-x-auto overscroll-x-contain pb-3 [scrollbar-color:#cfd1dc_transparent] xl:auto-cols-auto xl:grid-flow-row xl:grid-cols-3 xl:overflow-visible xl:pb-0"
+        className="grid snap-x snap-mandatory auto-cols-[minmax(17.5rem,86vw)] grid-flow-col items-start gap-4 overflow-x-auto overscroll-x-contain pb-3 [scrollbar-color:#cfd1dc_transparent] xl:auto-cols-auto xl:snap-none xl:grid-flow-row xl:grid-cols-3 xl:overflow-visible xl:pb-0"
         id="issue-board"
       >
         {issueStatuses.map((status) => {

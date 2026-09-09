@@ -1,3 +1,4 @@
+import { validateRouteIds } from "../../middleware/object-id.middleware.js";
 import { Router } from "express";
 import { authenticate } from "../../middleware/auth.middleware.js";
 import { verifyWorkspaceMembership } from "../../middleware/workspace-membership.middleware.js";
@@ -13,6 +14,7 @@ const commentRoute = Router();
 commentRoute.get(
   "/:workspaceId/issues/:issueId/comments",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   getCommentsByIssueController,
 );
@@ -20,6 +22,7 @@ commentRoute.get(
 commentRoute.post(
   "/:workspaceId/issues/:issueId/comments",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   createCommentController,
 );
@@ -27,6 +30,7 @@ commentRoute.post(
 commentRoute.patch(
   "/:workspaceId/issues/:issueId/comments/:commentId",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   updateOwnCommentController,
 );
@@ -34,6 +38,7 @@ commentRoute.patch(
 commentRoute.delete(
   "/:workspaceId/issues/:issueId/comments/:commentId",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   deleteOwnCommentController,
 );

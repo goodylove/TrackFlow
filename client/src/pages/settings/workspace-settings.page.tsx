@@ -37,14 +37,16 @@ export default function WorkspaceSettingsPage() {
         noIndex
         title="Workspace settings"
       />
-      <div className="space-y-5">
+      <div className="space-y-6">
         <header>
-
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-action)]">
+            {selectedWorkspace?.name ?? "Workspace"}
+          </p>
           <h1 className="mt-1 text-3xl font-black tracking-[-0.04em] sm:text-4xl">
             Workspace settings
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Review the identity and access information for your selected workspace.
+            Review workspace identity, access, and owner controls.
           </p>
         </header>
 

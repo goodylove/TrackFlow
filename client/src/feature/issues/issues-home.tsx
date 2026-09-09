@@ -1,6 +1,7 @@
 // Composes the issue management page and its prerequisite empty states.
 import { ArrowsLeftRightIcon, PlusIcon } from "@phosphor-icons/react";
-import { useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "@/components/ui/toaster";
 
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,7 @@ export function IssuesHome({
   workspaceId,
   workspaceName,
 }: IssuesHomeProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [issues, setIssues] = useState(initialIssues);
   const [pendingIssueIds, setPendingIssueIds] = useState<Set<string>>(
     () => new Set(),
@@ -63,7 +65,7 @@ export function IssuesHome({
   const [issueToDelete, setIssueToDelete] = useState<Issue | null>(null);
   const [issueToEdit, setIssueToEdit] = useState<Issue | null>(null);
   const [issueWithComments, setIssueWithComments] = useState<Issue | null>(null);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(() => searchParams.get("search") ?? "");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [priority, setPriority] = useState<PriorityFilter>("all");
   const [assigneeId, setAssigneeId] = useState("all");
@@ -72,6 +74,20 @@ export function IssuesHome({
   useLayoutEffect(() => {
     setIssues(initialIssues);
   }, [initialIssues]);
+
+  useEffect(() => {
+    setQuery(searchParams.get("search") ?? "");
+  }, [searchParams]);
+
+  function handleQueryChange(value: string) {
+    setQuery(value);
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (value.trim()) next.set("search", value);
+      else next.delete("search");
+      return next;
+    }, { replace: true });
+  }
 
   const assignees = useMemo(
     () =>
@@ -182,14 +198,14 @@ export function IssuesHome({
   }
 
   function clearFilters() {
-    setQuery("");
+    handleQueryChange("");
     setStatus("all");
     setPriority("all");
     setAssigneeId("all");
   }
 
   return (
-    <div className="min-w-0 space-y-5">
+    <div className="min-w-0 space-y-6">
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-action)]">
@@ -205,7 +221,7 @@ export function IssuesHome({
         </div>
         {workspaceId ? (
           <Button
-            className="h-10 w-full rounded-lg bg-[var(--marketing-action)] px-4 font-bold text-white shadow-[0_12px_24px_-14px_var(--marketing-accent-shadow)] hover:bg-[var(--marketing-action-strong)] sm:w-auto"
+            className="h-11 w-full rounded-xl bg-[var(--marketing-action)] px-5 font-bold text-white shadow-[0_12px_24px_-14px_var(--marketing-accent-shadow)] hover:bg-[var(--marketing-action-strong)] sm:w-auto"
             onClick={() => setCreateIssueOpen(true)}
             type="button"
           >
@@ -240,7 +256,7 @@ export function IssuesHome({
             onAssigneeChange={setAssigneeId}
             onClearFilters={clearFilters}
             onPriorityChange={setPriority}
-            onQueryChange={setQuery}
+            onQueryChange={handleQueryChange}
             onStatusChange={setStatus}
             priority={priority}
             query={query}
@@ -251,10 +267,11 @@ export function IssuesHome({
 
           <div className="flex items-center gap-2 px-1 text-xs font-medium text-muted-foreground">
             <ArrowsLeftRightIcon aria-hidden="true" size={15} />
-            <p>
+            <p className="hidden sm:block">
               Drag issues between columns, or focus a card and use the left and
               right arrow keys.
             </p>
+            <p className="sm:hidden">Swipe between columns. Use a card menu to change its status.</p>
           </div>
 
           <KanbanBoard

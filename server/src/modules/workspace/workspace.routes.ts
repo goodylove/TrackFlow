@@ -1,3 +1,4 @@
+import { validateRouteIds } from "../../middleware/object-id.middleware.js";
 import Router from "express";
 import {
   addWorkspaceMemberController,
@@ -23,6 +24,7 @@ workspaceRouter.get("/", authenticate, getWorkspacesByUserIdController);
 workspaceRouter.get(
   "/:workspaceId",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   getWorkspaceByIdController,
 );
@@ -30,6 +32,7 @@ workspaceRouter.get(
 workspaceRouter.get(
   "/:workspaceId/members",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   getWorkspaceMembersController,
 );
@@ -37,6 +40,7 @@ workspaceRouter.get(
 workspaceRouter.delete(
   "/:workspaceId",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   authorizeWorkspaceRoles("owner"),
   deleteWorkspaceController,
@@ -45,6 +49,7 @@ workspaceRouter.delete(
 workspaceRouter.post(
   "/:workspaceId/members",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   authorizeWorkspaceRoles("owner", "admin"),
   addWorkspaceMemberController,
@@ -54,6 +59,7 @@ workspaceRouter.post(
 workspaceRouter.patch(
   "/:workspaceId/members/:memberId/role",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   authorizeWorkspaceRoles("owner"),
   changeWorkspaceMembershipRoleController,
@@ -62,6 +68,7 @@ workspaceRouter.patch(
 workspaceRouter.delete(
   "/:workspaceId/members/:memberId",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   authorizeWorkspaceRoles("owner", "admin"),
   removeWorkspaceMemberController,

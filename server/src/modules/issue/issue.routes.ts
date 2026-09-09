@@ -1,3 +1,4 @@
+import { validateRouteIds, validateAssigneeId } from "../../middleware/object-id.middleware.js";
 import { Router } from "express";
 import { authenticate } from "../../middleware/auth.middleware.js";
 import { verifyWorkspaceMembership } from "../../middleware/workspace-membership.middleware.js";
@@ -17,6 +18,8 @@ const issueRouter = Router();
 issueRouter.get(
   "/:workspaceId/issues",
   authenticate,
+  validateRouteIds,
+  validateAssigneeId("query"),
   verifyWorkspaceMembership,
   getIssuesByWorkspaceIdController,
 );
@@ -24,6 +27,7 @@ issueRouter.get(
 issueRouter.get(
   "/:workspaceId/issues/:issueId",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   getIssueByIdController,
 );
@@ -31,6 +35,8 @@ issueRouter.get(
 issueRouter.post(
   "/:workspaceId/issues",
   authenticate,
+  validateRouteIds,
+  validateAssigneeId("body"),
   verifyWorkspaceMembership,
   createIssueController,
 );
@@ -38,14 +44,16 @@ issueRouter.post(
 issueRouter.patch(
   "/:workspaceId/issues/:issueId/assignee",
   authenticate,
+  validateRouteIds,
+  validateAssigneeId("body"),
   verifyWorkspaceMembership,
-
   setIssueAssigneeController,
 );
 
 issueRouter.patch(
   "/:workspaceId/issues/:issueId",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   updateIssueDetailsController,
 );
@@ -53,6 +61,7 @@ issueRouter.patch(
 issueRouter.delete(
   "/:workspaceId/issues/:issueId",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   authorizeWorkspaceRoles("owner", "admin"),
   deleteIssueController,

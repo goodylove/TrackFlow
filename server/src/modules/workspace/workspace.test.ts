@@ -213,7 +213,7 @@ describe("Create workspace flow", () => {
     expect(invalidIdResponse.status).toBe(400);
     expect(invalidIdResponse.body).toMatchObject({
       success: false,
-      message: "A valid workspace member ID is required",
+      message: "Invalid member ID",
     });
   });
 
@@ -309,7 +309,7 @@ describe("Create workspace flow", () => {
     expect(invalidIdResponse.status).toBe(400);
     expect(invalidIdResponse.body).toMatchObject({
       success: false,
-      message: "A valid workspace member ID is required",
+      message: "Invalid member ID",
     });
   });
 });

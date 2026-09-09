@@ -43,10 +43,9 @@ function Modal({
             className,
           )}
         >
-          <header className="relative flex min-h-24 items-center gap-3 overflow-hidden border-b border-[var(--marketing-border)] px-5 py-5 sm:px-6">
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(79,70,229,0.1),transparent_55%),repeating-linear-gradient(90deg,transparent_0,transparent_27px,rgba(79,70,229,0.045)_28px)]" />
+          <header className="relative flex min-h-24 items-center gap-3 border-b border-[var(--marketing-border)] bg-[var(--marketing-bg)]/55 px-5 py-5 sm:px-6">
             {icon ? (
-              <span className="relative flex size-11 shrink-0 items-center justify-center rounded-xl border border-[var(--marketing-action)]/15 bg-white text-[var(--marketing-action)] shadow-sm">
+              <span className="relative flex size-11 shrink-0 items-center justify-center rounded-xl border border-[var(--marketing-action)]/15 bg-[var(--marketing-action-soft)] text-[var(--marketing-action)]">
                 {icon}
               </span>
             ) : null}
@@ -63,7 +62,7 @@ function Modal({
               disabled={preventClose}
               render={
                 <Button
-                  className="relative size-8 rounded-lg border border-border bg-white text-muted-foreground shadow-sm"
+                  className="relative size-10 rounded-xl border border-border bg-white text-muted-foreground shadow-sm"
                   size="icon"
                   type="button"
                   variant="ghost"

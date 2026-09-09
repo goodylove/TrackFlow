@@ -30,7 +30,7 @@ export class WorkspaceRolePermissionError extends Error {
 
 export class InvalidWorkspaceMemberIdError extends Error {
   constructor() {
-    super("A valid workspace member ID is required");
+    super("Invalid member ID");
     this.name = "InvalidWorkspaceMemberIdError";
   }
 }

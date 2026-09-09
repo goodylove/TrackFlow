@@ -125,7 +125,7 @@ export function IssueCard({
       aria-grabbed={isDragging}
       aria-busy={isUpdating}
       className={cn(
-        "group cursor-grab rounded-xl border border-[var(--marketing-border)] bg-white p-4 shadow-[0_10px_28px_-24px_rgba(23,23,34,0.45)] outline-none transition duration-200 hover:-translate-y-0.5 hover:border-[var(--marketing-border-strong)] hover:shadow-[0_18px_34px_-24px_rgba(23,23,34,0.35)] focus-visible:ring-2 focus-visible:ring-[var(--marketing-action)]/35 active:cursor-grabbing",
+        "group cursor-grab rounded-xl border border-[var(--marketing-border)] bg-white p-4 shadow-[0_10px_28px_-24px_rgba(23,23,34,0.45)] outline-none transition duration-200 hover:-translate-y-0.5 hover:border-[var(--marketing-border-strong)] hover:shadow-[0_18px_34px_-24px_rgba(23,23,34,0.35)] focus-visible:ring-2 focus-visible:ring-[var(--marketing-action)]/35 active:cursor-grabbing motion-reduce:transform-none motion-reduce:transition-none",
         isDragging &&
         "scale-[0.98] border-[var(--marketing-action)]/35 opacity-50 shadow-none",
         isUpdating &&
@@ -236,7 +236,7 @@ export function IssueCard({
         <h3 className=" text-[0.94rem] font-bold leading-6 tracking-[-0.015em] text-[#232331]">
           {issue.title}
         </h3>
-        <p className="text-sm font-normal leading-6 text-foreground/85">
+        <p className="line-clamp-2 text-sm font-normal leading-6 text-foreground/85">
           {issue.description ?? ""}
         </p>
       </div>
@@ -267,7 +267,7 @@ export function IssueCard({
           )}
           <button
             aria-label={`View ${issue.commentCount} ${issue.commentCount === 1 ? "comment" : "comments"} for ${issue.identifier}`}
-            className="inline-flex items-center gap-1.5 rounded-md outline-none transition-colors hover:text-[var(--marketing-action)] focus-visible:ring-2 focus-visible:ring-[var(--marketing-action)]/35"
+            className="inline-flex min-h-8 items-center gap-1.5 rounded-md px-1 outline-none transition-colors hover:text-[var(--marketing-action)] focus-visible:ring-2 focus-visible:ring-[var(--marketing-action)]/35"
             disabled={isUpdating}
             draggable={false}
             onClick={() => onOpenComments(issue)}

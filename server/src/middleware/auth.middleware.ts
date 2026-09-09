@@ -5,6 +5,7 @@ import { env } from "../config/env.js";
 import { AUTH_COOKIE_NAME } from "../config/auth-cookie.js";
 import { User } from "../modules/user/user.model.js";
 import { StatusCodes } from "http-status-codes";
+import { Types } from "mongoose";
 
 export const authenticate = async (
   req: Request,
@@ -52,7 +53,7 @@ export const authenticate = async (
   // Read the user ID from the verified token.
   const userId = payload.sub;
 
-  if (!userId) {
+  if (typeof userId !== "string" || !Types.ObjectId.isValid(userId)) {
     res.status(StatusCodes.UNAUTHORIZED).json({
       success: false,
       message: "Invalid authentication token",
