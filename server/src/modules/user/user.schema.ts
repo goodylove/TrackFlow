@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+const emailSchema = z
+  .string()
+  .trim()
+  .nonempty("Email is required")
+  .max(255, "Email cannot exceed 255 characters")
+  .email("Please provide a valid email address")
+  .transform((email) => email.toLowerCase());
+
 export const registerUserSchema = z.object({
   body: z.object({
     name: z
@@ -8,12 +16,7 @@ export const registerUserSchema = z.object({
       .min(2, "Name must contain at least 2 characters")
       .max(80, "Name cannot exceed 80 characters"),
 
-    email: z
-      .string()
-      .trim()
-      .nonempty("Email is required")
-      .max(255, "Email cannot exceed 255 characters")
-      .transform((email) => email.toLowerCase()),
+    email: emailSchema,
 
     password: z
       .string()
@@ -26,12 +29,7 @@ export type RegisterUserInput = z.infer<typeof registerUserSchema>["body"];
 
 export const loginUserSchema = z.object({
   body: z.object({
-    email: z
-      .string()
-      .trim()
-      .nonempty("Email is required")
-      .max(255, "Email cannot exceed 255 characters")
-      .transform((email) => email.toLowerCase()),
+    email: emailSchema,
 
     password: z
       .string()

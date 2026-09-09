@@ -1,5 +1,5 @@
-import { lazy, Suspense } from "react"
-import { Navigate, Route, Routes } from "react-router-dom"
+import { lazy, Suspense, useEffect } from "react"
+import { Navigate, Route, Routes, useLocation } from "react-router-dom"
 
 
 import { Hero } from "@/components/marketing/hero"
@@ -8,6 +8,7 @@ import { Navbar } from "@/components/marketing/navbar"
 import { Seo } from "@/components/shared/seo"
 import { ProtectedRoute, PublicOnlyRoute } from "@/feature/auth/auth-route-guard"
 import AuthPage from "./pages/auth/auth.page"
+import "@/styles/landing.css"
 
 const DashboardPage = lazy(() => import("./pages/dashboard/dashboard.page"))
 const DashboardLayout = lazy(() => import("./pages/dashboard/dashboard-layout"))
@@ -17,15 +18,21 @@ const WorkspaceSettingsPage = lazy(() => import("./pages/settings/workspace-sett
 const WorkspacesPage = lazy(() => import("./pages/workspace/workspaces.page"))
 
 function LandingPage() {
+  const { hash, key } = useLocation()
+
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView()
+  }, [hash, key])
+
   return (
     <>
       <Seo
-        description="TrackFlow gives focused teams one place to organize issues, assign clear ownership, and keep work moving forward."
+        description="TrackFlow helps small teams organize bugs, tasks, and follow-ups. Assign owners, set priorities, and track issues from Todo to Done."
         keywords="issue tracking, project management, team collaboration, issue workflow"
-        title="Issue tracking for focused teams"
+        title="Issue tracking for small teams"
       />
-      <div className="min-h-screen px-0 py-0 text-[var(--foreground)] sm:px-6 sm:py-4">
-        <div className="mx-auto min-h-screen w-full max-w-[var(--landing-canvas-width)] overflow-hidden ">
+      <div className="landing-page min-h-screen px-0 py-0 text-[var(--foreground)] sm:px-6 sm:py-4">
+        <div className="mx-auto min-h-screen w-full max-w-[var(--landing-canvas-width)] overflow-clip">
           <Navbar />
 
           <main>

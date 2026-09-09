@@ -1,21 +1,66 @@
 import { Container } from "@/components/shared/container"
 
-import { CornerGrid } from "./corner-grid"
 import { CoordinationMockup, ProjectListMockup, VisibilityMockup } from "./feature-mockups"
-import { Reveal } from "./reveal"
 import { SectionHeading } from "./section-heading"
+import { StickyStackCard } from "./motion"
+
+const featureCopy = [
+  {
+    eyebrow: "Board",
+    title: "A board with a clear next step",
+    description: "See what is waiting, what is in progress, and what is done. Update the board as the work changes.",
+  },
+  {
+    eyebrow: "Focus",
+    title: "Find the issue that needs you",
+    description: "Search your workspace issues and review their owners and priorities before deciding what to pick up next.",
+  },
+  {
+    eyebrow: "Ownership",
+    title: "Know who is taking it forward",
+    description: "Assign work to a teammate and keep the discussion in issue comments. The next person can pick up the context without starting over.",
+  },
+]
+
+function FeatureText({ description, eyebrow, title }: (typeof featureCopy)[number]) {
+  return (
+    <div className="max-w-[28rem] text-left">
+      <p className="text-[0.7rem] font-black uppercase tracking-[0.17em] text-[var(--marketing-action)]">{eyebrow}</p>
+      <h3 className="mt-4 text-[1.8rem] font-black leading-[1.08] tracking-[-0.035em] text-[var(--marketing-foreground)] sm:text-[2.3rem]">{title}</h3>
+      <p className="mt-4 text-base leading-8 text-[var(--marketing-muted-foreground)]">{description}</p>
+    </div>
+  )
+}
 
 export function FeaturesSection() {
-  return <section className="relative overflow-hidden bg-white py-16 sm:py-20" id="features">
-    <Container>
-      <Reveal direction="right"><SectionHeading title="Optimize, organize, and resolve more" description="A calmer issue workflow with enough structure to keep every handoff visible." /></Reveal>
-      <div className="relative mt-12 grid gap-5 lg:grid-cols-2 z-10">
-        <CornerGrid className="-left-8 top-36" />
-        <Reveal direction="left"><article className="relative overflow-hidden rounded-[1rem] bg-[#f7f7fa] p-4 sm:p-7 text-center"><h3 className="text-xl font-black text-[#171722]">Effortless project coordination</h3><p className="mx-auto mt-3 max-w-[20rem] text-[0.84rem] leading-6 text-[var(--marketing-muted-foreground)]">Keep your team aligned and your issue workflow structured from first report to resolution.</p><CoordinationMockup /></article></Reveal>
-        <Reveal delay={90} direction="right"><article className="relative overflow-hidden rounded-[1rem] bg-[#f7f7fa] p-4 sm:p-7 text-center"><h3 className="text-xl font-black text-[#171722]">No more scattered issues</h3><p className="mx-auto mt-3 max-w-[20rem] text-[0.84rem] leading-6 text-[var(--marketing-muted-foreground)]">Keep every issue organized and direct your energy toward the work that matters.</p><ProjectListMockup /></article></Reveal>
-        <CornerGrid className="-right-8 bottom-12" />
-        <article className="grid gap-8 rounded-[1rem] bg-[#f7f7fa] p-4 sm:p-7 lg:col-span-2 lg:grid-cols-[0.95fr_1fr] lg:items-center"><Reveal delay={120} direction="left"><VisibilityMockup /></Reveal><Reveal delay={180} direction="right"><div><h3 className="text-xl font-black text-[#171722]">Seamless team visibility</h3><p className="mt-3 max-w-[24rem] text-[0.88rem] leading-7 text-[var(--marketing-muted-foreground)]">Stay updated on who is working on what, then keep collaboration close to the issue itself.</p></div></Reveal></article>
-      </div>
-    </Container>
-  </section>
+  return (
+    <section className="relative bg-white pb-20 pt-20 sm:pb-24 sm:pt-24 lg:pb-28 lg:pt-28" id="features">
+      <Container>
+        <SectionHeading title="See the details behind the work" description="Owners, priorities, due dates, and comments stay close to the issue, so your team has the context to act." />
+
+        <div className="mt-14 sm:mt-16 lg:mt-20">
+          <StickyStackCard index={0}>
+            <article className="grid min-h-[34rem] items-center gap-9 overflow-hidden rounded-[1.25rem] border border-[var(--marketing-border)] bg-[var(--landing-surface)] p-5 shadow-[var(--landing-preview-shadow)] sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:p-10">
+              <FeatureText {...featureCopy[0]} />
+              <CoordinationMockup />
+            </article>
+          </StickyStackCard>
+
+          <StickyStackCard index={1}>
+            <article className="grid min-h-[34rem] items-center gap-9 overflow-hidden rounded-[1.25rem] border border-[var(--marketing-border)] bg-white p-5 shadow-[var(--landing-preview-shadow)] sm:p-8 lg:grid-cols-[1.28fr_0.72fr] lg:p-10">
+              <div className="lg:order-2"><FeatureText {...featureCopy[1]} /></div>
+              <div className="lg:order-1"><ProjectListMockup /></div>
+            </article>
+          </StickyStackCard>
+
+          <StickyStackCard index={2}>
+            <article className="grid min-h-[34rem] items-center gap-9 overflow-hidden rounded-[1.25rem] border border-[var(--marketing-border)] bg-[var(--landing-ink)] p-5 text-white shadow-[var(--landing-preview-shadow)] sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:p-10">
+              <div className="[&_h3]:text-white [&_p:first-child]:text-white/70 [&_p:last-child]:text-white/72"><FeatureText {...featureCopy[2]} /></div>
+              <VisibilityMockup />
+            </article>
+          </StickyStackCard>
+        </div>
+      </Container>
+    </section>
+  )
 }

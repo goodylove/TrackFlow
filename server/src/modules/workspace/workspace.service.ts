@@ -1,3 +1,5 @@
+import { withOptionalTransaction } from "../../utils/transaction.js";
+import { Comment } from "../comment/comment.model.js";
 import { StatusCodes } from "http-status-codes";
 import { Types } from "mongoose";
 import { WorkspaceMember, type WorkspaceRole } from "./workspace-member.model.js";
@@ -137,19 +139,17 @@ export const getWorkspaceMembers = async (workspaceId: string) => {
 };
 
 export const deleteWorkspace = async (workspaceId: string) => {
-  const workspace = await Workspace.findByIdAndDelete(workspaceId);
-
-  if (!workspace) {
-    throw {
-      status: StatusCodes.NOT_FOUND,
-      message: "Workspace not found",
-    };
-  }
-
-  await WorkspaceMember.deleteMany({
-    workspace: workspaceId,
+  return withOptionalTransaction(async (session) => {
+    const workspace = await Workspace.findOne({ _id: workspaceId }).session(session);
+    if (!workspace) {
+      throw { status: StatusCodes.NOT_FOUND, message: "Workspace not found" };
+    }
+    await Comment.deleteMany({ workspace: workspaceId }).session(session);
+    await Issue.deleteMany({ workspace: workspaceId }).session(session);
+    await WorkspaceMember.deleteMany({ workspace: workspaceId }).session(session);
+    await Workspace.deleteOne({ _id: workspaceId }).session(session);
+    return workspace;
   });
-  return workspace;
 };
 
 export const addWorkspaceMember = async (

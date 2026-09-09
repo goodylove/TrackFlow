@@ -1,3 +1,4 @@
+import { withOptionalTransaction } from "../../utils/transaction.js";
 import { Types } from "mongoose";
 
 import { Comment } from "../comment/comment.model.js";
@@ -159,6 +160,9 @@ export const getIssuesByWorkspaceId = async (
 };
 
 export const getIssueById = async (workspaceId: string, issueId: string) => {
+  if (!Types.ObjectId.isValid(issueId)) {
+    throw { status: StatusCodes.BAD_REQUEST, message: "Invalid issue ID" };
+  }
   const issue = await Issue.findOne({
     _id: issueId,
     workspace: workspaceId,
@@ -189,8 +193,8 @@ export const setIssueAssignee = async (
 ) => {
   if (!Types.ObjectId.isValid(issueId)) {
     throw {
-      status: StatusCodes.FORBIDDEN,
-      message: "Invalid issue iD",
+      status: StatusCodes.BAD_REQUEST,
+      message: "Invalid issue ID",
     };
   }
 
@@ -251,8 +255,8 @@ export const updateIssueDetails = async (
 ) => {
   if (!Types.ObjectId.isValid(issueId)) {
     throw {
-      status: StatusCodes.FORBIDDEN,
-      message: "Invalid issue iD",
+      status: StatusCodes.BAD_REQUEST,
+      message: "Invalid issue ID",
     };
   }
 
@@ -299,23 +303,16 @@ export const updateIssueDetails = async (
 
 export const deleteIssue = async (workspaceId: string, issueId: string) => {
   if (!Types.ObjectId.isValid(issueId)) {
-    throw {
-      status: StatusCodes.FORBIDDEN,
-      message: "Invalid issue iD",
-    };
+    throw { status: StatusCodes.BAD_REQUEST, message: "Invalid issue ID" };
   }
-
-  const issue = await Issue.findOneAndDelete({
-    workspace: workspaceId,
-    _id: issueId,
+  return withOptionalTransaction(async (session) => {
+    const query = { workspace: workspaceId, _id: issueId };
+    const issue = await Issue.findOne(query).session(session);
+    if (!issue) {
+      throw { status: StatusCodes.NOT_FOUND, message: "Issue not found in this workspace" };
+    }
+    await Comment.deleteMany({ workspace: workspaceId, issue: issueId }).session(session);
+    await Issue.deleteOne(query).session(session);
+    return issue;
   });
-
-  if (!issue) {
-    throw {
-      status: StatusCodes.NOT_FOUND,
-      message: "Issue not found in this workspace",
-    };
-  }
-
-  return issue;
 };

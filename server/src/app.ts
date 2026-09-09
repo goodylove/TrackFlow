@@ -12,15 +12,18 @@ import issueRouter from "./modules/issue/issue.routes.js";
 import commentRoute from "./modules/comment/comment.routes.js";
 import dashboardRouter from "./modules/dashboard/dashboard.routes.js";
 import { env } from "./config/env.js";
+import mongoose from "mongoose";
+import { verifyRequestOrigin } from "./middleware/csrf.middleware.js";
 
 const app = express();
 app.use(
   cors({
-    origin: env.CLIENT_ORIGIN,
+    origin: (origin, callback) => callback(null, origin === env.CLIENT_ORIGIN),
     credentials: true,
   }),
 );
 app.use(helmet());
+app.use("/api/v1", verifyRequestOrigin);
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
@@ -33,6 +36,15 @@ app.get("/", (req, res) => {
 app.get("/api/v1/health", (req, res) => {
   res.set("Cache-Control", "no-store");
   res.status(StatusCodes.OK).json({ message: "API is healthy", status: "success" });
+});
+
+app.get("/api/v1/ready", (_req, res) => {
+  const ready = mongoose.connection.readyState === 1;
+  res.set("Cache-Control", "no-store");
+  res.status(ready ? 200 : 503).json({
+    message: ready ? "API is ready" : "API is not ready",
+    status: ready ? "success" : "error",
+  });
 });
 
 // User

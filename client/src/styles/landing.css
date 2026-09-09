@@ -1,0 +1,98 @@
+/* Shared colours come from variables.css; these tokens style landing surfaces. */
+.landing-page {
+  --background: #ffffff;
+  --landing-surface: #f5f7fb;
+  --landing-panel: #eef1f6;
+  --landing-ink: #121526;
+  --landing-placeholder: #d8dce6;
+  --landing-placeholder-soft: #e9ecf2;
+  --landing-danger: #b42318;
+  --landing-danger-soft: #fff0f0;
+  --landing-warning: #8a5b00;
+  --landing-warning-soft: #fff7dc;
+  --landing-success: #236640;
+  --landing-success-soft: #eef7f0;
+  --landing-card-shadow: 0 2px 6px rgb(17 24 39 / 4%);
+  --landing-preview-shadow: 0 8px 24px -12px rgb(17 24 39 / 24%);
+
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.landing-page section[id] {
+  scroll-margin-top: 5.5rem;
+}
+
+.landing-hero::before {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgb(216 220 230 / 32%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(216 220 230 / 32%) 1px, transparent 1px);
+  background-position: center;
+  background-size: 4rem 4rem;
+  content: "";
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 22%), transparent 72%);
+  pointer-events: none;
+}
+
+.landing-page a:focus-visible,
+.landing-page button:focus-visible {
+  outline: 2px solid var(--marketing-action);
+  outline-offset: 3px;
+}
+
+.landing-page #final-cta a:focus-visible {
+  outline-color: var(--primary-foreground);
+}
+
+.landing-page .landing-card:hover {
+  border-color: var(--marketing-border-strong);
+  box-shadow: 0 6px 16px -8px rgb(17 24 39 / 16%);
+}
+
+.landing-stack-stage + .landing-stack-stage {
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 64rem) {
+  .landing-process-grid::before {
+    position: absolute;
+    top: 3rem;
+    right: 12%;
+    left: 12%;
+    height: 1px;
+    background: var(--marketing-border-strong);
+    content: "";
+  }
+}
+
+@media (min-width: 48rem) {
+  .landing-stack-stage {
+    min-height: 88vh;
+  }
+
+  .landing-stack-stage + .landing-stack-stage {
+    margin-top: 0;
+  }
+
+  .landing-stack-stage:last-child {
+    min-height: 68vh;
+  }
+
+  .landing-stack-card {
+    position: sticky;
+    transform-origin: center top;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-stack-stage {
+    min-height: auto;
+  }
+
+  .landing-stack-card {
+    position: relative;
+    top: auto !important;
+  }
+}

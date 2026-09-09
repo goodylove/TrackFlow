@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { Types } from "mongoose";
 
 import { WorkspaceMember } from "../modules/workspace/workspace-member.model.js";
+import { Workspace } from "../modules/workspace/workspace.model.js";
 
 export const verifyWorkspaceMembership = async (
   req: Request<{ workspaceId: string }>,
@@ -23,9 +24,14 @@ export const verifyWorkspaceMembership = async (
   if (!workspaceId || !Types.ObjectId.isValid(workspaceId)) {
     res.status(StatusCodes.BAD_REQUEST).json({
       success: false,
-      message: "A valid workspace ID is required",
+      message: "Invalid workspace ID",
     });
 
+    return;
+  }
+
+  if (!(await Workspace.exists({ _id: workspaceId }))) {
+    res.status(StatusCodes.NOT_FOUND).json({ success: false, message: "Workspace not found" });
     return;
   }
 

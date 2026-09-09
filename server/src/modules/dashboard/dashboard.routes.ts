@@ -1,3 +1,4 @@
+import { validateRouteIds } from "../../middleware/object-id.middleware.js";
 
 
 import { Router } from "express";
@@ -10,6 +11,7 @@ const dashboardRouter = Router();
 dashboardRouter.get(
   "/:workspaceId/dashboard/stats",
   authenticate,
+  validateRouteIds,
   verifyWorkspaceMembership,
   getDashboardStatsController,
 );
