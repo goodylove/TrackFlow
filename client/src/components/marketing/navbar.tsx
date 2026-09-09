@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from "react"
-import { ArrowUpRight, GithubLogo, List, X } from "@phosphor-icons/react"
+import { ArrowUpRight, List, X } from "@phosphor-icons/react"
 import { Link, useLocation } from "react-router-dom"
 
 import { Container } from "@/components/shared/container"
