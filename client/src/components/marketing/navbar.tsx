@@ -1,6 +1,6 @@
-import { useId, useState } from "react"
+import { useEffect, useId, useState } from "react"
 import { ArrowUpRight, GithubLogo, List, X } from "@phosphor-icons/react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 
 import { Container } from "@/components/shared/container"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -10,6 +10,7 @@ import { BrandMark } from "../shared/brandMark"
 const navigation = [
   { href: "#benefits", label: "Workflow" },
   { href: "#features", label: "Features" },
+  { href: "#builder", label: "Builder" },
   { href: "https://github.com/goodylove/TrackFlow", label: "GitHub" },
 ]
 
@@ -18,6 +19,22 @@ const navigation = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const menuId = useId()
+  const location = useLocation()
+
+  useEffect(() => {
+    setIsOpen(false)
+  }, [location.hash, location.pathname])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsOpen(false)
+    }
+
+    window.addEventListener("keydown", closeOnEscape)
+    return () => window.removeEventListener("keydown", closeOnEscape)
+  }, [isOpen])
 
 
   return (
@@ -66,7 +83,7 @@ export function Navbar() {
             aria-controls={menuId}
             aria-expanded={isOpen}
             aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
-            className="size-9 rounded-full bg-white hover:bg-[var(--marketing-action-soft)] hover:text-[var(--marketing-action)] md:hidden lg:hidden"
+            className="size-11 rounded-full bg-white hover:bg-[var(--marketing-action-soft)] hover:text-[var(--marketing-action)] md:hidden lg:hidden"
             size="icon"
             type="button"
             variant="outline"

@@ -32,7 +32,7 @@ export function WorkspaceDangerZone({
           </p>
         </div>
         <Button
-          className="h-10 shrink-0 rounded-lg border-destructive/30 text-destructive hover:bg-destructive/5"
+          className="h-11 w-full shrink-0 rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5 sm:w-auto"
           onClick={onDelete}
           type="button"
           variant="outline"

@@ -55,7 +55,7 @@ export function StatusOverview({ issues }: { issues: DashboardIssue[] }) {
 
   return (
     <Card className="min-h-[22rem]">
-      <CardHeader>
+      <CardHeader className="flex-col sm:flex-row">
         <div>
           <CardTitle>Issues by month</CardTitle>
           <CardDescription className="mt-1">
@@ -76,7 +76,7 @@ export function StatusOverview({ issues }: { issues: DashboardIssue[] }) {
           />
         ) : (
           <ResponsiveContainer height="100%" width="100%">
-            <LineChart data={data} margin={{ left: -22, right: 4, top: 8 }}>
+            <LineChart data={data} margin={{ left: -18, right: 8, top: 8 }}>
             <CartesianGrid
               stroke="var(--border)"
               strokeDasharray="4 6"
@@ -97,7 +97,7 @@ export function StatusOverview({ issues }: { issues: DashboardIssue[] }) {
               tickLine={false}
             />
             <Tooltip
-              cursor={{ fill: "var(--muted)" }}
+              cursor={{ stroke: "var(--marketing-border-strong)", strokeDasharray: "4 4" }}
               contentStyle={{
                 border: "1px solid var(--border)",
                 borderRadius: 12,

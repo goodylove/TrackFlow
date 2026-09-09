@@ -6,6 +6,7 @@ import {
   MagnifyingGlassIcon,
   PencilSimpleIcon,
   TrashIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -75,6 +76,16 @@ export function RecentIssuesTable({
     IssuePriority | "all"
   >("all");
   const deferredSearch = useDeferredValue(search.trim().toLowerCase());
+  const hasActions = Boolean(onEditIssue || onDeleteIssue);
+  const hasActiveFilters = Boolean(
+    search || statusFilter !== "all" || priorityFilter !== "all",
+  );
+
+  function clearFilters() {
+    setSearch("");
+    setStatusFilter("all");
+    setPriorityFilter("all");
+  }
 
   const filteredIssues = issues
     .filter((issue) => {
@@ -96,14 +107,19 @@ export function RecentIssuesTable({
     <Card className="min-w-0 overflow-hidden">
       <CardHeader className="flex-col items-stretch border-b border-border/70">
         <div>
-          <CardTitle>Recent issues</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Recent issues</CardTitle>
+            <span className="rounded-full bg-[var(--marketing-action-soft)] px-2 py-0.5 text-[0.65rem] font-black text-[var(--marketing-action)]">
+              {filteredIssues.length}
+            </span>
+          </div>
           <p className="mt-1 text-xs text-muted-foreground">
             Latest updates in this workspace
           </p>
         </div>
 
         {issues.length > 0 ? (
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative w-full sm:max-w-64">
             <MagnifyingGlassIcon
               aria-hidden="true"
@@ -120,7 +136,7 @@ export function RecentIssuesTable({
             />
           </div>
 
-          <div className="flex flex-col gap-2 sm:ml-auto sm:flex-row sm:items-end">
+          <div className="grid grid-cols-2 gap-2 sm:flex lg:ml-auto">
             <div className="grid gap-1.5">
               {/* <span className="text-xs font-bold text-muted-foreground">
                 Status
@@ -200,6 +216,18 @@ export function RecentIssuesTable({
                 </SelectContent>
               </Select>
             </div>
+            {hasActiveFilters ? (
+              <Button
+                className="col-span-2 h-10 gap-1.5 text-muted-foreground sm:col-span-1"
+                onClick={clearFilters}
+                size="sm"
+                type="button"
+                variant="ghost"
+              >
+                <XIcon aria-hidden="true" size={14} />
+                Clear
+              </Button>
+            ) : null}
           </div>
           </div>
         ) : null}
@@ -214,7 +242,44 @@ export function RecentIssuesTable({
           />
         </div>
       ) : (
-        <Table className="min-w-[52rem]">
+        <>
+        <div className="divide-y divide-border/70 md:hidden">
+          {filteredIssues.length > 0 ? (
+            filteredIssues.map((issue) => (
+              <article className="p-5" key={issue._id}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-foreground">{issue.title}</p>
+                    <span className="mt-1 block text-[0.68rem] font-semibold text-muted-foreground">{issue.identifier}</span>
+                  </div>
+                  <Badge className={statusStyles[issue.status]} variant="secondary">
+                    {statusLabels[issue.status]}
+                  </Badge>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <Badge className={priorityStyles[issue.priority]} variant="outline">
+                    {priorityLabels[issue.priority]}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {issue.dueDate ? `Due ${formatDueDate(issue.dueDate)}` : "No due date"}
+                  </span>
+                  {issue.assignee ? (
+                    <span className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                      <Avatar className="size-6"><AvatarFallback>{getInitials(issue.assignee.name)}</AvatarFallback></Avatar>
+                      {issue.assignee.name}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">Unassigned</span>
+                  )}
+                </div>
+              </article>
+            ))
+          ) : (
+            <p className="px-5 py-12 text-center text-sm text-muted-foreground">No issues match your search and filters.</p>
+          )}
+        </div>
+        <div className="hidden md:block">
+        <Table className={hasActions ? "min-w-[52rem]" : "min-w-[47rem]"}>
         <TableHeader>
           <TableRow className="bg-muted/35 hover:bg-muted/35">
             <TableHead>Issue</TableHead>
@@ -223,7 +288,7 @@ export function RecentIssuesTable({
             <TableHead>Assignee</TableHead>
             <TableHead>Due date</TableHead>
             <TableHead>Updated</TableHead>
-            <TableHead className="w-14 text-right">Actions</TableHead>
+            {hasActions ? <TableHead className="w-14 text-right">Actions</TableHead> : null}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -280,7 +345,7 @@ export function RecentIssuesTable({
                 <TableCell className="text-xs text-muted-foreground">
                   {formatUpdatedTime(issue.updatedAt)}
                 </TableCell>
-                <TableCell className="text-right">
+                {hasActions ? <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger
                       render={
@@ -321,14 +386,14 @@ export function RecentIssuesTable({
                       </DropdownMenuGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </TableCell>
+                </TableCell> : null}
               </TableRow>
             ))
           ) : (
             <TableRow className="hover:bg-transparent">
               <TableCell
                 className="h-28 text-center text-sm text-muted-foreground"
-                colSpan={7}
+                colSpan={hasActions ? 7 : 6}
               >
                 No issues match your search and filters.
               </TableCell>
@@ -336,6 +401,8 @@ export function RecentIssuesTable({
           )}
         </TableBody>
         </Table>
+        </div>
+        </>
       )}
     </Card>
   );

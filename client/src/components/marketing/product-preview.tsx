@@ -115,12 +115,17 @@ export function ProductPreview() {
         </div>
       </div>
 
-      <div className="overflow-hidden bg-[var(--landing-surface)] p-3 sm:p-4">
-        <div className="grid min-w-[42rem] grid-cols-3 gap-3">
+      <div
+        aria-label="Issue board preview. Scroll horizontally to see every status column."
+        className="landing-preview-scroll overflow-x-auto bg-[var(--landing-surface)] p-3 sm:p-4"
+        role="region"
+        tabIndex={0}
+      >
+        <div className="grid w-max grid-cols-3 gap-3 sm:w-auto sm:min-w-[42rem]">
           {columns.map((column) => {
             const StatusIcon = column.icon
             return (
-              <section className="rounded-xl border border-[var(--marketing-border)] bg-[var(--landing-panel)] p-2" key={column.name}>
+              <section className="w-[13.5rem] snap-start rounded-xl border border-[var(--marketing-border)] bg-[var(--landing-panel)] p-2 sm:w-auto" key={column.name}>
                 <div className="mb-3 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className={cn("h-5 w-1 rounded-full", column.accent)} />

@@ -16,7 +16,7 @@ function DropdownMenuContent({ align = "start", side = "bottom", sideOffset = 6,
   )
 }
 function DropdownMenuLabel({ className, ...props }: MenuPrimitive.GroupLabel.Props) { return <MenuPrimitive.GroupLabel className={cn("px-2.5 py-2 text-xs font-semibold text-muted-foreground", className)} {...props} /> }
-function DropdownMenuItem({ className, ...props }: MenuPrimitive.Item.Props) { return <MenuPrimitive.Item className={cn("flex cursor-default items-center gap-2 rounded-lg px-2.5 py-2 text-sm outline-none focus:bg-muted data-disabled:opacity-50", className)} {...props} /> }
+function DropdownMenuItem({ className, ...props }: MenuPrimitive.Item.Props) { return <MenuPrimitive.Item className={cn("flex min-h-10 cursor-default items-center gap-2 rounded-lg px-2.5 py-2 text-sm outline-none focus:bg-[var(--marketing-action-soft)] data-highlighted:bg-[var(--marketing-action-soft)] data-highlighted:text-[var(--marketing-action)] data-disabled:opacity-50", className)} {...props} /> }
 function DropdownMenuSeparator({ className, ...props }: MenuPrimitive.Separator.Props) { return <MenuPrimitive.Separator className={cn("my-1 h-px bg-border", className)} {...props} /> }
 
 export { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger }

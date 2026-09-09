@@ -72,11 +72,11 @@ export default function WorkspacesPage() {
               Workspaces
             </h1>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {workspaces.length} {workspaces.length === 1 ? "workspace" : "workspaces"}
+              Switch between the {workspaces.length} {workspaces.length === 1 ? "workspace" : "workspaces"} available to your account.
             </p>
           </div>
           <Button
-            className="h-10 self-start rounded-lg bg-[var(--marketing-action)] px-4 hover:bg-[var(--marketing-action)]/90 sm:self-auto"
+            className="h-11 w-full self-start rounded-xl bg-[var(--marketing-action)] px-5 hover:bg-[var(--marketing-action-strong)] sm:w-auto sm:self-auto"
             onClick={onAddWorkspace}
             type="button"
           >
@@ -128,14 +128,15 @@ export default function WorkspacesPage() {
                         </p>
                       </div>
                     </div>
-                    {isSelected ? (
-                      <Badge className="gap-1 border-[var(--marketing-action)]/15 bg-[var(--marketing-action-soft)] text-[var(--marketing-action)]">
-                        <CheckCircleIcon aria-hidden="true" size={12} weight="fill" />
-                        Active
-                      </Badge>
-                    ) : (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {isSelected ? (
+                        <Badge className="gap-1 border-[var(--marketing-action)]/15 bg-[var(--marketing-action-soft)] text-[var(--marketing-action)]">
+                          <CheckCircleIcon aria-hidden="true" size={12} weight="fill" />
+                          Active
+                        </Badge>
+                      ) : null}
                       <Badge variant="outline">{roleLabels[workspace.role]}</Badge>
-                    )}
+                    </div>
                   </CardHeader>
 
                   <CardContent className="flex flex-1 flex-col">
@@ -175,7 +176,7 @@ export default function WorkspacesPage() {
                       {!isSelected && (
 
                         <Button
-                          className="h-10 w-full rounded-lg"
+                          className="h-11 w-full rounded-xl"
                           onClick={() => switchWorkspace(workspace._id)}
                           type="button"
                           variant="outline"

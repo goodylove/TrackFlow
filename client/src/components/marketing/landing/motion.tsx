@@ -1,5 +1,5 @@
-import { motion, useReducedMotion, useScroll, useTransform, type HTMLMotionProps } from "framer-motion"
-import { useRef, type ReactNode } from "react"
+import { motion, useAnimationControls, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type HTMLMotionProps } from "framer-motion"
+import { useEffect, useRef, type ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -13,17 +13,35 @@ type EntranceProps = {
   distance?: number
 }
 
+type HiddenState = {
+  opacity: number
+  x?: number
+  y?: number
+  filter: string
+}
+
 const transition = {
   duration: 0.78,
   ease: [0.22, 1, 0.36, 1] as const,
 }
 
-function hiddenState(direction: EntranceDirection, distance: number) {
+function hiddenState(direction: EntranceDirection, distance: number): HiddenState {
   if (direction === "left") return { opacity: 0, x: -distance * 0.45, y: distance * 0.2, filter: "blur(6px)" }
   if (direction === "right") return { opacity: 0, x: distance * 0.45, y: distance * 0.2, filter: "blur(6px)" }
   if (direction === "down") return { opacity: 0, y: -distance * 0.65, filter: "blur(6px)" }
 
   return { opacity: 0, y: distance * 0.65, filter: "blur(6px)" }
+}
+
+function directionalHiddenState(direction: EntranceDirection, distance: number, scrollDirection: 1 | -1) {
+  const state = hiddenState(direction, distance)
+  if (scrollDirection === 1) return state
+
+  return {
+    ...state,
+    x: typeof state.x === "number" ? -state.x : state.x,
+    y: typeof state.y === "number" ? -state.y : state.y,
+  }
 }
 
 function MotionEntrance({
@@ -53,15 +71,61 @@ export function LoadReveal(props: EntranceProps) {
   return <MotionEntrance {...props} animate={{ opacity: 1, x: 0, y: 0, filter: "blur(0px)" }} />
 }
 
-export function ScrollReveal(props: EntranceProps) {
+export function ScrollReveal({
+  children,
+  className,
+  delay = 0,
+  direction = "up",
+  distance = 32,
+}: EntranceProps) {
+  const ref = useRef<HTMLDivElement>(null)
+  const previousScroll = useRef(0)
+  const scrollDirection = useRef<1 | -1>(1)
+  const controls = useAnimationControls()
   const shouldReduceMotion = useReducedMotion()
+  const isInView = useInView(ref, { amount: 0.18 })
+  const { scrollY } = useScroll()
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const nextDirection = latest >= previousScroll.current ? 1 : -1
+    previousScroll.current = latest
+
+    if (nextDirection !== scrollDirection.current) {
+      scrollDirection.current = nextDirection
+      if (!isInView && !shouldReduceMotion) {
+        controls.set(directionalHiddenState(direction, distance, nextDirection))
+      }
+    }
+  })
+
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      controls.set({ opacity: 1, x: 0, y: 0, filter: "blur(0px)" })
+      return
+    }
+
+    if (isInView) {
+      void controls.start({
+        opacity: 1,
+        x: 0,
+        y: 0,
+        filter: "blur(0px)",
+        transition: { ...transition, delay: delay / 1000 },
+      })
+    } else {
+      controls.set(directionalHiddenState(direction, distance, scrollDirection.current))
+    }
+  }, [controls, delay, direction, distance, isInView, shouldReduceMotion])
 
   return (
-    <MotionEntrance
-      {...props}
-      viewport={{ once: false, amount: 0.18 }}
-      whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0, y: 0, filter: "blur(0px)" }}
-    />
+    <motion.div
+      animate={controls}
+      className={className}
+      initial={shouldReduceMotion ? false : hiddenState(direction, distance)}
+      ref={ref}
+    >
+      {children}
+    </motion.div>
   )
 }
 

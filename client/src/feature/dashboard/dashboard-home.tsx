@@ -51,7 +51,7 @@ export function DashboardHome({
     (issue) => issue.assignee?._id === currentUser._id,
   );
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-action)]">
@@ -60,6 +60,9 @@ export function DashboardHome({
           <h1 className="mt-1 text-3xl font-black tracking-[-0.04em] sm:text-4xl">
             {getGreeting()}, {currentUser.name.split(" ")[0]}
           </h1>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Here is what needs attention across this workspace.
+          </p>
         </div>
         {/* <p className="max-w-sm text-sm leading-6 text-muted-foreground">
           Here is what needs attention across your TrackFlow workspace.
@@ -120,7 +123,7 @@ export function DashboardHome({
       </section>
       <section
         aria-label="Issue activity"
-        className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,0.72fr)]"
+        className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(20rem,0.8fr)]"
       >
         <RecentIssuesTable issues={issues} />
         <AssignedIssues issues={assignedIssues} />

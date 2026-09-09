@@ -4,7 +4,7 @@ import {
   CaretDownIcon,
   PlusIcon,
 } from "@phosphor-icons/react";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import type { DashboardWorkspace } from "@/feature/dashboard/types";
@@ -24,6 +24,7 @@ export function WorkspaceSwitcher({
 }: WorkspaceSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const optionsId = useId();
+  const rootRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const selectedWorkspaceId = useWorkspaceStore(
     (state) => state.selectedWorkspaceId,
@@ -35,6 +36,25 @@ export function WorkspaceSwitcher({
   const otherWorkspaces = workspaces.filter(
     (workspace) => workspace._id !== selected?._id,
   );
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) setIsOpen(false);
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsOpen(false);
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
 
   function handleWorkspaceSelection(workspaceId: string) {
     selectWorkspace(workspaceId);
@@ -83,8 +103,21 @@ export function WorkspaceSwitcher({
     );
   }
 
+  if (collapsed) {
+    return (
+      <button
+        aria-label={`Manage workspaces. Current workspace: ${selected.name}`}
+        className="flex size-11 items-center justify-center rounded-xl border border-border bg-muted/55 text-[var(--marketing-action)] transition-colors hover:bg-[var(--marketing-action-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--marketing-action)]/25"
+        onClick={handleAddWorkspace}
+        type="button"
+      >
+        <BuildingsIcon aria-hidden="true" size={18} weight="fill" />
+      </button>
+    );
+  }
+
   return (
-    <div className="w-full">
+    <div className="w-full" ref={rootRef}>
       <div
         className={cn(
           "flex w-full items-center rounded-xl border border-border bg-muted/55 p-2.5 text-left transition-colors hover:bg-muted",
@@ -128,7 +161,7 @@ export function WorkspaceSwitcher({
 
       {!collapsed && isOpen ? (
         <div
-          className="animate-in fade-in slide-in-from-top-1 duration-200"
+          className="animate-in fade-in slide-in-from-top-1 duration-200 motion-reduce:animate-none"
           id={optionsId}
         >
           <div className="mt-2 space-y-1 border-l border-[var(--marketing-border)] pl-3">

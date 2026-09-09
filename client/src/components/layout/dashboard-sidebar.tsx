@@ -66,25 +66,27 @@ export function DashboardSidebar({
   return (
     <aside
       className={cn(
-        "flex h-full shrink-0 flex-col border-r border-[var(--marketing-border)] bg-white transition-[width] duration-300 ease-out",
-        mobile ? "w-full border-r-0" : collapsed ? "w-[5.25rem]" : "w-[17rem]",
+        "flex h-full shrink-0 flex-col border-r border-[var(--marketing-border)] bg-white transition-[width] duration-300 ease-out motion-reduce:transition-none",
+        mobile ? "w-full border-r-0" : collapsed ? "w-[4.75rem]" : "w-[16.5rem]",
       )}
     >
       <div
         className={cn(
-          "flex h-20 items-center border-b border-[var(--marketing-border)]",
+          "flex h-[4.5rem] items-center border-b border-[var(--marketing-border)]",
           collapsed ? "justify-center px-3" : "justify-between px-5",
         )}
       >
-        <div
-
+        <Link
+          aria-label={collapsed ? "TrackFlow dashboard" : undefined}
           className="flex items-center gap-2 text-[0.98rem] font-bold tracking-tight text-[var(--marketing-action)]"
+          onClick={onNavigate}
+          to="/dashboard"
         >
           <span className="flex size-8 items-center justify-center rounded-[0.6rem] bg-[var(--marketing-action)]/95 text-white">
             <BrandMark />
           </span>
           {!collapsed ? <span>TrackFlow</span> : null}
-        </div>
+        </Link>
 
 
 
@@ -110,6 +112,11 @@ export function DashboardSidebar({
         aria-label="Dashboard navigation"
         className={cn("flex-1 space-y-1", collapsed ? "px-3" : "px-4")}
       >
+        {!collapsed ? (
+          <p className="mb-2 px-3 text-[0.65rem] font-black uppercase tracking-[0.16em] text-muted-foreground">
+            Workspace
+          </p>
+        ) : null}
         {navItems.map(({ label, icon: NavIcon, to }) => {
           const isActive = to
             ? to === "/dashboard"
@@ -117,10 +124,10 @@ export function DashboardSidebar({
               : location.pathname.startsWith(to)
             : false;
           const className = cn(
-            "flex h-11 w-full items-center rounded-lg text-sm font-bold transition-colors",
+            "relative flex h-11 w-full items-center rounded-xl text-sm font-bold transition-colors",
             collapsed ? "justify-center" : "gap-3 px-3",
             isActive
-              ? "bg-[var(--marketing-action)]/95 text-white shadow-[0_12px_24px_-16px_var(--marketing-accent-shadow)]"
+              ? "bg-[var(--marketing-action-soft)] text-[var(--marketing-action)]"
               : "text-[var(--marketing-muted-foreground)] hover:bg-[var(--marketing-action-soft)] hover:text-[var(--marketing-action)]",
           );
           const content = (

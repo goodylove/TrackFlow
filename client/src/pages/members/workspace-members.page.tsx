@@ -43,7 +43,7 @@ export default function WorkspaceMembersPage() {
         noIndex
         title="Workspace members"
       />
-      <div className="space-y-5">
+      <div className="space-y-6">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--marketing-action)]">
@@ -58,7 +58,7 @@ export default function WorkspaceMembersPage() {
           </div>
           {selectedWorkspace && selectedWorkspace.role !== "member" ? (
             <Button
-              className="h-10 shrink-0 rounded-lg bg-[var(--marketing-action)] px-4 hover:bg-[var(--marketing-action)]/90"
+              className="h-11 w-full shrink-0 rounded-xl bg-[var(--marketing-action)] px-5 hover:bg-[var(--marketing-action-strong)] sm:w-auto"
               onClick={() => setAddMemberOpen(true)}
               type="button"
             >

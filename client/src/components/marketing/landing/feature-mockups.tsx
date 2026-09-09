@@ -7,7 +7,7 @@ export function CoordinationMockup() {
   return <div className="relative mt-8 overflow-hidden rounded-[0.95rem] bg-white p-4 text-left border border-[var(--marketing-preview-border)] shadow-[var(--landing-card-shadow)]">
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-2"><span className="flex size-8 items-center justify-center rounded-[0.6rem] bg-[var(--landing-ink)] text-white"><Kanban className="size-4" weight="fill" /></span><div><p className="text-[0.78rem] font-black text-[var(--marketing-foreground)]">TrackFlow Development</p><p className="text-[0.68rem] font-bold text-[var(--marketing-muted-foreground)]">Sprint workspace</p></div></div>
-      <button className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] bg-[var(--marketing-action)] px-3 py-2 text-[0.68rem] font-black text-white" type="button"><Plus className="size-3.5" />New issue</button>
+      <span aria-hidden="true" className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] bg-[var(--marketing-action)] px-3 py-2 text-[0.68rem] font-black text-white"><Plus className="size-3.5" />New issue</span>
     </div>
     <div className="grid gap-3 rounded-[0.8rem] border border-[var(--marketing-border)] bg-[var(--landing-surface)] p-3 sm:grid-cols-[6rem_1fr]">
       <div className="rounded-[0.7rem] bg-[var(--landing-ink)] p-2 text-white ">{workspaces.slice(0, 4).map((workspace, index) => <div key={workspace} className={cn("rounded-[0.55rem] px-2 py-2 text-[0.62rem] font-bold", index === 0 ? "bg-[var(--marketing-action)]" : "text-white/80")}>{workspace.split(" ")[0]}</div>)}</div>

@@ -51,6 +51,24 @@
   box-shadow: 0 6px 16px -8px rgb(17 24 39 / 16%);
 }
 
+.landing-preview-scroll {
+  overscroll-behavior-inline: contain;
+  scrollbar-color: var(--marketing-border-strong) transparent;
+  scrollbar-width: thin;
+  scroll-snap-type: inline proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.landing-preview-scroll > div > * {
+  min-width: 13.5rem;
+  scroll-snap-align: start;
+}
+
+.landing-preview-scroll:focus-visible {
+  outline: 2px solid var(--marketing-action);
+  outline-offset: -2px;
+}
+
 .landing-stack-stage + .landing-stack-stage {
   margin-top: 1.5rem;
 }
@@ -87,6 +105,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .landing-page *,
+  .landing-page *::before,
+  .landing-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
   .landing-stack-stage {
     min-height: auto;
   }
