@@ -163,7 +163,7 @@ export function RecentIssuesTable({
                       <span
                         aria-hidden="true"
                         className={`size-2 rounded-full ${status === "done"
-                          ? "bg-emerald-500"
+                          ? "bg-[var(--status-success)]"
                           : status === "in_progress"
                             ? "bg-blue-500"
                             : "bg-slate-400"

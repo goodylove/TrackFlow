@@ -15,7 +15,7 @@ export const priorityLabels: Record<IssuePriority, string> = {
 export const statusStyles: Record<IssueStatus, string> = {
   todo: "border-slate-200 bg-slate-100 text-slate-700",
   in_progress: "border-blue-200 bg-blue-50 text-blue-700",
-  done: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  done: "border-[var(--status-success-border)] bg-[var(--status-success-soft)] text-[var(--status-success)]",
 };
 
 export const priorityStyles: Record<IssuePriority, string> = {

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react"
-import { Navigate, Route, Routes, useLocation } from "react-router-dom"
+import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom"
 
 
 import { Hero } from "@/components/marketing/hero"
@@ -21,7 +21,11 @@ function LandingPage() {
   const { hash, key } = useLocation()
 
   useEffect(() => {
-    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView()
+    if (!hash) return
+
+    const target = document.getElementById(hash.slice(1))
+    target?.scrollIntoView()
+    if (target?.tabIndex === -1) target.focus({ preventScroll: true })
   }, [hash, key])
 
   return (
@@ -33,9 +37,15 @@ function LandingPage() {
       />
       <div className="landing-page min-h-screen px-0 py-0 text-[var(--foreground)] sm:px-6 sm:py-4">
         <div className="mx-auto min-h-screen w-full max-w-[var(--landing-canvas-width)] overflow-clip">
+          <Link
+            className="fixed left-4 top-4 z-[60] -translate-y-24 rounded-lg bg-[var(--marketing-action)] px-4 py-2.5 text-sm font-bold text-white shadow-lg transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--marketing-action)]"
+            to="#landing-content"
+          >
+            Skip to main content
+          </Link>
           <Navbar />
 
-          <main>
+          <main id="landing-content" tabIndex={-1}>
             <Hero />
             <LandingSections />
           </main>

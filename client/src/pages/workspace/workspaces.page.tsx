@@ -5,15 +5,18 @@ import {
   ClockCounterClockwiseIcon,
   ListChecksIcon,
   PlusIcon,
+  TrashIcon,
   UsersIcon,
   UsersThreeIcon,
 } from "@phosphor-icons/react";
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Seo } from "@/components/shared/seo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toaster";
 import {
   Card,
   CardContent,
@@ -22,6 +25,7 @@ import {
 } from "@/components/ui/card";
 import { DashboardEmptyState } from "@/feature/dashboard/components/dashboard-empty-state";
 import type { DashboardWorkspace } from "@/feature/dashboard/types";
+import { DeleteWorkspaceModal } from "@/feature/workspace/components/delete-workspace-modal";
 import { useDashboardOutletContext } from "@/pages/dashboard/dashboard-layout";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { cn } from "@/lib/utils";
@@ -40,8 +44,11 @@ function formatCreatedAt(createdAt: string) {
 }
 
 export default function WorkspacesPage() {
+  const [workspaceToDelete, setWorkspaceToDelete] =
+    useState<DashboardWorkspace | null>(null);
   const navigate = useNavigate();
-  const { onAddWorkspace, workspaces } = useDashboardOutletContext();
+  const { currentUser, onAddWorkspace, workspaces } =
+    useDashboardOutletContext();
   const selectedWorkspaceId = useWorkspaceStore(
     (state) => state.selectedWorkspaceId,
   );
@@ -172,9 +179,14 @@ export default function WorkspacesPage() {
                       </span>
                     </div>
 
-                    <div className="mt-auto pt-5">
-                      {!isSelected && (
-
+                    <div
+                      className={cn(
+                        "mt-auto grid gap-2 pt-5",
+                        !isSelected && workspace.role === "owner" &&
+                          "sm:grid-cols-2",
+                      )}
+                    >
+                      {!isSelected ? (
                         <Button
                           className="h-11 w-full rounded-xl"
                           onClick={() => switchWorkspace(workspace._id)}
@@ -183,7 +195,18 @@ export default function WorkspacesPage() {
                         >
                           Switch to workspace
                         </Button>
-                      )}
+                      ) : null}
+                      {workspace.role === "owner" ? (
+                        <Button
+                          className="h-11 w-full rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5"
+                          onClick={() => setWorkspaceToDelete(workspace)}
+                          type="button"
+                          variant="outline"
+                        >
+                          <TrashIcon aria-hidden="true" size={16} weight="bold" />
+                          Delete workspace
+                        </Button>
+                      ) : null}
                     </div>
                   </CardContent>
                 </Card>
@@ -191,6 +214,22 @@ export default function WorkspacesPage() {
             })}
           </section>
         )}
+        {workspaceToDelete ? (
+          <DeleteWorkspaceModal
+            onDeleted={() =>
+              toast.success("Workspace deleted", {
+                description: `${workspaceToDelete.name} was deleted successfully.`,
+              })
+            }
+            onOpenChange={(open) => {
+              if (!open) setWorkspaceToDelete(null);
+            }}
+            open
+            userId={currentUser._id}
+            workspaceId={workspaceToDelete._id}
+            workspaceName={workspaceToDelete.name}
+          />
+        ) : null}
       </div>
     </>
   );

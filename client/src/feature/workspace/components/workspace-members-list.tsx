@@ -192,7 +192,7 @@ export function WorkspaceMembersList({
                         aria-hidden="true"
                         className={cn(
                           "size-2 rounded-full",
-                          user.status === "active" ? "bg-emerald-500" : "bg-red-500",
+                          user.status === "active" ? "bg-[var(--status-success)]" : "bg-red-500",
                         )}
                       />
                       {user.status === "active" ? "Active" : "Suspended"}

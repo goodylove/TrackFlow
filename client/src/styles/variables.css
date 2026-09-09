@@ -57,6 +57,9 @@
   --accent: var(--marketing-action-soft);
   --accent-foreground: var(--marketing-action);
   --destructive: #dc4c45;
+  --status-success: #236640;
+  --status-success-soft: #eef7f0;
+  --status-success-border: #b9ddc3;
   --border: var(--marketing-border);
   --input: var(--marketing-border-strong);
   --ring: var(--marketing-action);

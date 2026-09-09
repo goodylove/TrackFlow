@@ -33,9 +33,9 @@ const columnStyles: Record<
     iconClassName: "text-[var(--marketing-action)]",
   },
   done: {
-    accent: "bg-emerald-500",
+    accent: "bg-[var(--status-success)]",
     icon: CheckCircleIcon,
-    iconClassName: "text-emerald-600",
+    iconClassName: "text-[var(--status-success)]",
   },
 };
 

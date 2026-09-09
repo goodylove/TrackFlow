@@ -13,14 +13,14 @@ type StatsCardProps = {
 
 const toneStyles: Record<StatsCardProps["tone"], string> = {
   total: "bg-[var(--marketing-action-soft)] text-[var(--marketing-action)]",
-  assigned: "bg-emerald-50 text-emerald-600",
+  assigned: "bg-[var(--status-success-soft)] text-[var(--status-success)]",
   unassigned: "bg-amber-50 text-amber-600",
   overdue: "bg-red-50 text-red-600",
 }
 
 const toneBars: Record<StatsCardProps["tone"], string> = {
   total: "bg-[var(--marketing-action)]",
-  assigned: "bg-emerald-500",
+  assigned: "bg-[var(--status-success)]",
   unassigned: "bg-amber-500",
   overdue: "bg-red-500",
 }
