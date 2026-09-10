@@ -364,8 +364,7 @@ export function RecentIssuesTable({
             )}
           </TableBody>
         </Table>
-        </div>
-        </>
+      
       )}
     </Card>
   );
