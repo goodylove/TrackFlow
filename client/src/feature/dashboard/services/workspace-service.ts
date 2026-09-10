@@ -333,7 +333,8 @@ export function useUpdateWorkspaceMemberRoleService(
 
   return useMutation({
     mutationKey: ["workspaces", workspaceId, "members", "update-role"],
-    mutationFn: updateWorkspaceMemberRole.bind(null, workspaceId),
+    mutationFn: (input: UpdateWorkspaceMemberRoleInput) =>
+      updateWorkspaceMemberRole(workspaceId, input),
     onSuccess: () =>
       queryClient.invalidateQueries({
         queryKey: workspaceQueryKeys.members(userId, workspaceId),
