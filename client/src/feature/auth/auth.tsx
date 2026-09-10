@@ -358,7 +358,7 @@ export function Auth({ mode }: AuthPageProps) {
                                                     />
                                                 </FormControl>
                                                 <FormLabel className="cursor-pointer text-xs font-normal text-[var(--marketing-muted-foreground)]">
-                                                    Remember me for 30 days
+                                                    Remember me 
                                                 </FormLabel>
                                             </FormItem>
                                         )}
