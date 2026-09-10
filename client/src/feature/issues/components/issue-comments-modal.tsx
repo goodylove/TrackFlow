@@ -59,7 +59,6 @@ function getInitials(name: string) {
 
 function formatCommentDate(value: string) {
   return new Intl.DateTimeFormat("en", {
-    // dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
 }
@@ -370,21 +369,11 @@ export function IssueCommentsModal({
             </p>
           </>
         }
-        // icon={<ChatCircleIcon aria-hidden="true" size={22} weight="fill" />}
         onOpenChange={handleOpenChange}
         open={open}
         preventClose={isCreating}
         title={issue?.title}
       >
-      {/* <div className="border-b border-[var(--marketing-border)] bg-muted/20 px-5 py-4 sm:px-6">
-        <p className="text-lg font-bold leading-6 text-foreground">
-          {issue.title}
-        </p>
-        <p className="text-sm font-normal leading-6 text-foreground/85">
-          {issue.description ?? ""}
-        </p>
-      </div> */}
-
       <div className="min-h-56 px-5 py-5 sm:px-6">
         {commentsQuery.isPending ? (
           <div

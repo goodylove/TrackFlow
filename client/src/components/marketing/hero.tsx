@@ -90,23 +90,6 @@ export function Hero() {
           </LoadReveal>
         </div>
 
-        {/* <div className="mt-14 border-t border-[var(--marketing-border)] pt-6">
-          <p className="text-center text-[0.72rem] font-bold text-[#55586a]">
-            Built around the work teams repeat every day
-          </p>
-
-          <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3 lg:grid-cols-5">
-            {featureTags.map((tag) => (
-              <div
-                key={tag}
-                className="flex items-center justify-center gap-2 text-center text-[0.82rem] font-bold text-[#9a9daa]"
-              >
-                <span className="size-2 rounded-full bg-[var(--marketing-action)]/95" />
-                {tag}
-              </div>
-            ))}
-          </div>
-        </div> */}
       </Container>
     </section>
   )
