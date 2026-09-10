@@ -14,6 +14,7 @@ import dashboardRouter from "./modules/dashboard/dashboard.routes.js";
 import { env } from "./config/env.js";
 import mongoose from "mongoose";
 import { verifyRequestOrigin } from "./middleware/csrf.middleware.js";
+import path from "path";
 
 const app = express();
 app.use(
@@ -62,6 +63,24 @@ app.use("/api/v1/workspaces", commentRoute);
 
 // Dashboard
 app.use("/api/v1/workspaces", dashboardRouter);
+
+
+
+// Serve the frontend in production
+if (process.env.NODE_ENV === "production") {
+  const clientDistPath = path.resolve(process.cwd(), "../client/dist");
+
+  app.use(express.static(clientDistPath));
+
+  app.use((req, res, next) => {
+    if (req.method !== "GET" || req.path.startsWith("/api/")) {
+      next();
+      return;
+    }
+
+    res.sendFile(path.join(clientDistPath, "index.html"));
+  });
+}
 
 // Handle unknown routes
 app.use(NotFound);
