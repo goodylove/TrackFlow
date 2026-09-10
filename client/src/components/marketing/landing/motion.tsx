@@ -17,7 +17,6 @@ type HiddenState = {
   opacity: number
   x?: number
   y?: number
-  filter: string
 }
 
 const transition = {
@@ -26,11 +25,11 @@ const transition = {
 }
 
 function hiddenState(direction: EntranceDirection, distance: number): HiddenState {
-  if (direction === "left") return { opacity: 0, x: -distance * 0.45, y: distance * 0.2, filter: "blur(6px)" }
-  if (direction === "right") return { opacity: 0, x: distance * 0.45, y: distance * 0.2, filter: "blur(6px)" }
-  if (direction === "down") return { opacity: 0, y: -distance * 0.65, filter: "blur(6px)" }
+  if (direction === "left") return { opacity: 0, x: -distance * 0.45, y: distance * 0.2 }
+  if (direction === "right") return { opacity: 0, x: distance * 0.45, y: distance * 0.2 }
+  if (direction === "down") return { opacity: 0, y: -distance * 0.65 }
 
-  return { opacity: 0, y: distance * 0.65, filter: "blur(6px)" }
+  return { opacity: 0, y: distance * 0.65 }
 }
 
 function directionalHiddenState(direction: EntranceDirection, distance: number, scrollDirection: 1 | -1) {
@@ -68,7 +67,7 @@ function MotionEntrance({
 }
 
 export function LoadReveal(props: EntranceProps) {
-  return <MotionEntrance {...props} animate={{ opacity: 1, x: 0, y: 0, filter: "blur(0px)" }} />
+  return <MotionEntrance {...props} animate={{ opacity: 1, x: 0, y: 0 }} />
 }
 
 export function ScrollReveal({
@@ -100,7 +99,7 @@ export function ScrollReveal({
 
   useEffect(() => {
     if (shouldReduceMotion) {
-      controls.set({ opacity: 1, x: 0, y: 0, filter: "blur(0px)" })
+      controls.set({ opacity: 1, x: 0, y: 0 })
       return
     }
 
@@ -109,7 +108,6 @@ export function ScrollReveal({
         opacity: 1,
         x: 0,
         y: 0,
-        filter: "blur(0px)",
         transition: { ...transition, delay: delay / 1000 },
       })
     } else {
