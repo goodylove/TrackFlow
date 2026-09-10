@@ -1,4 +1,4 @@
-// Confirms owner-only membership role changes and refreshes canonical member data.
+
 import { SpinnerGapIcon, UserSwitchIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 
