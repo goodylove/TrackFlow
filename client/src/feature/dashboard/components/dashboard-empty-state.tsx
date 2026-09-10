@@ -38,7 +38,6 @@ export function DashboardEmptyState({
         </p>
         <Button
           className="mt-7  cursor-pointer rounded-lg bg-[var(--marketing-action)] px-5 hover:bg-[var(--marketing-action)]/90"
-          // disabled={!onAddWorkspace}
           onClick={onAddWorkspace}
           type="button"
         >

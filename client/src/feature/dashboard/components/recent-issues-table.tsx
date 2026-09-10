@@ -76,7 +76,6 @@ export function RecentIssuesTable({
     IssuePriority | "all"
   >("all");
   const deferredSearch = useDeferredValue(search.trim().toLowerCase());
-  // const hasActions = Boolean(onEditIssue || onDeleteIssue);
   const hasActiveFilters = Boolean(
     search || statusFilter !== "all" || priorityFilter !== "all",
   );
@@ -138,9 +137,6 @@ export function RecentIssuesTable({
 
             <div className="flex flex-col gap-2 sm:ml-auto sm:flex-row sm:items-end">
               <div className="grid gap-1.5">
-                {/* <span className="text-xs font-bold text-muted-foreground">
-                Status
-              </span> */}
                 <Select
                   onValueChange={(value) =>
                     value && setStatusFilter(value as IssueStatus | "all")
@@ -177,9 +173,6 @@ export function RecentIssuesTable({
               </div>
 
               <div className="grid gap-1.5">
-                {/* <span className="text-xs font-bold text-muted-foreground">
-                Priority
-              </span> */}
                 <Select
                   onValueChange={(value) =>
                     value && setPriorityFilter(value as IssuePriority | "all")

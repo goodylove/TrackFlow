@@ -9,7 +9,7 @@ export function LandingSections() {
     <>
       <BenefitsSection />
       <FeaturesSection />
-      <CreatorProofSection />
+      {/* <CreatorProofSection /> */}
       <FinalCtaSection />
       <LandingFooter />
     </>

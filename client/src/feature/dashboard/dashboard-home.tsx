@@ -64,9 +64,6 @@ export function DashboardHome({
             Here is what needs attention across this workspace.
           </p>
         </div>
-        {/* <p className="max-w-sm text-sm leading-6 text-muted-foreground">
-          Here is what needs attention across your TrackFlow workspace.
-        </p> */}
       </div>
       <section
         aria-label="Issue statistics"
