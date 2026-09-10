@@ -117,11 +117,11 @@ export function ProductPreview() {
 
       <div
         aria-label="Issue board preview. Scroll horizontally to see every status column."
-        className="landing-preview-scroll overflow-x-auto bg-[var(--landing-surface)] p-3 sm:p-4"
+        className=" overflow-hidden  bg-[var(--landing-surface)] p-3 sm:p-4"
         role="region"
         tabIndex={0}
       >
-        <div className="grid w-max grid-cols-3 gap-3 sm:w-auto sm:min-w-[42rem]">
+        <div className="grid w-max grid-cols-3 gap-3 sm:w-auto sm:min-w-[40rem]">
           {columns.map((column) => {
             const StatusIcon = column.icon
             return (
