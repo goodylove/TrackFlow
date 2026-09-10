@@ -18,6 +18,7 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const isIssuesPage = location.pathname.startsWith("/dashboard/issues");
   const [query, setQuery] = useState(
     () => new URLSearchParams(location.search).get("search") ?? "",
   );
@@ -43,25 +44,29 @@ export function DashboardHeader({
       >
         <ListIcon aria-hidden="true" size={20} />
       </Button>
-      <form className="relative min-w-0 flex-1 md:max-w-xl" onSubmit={handleSearch} role="search">
-        <label className="block">
-          <span className="sr-only">Search issues</span>
-          <Input
-            className="h-11 rounded-xl border-[var(--marketing-border)] bg-[var(--marketing-bg)] pl-11 shadow-none transition-colors placeholder:text-muted-foreground focus-visible:border-[var(--marketing-action)] focus-visible:bg-white focus-visible:ring-[var(--marketing-action)]/15"
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search issues..."
-            type="search"
-            value={query}
-          />
-        </label>
-        <button
-          aria-label="Search issues"
-          className="absolute left-0 top-0 flex size-11 items-center justify-center rounded-l-xl text-muted-foreground transition-colors hover:text-[var(--marketing-action)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--marketing-action)]/25"
-          type="submit"
-        >
-          <MagnifyingGlassIcon aria-hidden="true" size={17} />
-        </button>
-      </form>
+      {!isIssuesPage ? (
+        <form className="relative min-w-0 flex-1 md:max-w-xl" onSubmit={handleSearch} role="search">
+          <label className="block">
+            <span className="sr-only">Search issues</span>
+            <Input
+              className="h-11 rounded-xl border-[var(--marketing-border)] bg-[var(--marketing-bg)] pl-11 shadow-none transition-colors placeholder:text-muted-foreground focus-visible:border-[var(--marketing-action)] focus-visible:bg-white focus-visible:ring-[var(--marketing-action)]/15"
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search issues..."
+              type="search"
+              value={query}
+            />
+          </label>
+          <button
+            aria-label="Search issues"
+            className="absolute left-0 top-0 flex size-11 items-center justify-center rounded-l-xl text-muted-foreground transition-colors hover:text-[var(--marketing-action)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--marketing-action)]/25"
+            type="submit"
+          >
+            <MagnifyingGlassIcon aria-hidden="true" size={17} />
+          </button>
+        </form>
+      ) : (
+        <div className="flex-1" />
+      )}
       <div className="ml-auto flex min-w-0 items-center">
         <UserMenu user={user} />
       </div>
