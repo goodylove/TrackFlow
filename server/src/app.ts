@@ -14,22 +14,25 @@ import dashboardRouter from "./modules/dashboard/dashboard.routes.js";
 import { env } from "./config/env.js";
 import mongoose from "mongoose";
 import { verifyRequestOrigin } from "./middleware/csrf.middleware.js";
-import path from "path";
-
+import path from "node:path";
 const app = express();
+
+app.use(helmet());
+app.use(morgan("dev"));
+
 app.use(
   cors({
     origin: (origin, callback) => callback(null, origin === env.CLIENT_ORIGIN),
     credentials: true,
   }),
 );
-app.use(helmet());
+
 app.use("/api/v1", verifyRequestOrigin);
-app.use(morgan("dev"));
+
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
+app.get("/api/v1", (req, res) => {
   res
     .status(StatusCodes.OK)
     .json({ message: "Welcome to the TrackFlow API", status: "success" });
@@ -63,8 +66,6 @@ app.use("/api/v1/workspaces", commentRoute);
 
 // Dashboard
 app.use("/api/v1/workspaces", dashboardRouter);
-
-
 
 // Serve the frontend in production
 if (process.env.NODE_ENV === "production") {
