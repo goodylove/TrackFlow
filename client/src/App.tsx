@@ -7,9 +7,9 @@ import { LandingSections } from "@/components/marketing/landing-sections"
 import { Navbar } from "@/components/marketing/navbar"
 import { Seo } from "@/components/shared/seo"
 import { ProtectedRoute, PublicOnlyRoute } from "@/feature/auth/auth-route-guard"
-import AuthPage from "./pages/auth/auth.page"
 import "@/styles/landing.css"
 
+const AuthPage = lazy(() => import("./pages/auth/auth.page"))
 const DashboardPage = lazy(() => import("./pages/dashboard/dashboard.page"))
 const DashboardLayout = lazy(() => import("./pages/dashboard/dashboard-layout"))
 const IssuesPage = lazy(() => import("./pages/issues/issues.page"))
@@ -69,7 +69,9 @@ function AuthRoute({ mode }: { mode: "login" | "signup" }) {
         noIndex
         title={isSignup ? "Create an account" : "Sign in"}
       />
-      <AuthPage key={mode} mode={mode} />
+      <Suspense fallback={<div className="grid min-h-screen place-items-center bg-background text-sm font-bold text-muted-foreground">Loading account...</div>}>
+        <AuthPage key={mode} mode={mode} />
+      </Suspense>
     </>
   )
 }
