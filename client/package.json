@@ -19,6 +19,11 @@
       "preview": "vite preview"
 
    },
+     "author": {
+    "name": "Goodness Nwachukwu",
+    "email": "goodyc474@gmail.com",
+    "url": "https://github.com/goodylove"
+  },
 
    "dependencies": {
 
