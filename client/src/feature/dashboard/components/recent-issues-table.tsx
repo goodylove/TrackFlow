@@ -76,7 +76,7 @@ export function RecentIssuesTable({
     IssuePriority | "all"
   >("all");
   const deferredSearch = useDeferredValue(search.trim().toLowerCase());
-  const hasActions = Boolean(onEditIssue || onDeleteIssue);
+  // const hasActions = Boolean(onEditIssue || onDeleteIssue);
   const hasActiveFilters = Boolean(
     search || statusFilter !== "all" || priorityFilter !== "all",
   );
@@ -364,7 +364,7 @@ export function RecentIssuesTable({
             )}
           </TableBody>
         </Table>
-      
+
       )}
     </Card>
   );
