@@ -2,7 +2,7 @@ const DEFAULT_API_URL = "http://localhost:5000/api/v1"
 const DEFAULT_API_TIMEOUT_MS = 15_000
 
 function resolveApiUrl() {
-  const value = import.meta.env.VITE_API_URL?.trim() || DEFAULT_API_URL
+  const value = import.meta.env.VITE_API_URL?.trim() ?? DEFAULT_API_URL
 
   try {
     const url = new URL(value)
