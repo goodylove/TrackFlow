@@ -16,7 +16,12 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
-  "keywords": [],
+    "author": {
+    "name": "Goodness Nwachukwu",
+    "email": "goodyc474@gmail.com",
+    "url": "https://github.com/goodylove"
+  },
+  "keywords": ["trackflow","issue management"],
   "author": "",
   "license": "ISC",
   "dependencies": {
