@@ -1,4 +1,4 @@
-// Owns shared authenticated dashboard state across nested dashboard routes.
+
 import { useEffect, useState } from "react";
 import { Outlet, useOutletContext } from "react-router-dom";
 
